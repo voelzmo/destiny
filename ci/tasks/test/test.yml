@@ -1,0 +1,10 @@
+---
+platform: linux
+
+image: docker:///cfinfrastructure/destiny
+
+inputs:
+- name: destiny
+
+run:
+  path: destiny/ci/tasks/test/test
