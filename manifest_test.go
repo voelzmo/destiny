@@ -27,6 +27,21 @@ var _ = Describe("Manifest", func() {
 			Expect(yaml).To(MatchYAML(etcdManifest))
 		})
 
+		It("returns a YAML representation of the consul manifest", func() {
+			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			manifest := destiny.NewConsul(destiny.Config{
+				DirectorUUID: "some-director-uuid",
+				Name:         "consul",
+				IAAS:         destiny.Warden,
+			})
+
+			yaml, err := manifest.ToYAML()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(yaml).To(MatchYAML(consulManifest))
+		})
+
 		It("returns a YAML representation of the turbulence manifest", func() {
 			turbulenceManifest, err := ioutil.ReadFile("fixtures/turbulence_manifest.yml")
 			Expect(err).NotTo(HaveOccurred())
