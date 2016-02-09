@@ -11,7 +11,8 @@ var _ = Describe("Job", func() {
 	Describe("SetJobInstanceCount", func() {
 		It("sets the correct values for instances and static_ips given a count", func() {
 			manifest := destiny.NewEtcd(destiny.Config{
-				IAAS: destiny.Warden,
+				IAAS:    destiny.Warden,
+				IPRange: "10.244.4.0/24",
 			})
 			job := manifest.Jobs[0]
 			network := manifest.Networks[0]

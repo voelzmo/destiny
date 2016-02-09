@@ -13,6 +13,7 @@ var _ = Describe("Consul Manifest", func() {
 			manifest := destiny.NewConsul(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
+				IPRange:      "10.244.4.0/24",
 				IAAS:         destiny.Warden,
 			})
 
@@ -131,6 +132,7 @@ var _ = Describe("Consul Manifest", func() {
 			manifest := destiny.NewConsul(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
+				IPRange:      "10.0.4.0/24",
 				IAAS:         destiny.AWS,
 				AWS: destiny.ConfigAWS{
 					Subnet: "subnet-1234",

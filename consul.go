@@ -29,11 +29,10 @@ func NewConsul(config Config) Manifest {
 		Version: "latest",
 	}
 
-	ipRange := IPRange("10.244.4.0/24")
+	ipRange := IPRange(config.IPRange)
 	cloudProperties := NetworkSubnetCloudProperties{Name: "random"}
 	if config.IAAS == AWS {
 		cloudProperties = NetworkSubnetCloudProperties{Subnet: config.AWS.Subnet}
-		ipRange = IPRange("10.0.4.0/24")
 	}
 
 	consulNetwork1 := Network{

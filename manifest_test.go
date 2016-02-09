@@ -19,6 +19,7 @@ var _ = Describe("Manifest", func() {
 			manifest := destiny.NewEtcd(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd",
+				IPRange:      "10.244.4.0/24",
 				IAAS:         destiny.Warden,
 			})
 
@@ -34,6 +35,7 @@ var _ = Describe("Manifest", func() {
 			manifest := destiny.NewConsul(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul",
+				IPRange:      "10.244.4.0/24",
 				IAAS:         destiny.Warden,
 			})
 
@@ -49,6 +51,7 @@ var _ = Describe("Manifest", func() {
 			manifest := destiny.NewTurbulence(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "turbulence",
+				IPRange:      "10.244.4.0/24",
 				IAAS:         destiny.Warden,
 				BOSH: destiny.ConfigBOSH{
 					Target:   "some-bosh-target",

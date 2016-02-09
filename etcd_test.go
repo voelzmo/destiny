@@ -13,6 +13,7 @@ var _ = Describe("Etcd Manifest", func() {
 			manifest := destiny.NewEtcd(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
+				IPRange:      "10.244.4.0/24",
 				IAAS:         destiny.Warden,
 			})
 
@@ -102,6 +103,7 @@ var _ = Describe("Etcd Manifest", func() {
 			manifest := destiny.NewEtcd(destiny.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
+				IPRange:      "10.0.16.0/24",
 				IAAS:         destiny.AWS,
 				AWS: destiny.ConfigAWS{
 					Subnet: "subnet-1234",

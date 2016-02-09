@@ -13,6 +13,7 @@ var _ = Describe("Turbulence Manifest", func() {
 			manifest := destiny.NewTurbulence(destiny.Config{
 				Name:         "turbulence",
 				DirectorUUID: "some-director-uuid",
+				IPRange:      "10.0.16.0/24",
 				IAAS:         destiny.AWS,
 				BOSH: destiny.ConfigBOSH{
 					Target:         "some-bosh-target",
@@ -178,6 +179,7 @@ var _ = Describe("Turbulence Manifest", func() {
 		It("generates a valid Turbulence BOSH-Lite manifest", func() {
 			manifest := destiny.NewTurbulence(destiny.Config{
 				DirectorUUID: "some-director-uuid",
+				IPRange:      "10.244.4.0/24",
 				BOSH: destiny.ConfigBOSH{
 					Target:   "some-bosh-target",
 					Username: "some-bosh-username",

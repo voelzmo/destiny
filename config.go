@@ -3,6 +3,7 @@ package destiny
 type Config struct {
 	DirectorUUID string
 	Name         string
+	IPRange      string
 	IAAS         int
 	AWS          ConfigAWS
 	BOSH         ConfigBOSH
