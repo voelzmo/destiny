@@ -111,6 +111,7 @@ var _ = Describe("Consul Manifest", func() {
 				Properties: destiny.Properties{
 					Consul: &destiny.PropertiesConsul{
 						Agent: destiny.PropertiesConsulAgent{
+							Domain:   "cf.internal",
 							LogLevel: "",
 							Servers: destiny.PropertiesConsulAgentServers{
 								Lan: []string{"10.244.4.4"},
@@ -249,6 +250,7 @@ var _ = Describe("Consul Manifest", func() {
 				Properties: destiny.Properties{
 					Consul: &destiny.PropertiesConsul{
 						Agent: destiny.PropertiesConsulAgent{
+							Domain:   "cf.internal",
 							LogLevel: "",
 							Servers: destiny.PropertiesConsulAgentServers{
 								Lan: []string{"10.0.4.4"},

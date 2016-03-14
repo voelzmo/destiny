@@ -138,6 +138,7 @@ func NewConsul(config Config) Manifest {
 	properties := Properties{
 		Consul: &PropertiesConsul{
 			Agent: PropertiesConsulAgent{
+				Domain: "cf.internal",
 				Servers: PropertiesConsulAgentServers{
 					Lan: consulNetwork1.StaticIPs(1),
 				},
