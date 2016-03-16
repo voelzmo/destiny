@@ -88,7 +88,7 @@ var _ = Describe("Consul Manifest", func() {
 						Instances: 1,
 						Networks: []destiny.JobNetwork{{
 							Name:      "consul1",
-							StaticIPs: []string{"10.244.4.7"},
+							StaticIPs: []string{"10.244.4.9"},
 						}},
 						PersistentDisk: 1024,
 						ResourcePool:   "consul_z1",
@@ -114,7 +114,7 @@ var _ = Describe("Consul Manifest", func() {
 								Range:           "10.244.4.0/24",
 								Reserved: []string{
 									"10.244.4.2-10.244.4.3",
-									"10.244.4.12-10.244.4.254",
+									"10.244.4.13-10.244.4.254",
 								},
 								Static: []string{
 									"10.244.4.4",
@@ -122,6 +122,7 @@ var _ = Describe("Consul Manifest", func() {
 									"10.244.4.6",
 									"10.244.4.7",
 									"10.244.4.8",
+									"10.244.4.9",
 								},
 							},
 						},
@@ -247,7 +248,7 @@ var _ = Describe("Consul Manifest", func() {
 						Instances: 1,
 						Networks: []destiny.JobNetwork{{
 							Name:      "consul1",
-							StaticIPs: []string{"10.0.4.7"},
+							StaticIPs: []string{"10.0.4.9"},
 						}},
 						PersistentDisk: 1024,
 						ResourcePool:   "consul_z1",
@@ -273,7 +274,7 @@ var _ = Describe("Consul Manifest", func() {
 								Range:           "10.0.4.0/24",
 								Reserved: []string{
 									"10.0.4.2-10.0.4.3",
-									"10.0.4.12-10.0.4.254",
+									"10.0.4.13-10.0.4.254",
 								},
 								Static: []string{
 									"10.0.4.4",
@@ -281,6 +282,7 @@ var _ = Describe("Consul Manifest", func() {
 									"10.0.4.6",
 									"10.0.4.7",
 									"10.0.4.8",
+									"10.0.4.9",
 								},
 							},
 						},
