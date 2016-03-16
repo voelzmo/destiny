@@ -13,26 +13,15 @@ func NewTurbulence(config Config) Manifest {
 		Version: "latest",
 	}
 
-	cpi := CPI{
-		JobName:     "warden_cpi",
-		ReleaseName: "bosh-warden-cpi",
-	}
-	if config.IAAS == AWS {
-		cpi = CPI{
-			JobName:     "aws_cpi",
-			ReleaseName: "bosh-aws-cpi",
-		}
-	}
+	ipRange := IPRange(config.IPRange)
+	iaasConfig := IAASConfig(config)
+
+	cloudProperties := iaasConfig.NetworkSubnet()
+	cpi := iaasConfig.CPI()
 
 	cpiRelease := Release{
 		Name:    cpi.ReleaseName,
 		Version: "latest",
-	}
-
-	ipRange := IPRange(config.IPRange)
-	cloudProperties := NetworkSubnetCloudProperties{Name: "random"}
-	if config.IAAS == AWS {
-		cloudProperties = NetworkSubnetCloudProperties{Subnet: config.AWS.Subnet}
 	}
 
 	turbulenceNetwork := Network{
@@ -54,6 +43,7 @@ func NewTurbulence(config Config) Manifest {
 		Network:             turbulenceNetwork.Name,
 		ReuseCompilationVMs: true,
 		Workers:             3,
+		CloudProperties:     iaasConfig.Compilation(),
 	}
 
 	turbulenceResourcePool := ResourcePool{
@@ -63,26 +53,7 @@ func NewTurbulence(config Config) Manifest {
 			Name:    StemcellForIAAS(config.IAAS),
 			Version: "latest",
 		},
-	}
-
-	if config.IAAS == AWS {
-		compilation.CloudProperties = CompilationCloudProperties{
-			InstanceType:     "m3.medium",
-			AvailabilityZone: "us-east-1a",
-			EphemeralDisk: &CompilationCloudPropertiesEphemeralDisk{
-				Size: 1024,
-				Type: "gp2",
-			},
-		}
-
-		turbulenceResourcePool.CloudProperties = ResourcePoolCloudProperties{
-			InstanceType:     "m3.medium",
-			AvailabilityZone: "us-east-1a",
-			EphemeralDisk: &ResourcePoolCloudPropertiesEphemeralDisk{
-				Size: 1024,
-				Type: "gp2",
-			},
-		}
+		CloudProperties: iaasConfig.ResourcePool(),
 	}
 
 	update := Update{
@@ -133,6 +104,8 @@ func NewTurbulence(config Config) Manifest {
 			PrivateKey: TurbulenceAPIPrivateKey,
 		},
 	}
+
+	//properties := properties.Merge(iaasConfig.Properties())
 
 	switch config.IAAS {
 	case Warden:

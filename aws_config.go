@@ -12,7 +12,6 @@ func NewAWSConfig(subnet string) AWSConfig {
 
 func (a AWSConfig) NetworkSubnet() NetworkSubnetCloudProperties {
 	return NetworkSubnetCloudProperties{
-		Name:   "random",
 		Subnet: a.Subnet,
 	}
 }

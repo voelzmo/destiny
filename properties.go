@@ -110,3 +110,32 @@ type PropertiesConsulAgent struct {
 type PropertiesConsulAgentServers struct {
 	Lan []string `yaml:"lan"`
 }
+
+func (p Properties) Merge(properties Properties) Properties {
+	if properties.Etcd != nil {
+		p.Etcd = properties.Etcd
+	}
+	if properties.Consul != nil {
+		p.Consul = properties.Consul
+	}
+	if properties.TurbulenceAPI != nil {
+		p.TurbulenceAPI = properties.TurbulenceAPI
+	}
+	if properties.WardenCPI != nil {
+		p.WardenCPI = properties.WardenCPI
+	}
+	if properties.AWS != nil {
+		p.AWS = properties.AWS
+	}
+	if properties.Registry != nil {
+		p.Registry = properties.Registry
+	}
+	if properties.Blobstore != nil {
+		p.Blobstore = properties.Blobstore
+	}
+	if properties.Agent != nil {
+		p.Agent = properties.Agent
+	}
+
+	return p
+}

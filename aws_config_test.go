@@ -16,13 +16,28 @@ var _ = Describe("AWS Config", func() {
 	BeforeEach(func() {
 		subnet = "some-subnet"
 		awsConfig = destiny.NewAWSConfig(subnet)
+		//destiny.Config{
+		//AWS: destiny.ConfigAWS{
+		//AccessKeyID:           "some-access-key-id",
+		//SecretAccessKey:       "some-secret-access-key",
+		//DefaultKeyName:        "some-default-key-name",
+		//DefaultSecurityGroups: []string{"some-default-security-group"},
+		//Region:                "some-region",
+		//Subnet:                "some-subnet",
+		//},
+		//Registry: destiny.ConfigRegistry{
+		//Host:     "some-host",
+		//Password: "some-password",
+		//Port:     "some-port",
+		//Username: "some-username",
+		//},
+		//})
 	})
 
 	Describe("NetworkSubnet", func() {
 		It("returns a network subnet specific to AWS", func() {
 			subnetCloudProperties := awsConfig.NetworkSubnet()
 			Expect(subnetCloudProperties).To(Equal(destiny.NetworkSubnetCloudProperties{
-				Name:   "random",
 				Subnet: subnet,
 			}))
 		})
@@ -63,6 +78,38 @@ var _ = Describe("AWS Config", func() {
 				JobName:     "aws_cpi",
 				ReleaseName: "bosh-aws-cpi",
 			}))
+		})
+	})
+
+	Describe("Properties", func() {
+		PIt("returns the properties specific to AWS", func() {
+			//properties = awsConfig.Properties()
+			//Expect(properties).To(Equal(destiny.Properties{
+			//AWS: &destiny.PropertiesAWS{
+			//AccessKeyID:           config.AWS.AccessKeyID,
+			//SecretAccessKey:       config.AWS.SecretAccessKey,
+			//DefaultKeyName:        config.AWS.DefaultKeyName,
+			//DefaultSecurityGroups: config.AWS.DefaultSecurityGroups,
+			//Region:                config.AWS.Region,
+			//},
+			//Registry: &destiny.PropertiesRegistry{
+			//Host:     config.Registry.Host,
+			//Password: config.Registry.Password,
+			//Port:     config.Registry.Port,
+			//Username: config.Registry.Username,
+			//},
+			//Blobstore: &destiny.PropertiesBlobstore{
+			//Address: turbulenceNetwork.StaticIPs(1)[0],
+			//Port:    2520,
+			//Agent: destiny.PropertiesBlobstoreAgent{
+			//User:     "agent",
+			//Password: "agent-password",
+			//},
+			//},
+			//Agent: &destiny.PropertiesAgent{
+			//Mbus: fmt.Sprintf("nats://nats:password@%s:4222", turbulenceNetwork.StaticIPs(1)[0]),
+			//},
+			//}))
 		})
 	})
 })

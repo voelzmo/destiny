@@ -30,10 +30,8 @@ func NewEtcd(config Config) Manifest {
 	}
 
 	ipRange := IPRange(config.IPRange)
-	cloudProperties := NetworkSubnetCloudProperties{Name: "random"}
-	if config.IAAS == AWS {
-		cloudProperties = NetworkSubnetCloudProperties{Subnet: config.AWS.Subnet}
-	}
+	iaasConfig := IAASConfig(config)
+	cloudProperties := iaasConfig.NetworkSubnet()
 
 	etcdNetwork1 := Network{
 		Name: "etcd1",
@@ -57,6 +55,7 @@ func NewEtcd(config Config) Manifest {
 		Network:             etcdNetwork1.Name,
 		ReuseCompilationVMs: true,
 		Workers:             3,
+		CloudProperties:     iaasConfig.Compilation(),
 	}
 
 	update := Update{
@@ -73,29 +72,10 @@ func NewEtcd(config Config) Manifest {
 	}
 
 	z1ResourcePool := ResourcePool{
-		Name:     "etcd_z1",
-		Network:  etcdNetwork1.Name,
-		Stemcell: stemcell,
-	}
-
-	if config.IAAS == AWS {
-		compilation.CloudProperties = CompilationCloudProperties{
-			InstanceType:     "m3.medium",
-			AvailabilityZone: "us-east-1a",
-			EphemeralDisk: &CompilationCloudPropertiesEphemeralDisk{
-				Size: 1024,
-				Type: "gp2",
-			},
-		}
-
-		z1ResourcePool.CloudProperties = ResourcePoolCloudProperties{
-			InstanceType:     "m3.medium",
-			AvailabilityZone: "us-east-1a",
-			EphemeralDisk: &ResourcePoolCloudPropertiesEphemeralDisk{
-				Size: 1024,
-				Type: "gp2",
-			},
-		}
+		Name:            "etcd_z1",
+		Network:         etcdNetwork1.Name,
+		Stemcell:        stemcell,
+		CloudProperties: iaasConfig.ResourcePool(),
 	}
 
 	z1Job := Job{

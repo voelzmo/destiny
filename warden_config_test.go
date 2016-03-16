@@ -20,7 +20,7 @@ var _ = Describe("Warden Config", func() {
 		It("returns a network subnet specific to Warden", func() {
 			subnetCloudProperties := wardenConfig.NetworkSubnet()
 			Expect(subnetCloudProperties).To(Equal(destiny.NetworkSubnetCloudProperties{
-				Subnet: "random",
+				Name: "random",
 			}))
 		})
 	})
@@ -45,6 +45,31 @@ var _ = Describe("Warden Config", func() {
 			Expect(cpi).To(Equal(destiny.CPI{
 				JobName:     "warden_cpi",
 				ReleaseName: "bosh-warden-cpi",
+			}))
+		})
+	})
+
+	Describe("Properties", func() {
+		It("returns the properties specific to Warden", func() {
+			properties := wardenConfig.Properties()
+			Expect(properties).To(Equal(destiny.Properties{
+				WardenCPI: &destiny.PropertiesWardenCPI{
+					Agent: destiny.PropertiesWardenCPIAgent{
+						Blobstore: destiny.PropertiesWardenCPIAgentBlobstore{
+							Options: destiny.PropertiesWardenCPIAgentBlobstoreOptions{
+								Endpoint: "http://10.254.50.4:25251",
+								Password: "agent-password",
+								User:     "agent",
+							},
+							Provider: "dav",
+						},
+						Mbus: "nats://nats:nats-password@10.254.50.4:4222",
+					},
+					Warden: destiny.PropertiesWardenCPIWarden{
+						ConnectAddress: "10.254.50.4:7777",
+						ConnectNetwork: "tcp",
+					},
+				},
 			}))
 		})
 	})

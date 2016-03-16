@@ -30,13 +30,9 @@ func NewConsul(config Config) Manifest {
 	}
 
 	ipRange := IPRange(config.IPRange)
-	//iaasConfig := IAASConfig(config)
+	iaasConfig := IAASConfig(config)
 
-	//cloudProperties := iaasConfig.NetworkSubnet()
-	cloudProperties := NetworkSubnetCloudProperties{Name: "random"}
-	if config.IAAS == AWS {
-		cloudProperties = NetworkSubnetCloudProperties{Subnet: config.AWS.Subnet}
-	}
+	cloudProperties := iaasConfig.NetworkSubnet()
 
 	consulNetwork1 := Network{
 		Name: "consul1",
@@ -60,6 +56,7 @@ func NewConsul(config Config) Manifest {
 		Network:             consulNetwork1.Name,
 		ReuseCompilationVMs: true,
 		Workers:             3,
+		CloudProperties:     iaasConfig.Compilation(),
 	}
 
 	update := Update{
@@ -76,29 +73,10 @@ func NewConsul(config Config) Manifest {
 	}
 
 	z1ResourcePool := ResourcePool{
-		Name:     "consul_z1",
-		Network:  consulNetwork1.Name,
-		Stemcell: stemcell,
-	}
-
-	if config.IAAS == AWS {
-		compilation.CloudProperties = CompilationCloudProperties{
-			InstanceType:     "m3.medium",
-			AvailabilityZone: "us-east-1a",
-			EphemeralDisk: &CompilationCloudPropertiesEphemeralDisk{
-				Size: 1024,
-				Type: "gp2",
-			},
-		}
-
-		z1ResourcePool.CloudProperties = ResourcePoolCloudProperties{
-			InstanceType:     "m3.medium",
-			AvailabilityZone: "us-east-1a",
-			EphemeralDisk: &ResourcePoolCloudPropertiesEphemeralDisk{
-				Size: 1024,
-				Type: "gp2",
-			},
-		}
+		Name:            "consul_z1",
+		Network:         consulNetwork1.Name,
+		Stemcell:        stemcell,
+		CloudProperties: iaasConfig.ResourcePool(),
 	}
 
 	z1Job := Job{
