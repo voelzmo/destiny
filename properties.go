@@ -16,6 +16,7 @@ type PropertiesEtcd struct {
 	PeerRequireSSL                  bool     `yaml:"peer_require_ssl"`
 	RequireSSL                      bool     `yaml:"require_ssl"`
 	HeartbeatIntervalInMilliseconds int      `yaml:"heartbeat_interval_in_milliseconds"`
+	AdvertiseURLsDNSSuffix          string   `yaml:"advertise_urls_dns_suffix"`
 }
 
 type PropertiesBlobstore struct {
