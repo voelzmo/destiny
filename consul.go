@@ -30,6 +30,9 @@ func NewConsul(config Config) Manifest {
 	}
 
 	ipRange := IPRange(config.IPRange)
+	//iaasConfig := IAASConfig(config)
+
+	//cloudProperties := iaasConfig.NetworkSubnet()
 	cloudProperties := NetworkSubnetCloudProperties{Name: "random"}
 	if config.IAAS == AWS {
 		cloudProperties = NetworkSubnetCloudProperties{Subnet: config.AWS.Subnet}

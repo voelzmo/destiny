@@ -68,6 +68,13 @@ type Manifest struct {
 	Update        Update         `yaml:"update"`
 }
 
+type iaasConfig interface {
+	NetworkSubnet() NetworkSubnetCloudProperties
+	Compilation() CompilationCloudProperties
+	ResourcePool() ResourcePoolCloudProperties
+	CPI() CPI
+}
+
 func (m Manifest) ToYAML() ([]byte, error) {
 	return candiedyaml.Marshal(m)
 }
@@ -78,6 +85,17 @@ func FromYAML(yaml []byte) (Manifest, error) {
 		return m, err
 	}
 	return m, nil
+}
+
+func IAASConfig(config Config) iaasConfig {
+	switch config.IAAS {
+	case AWS:
+		return NewAWSConfig(config.AWS.Subnet)
+	case Warden:
+		return NewWardenConfig()
+	default:
+		panic("failed to find a stemcell for the given IAAS")
+	}
 }
 
 func StemcellForIAAS(iaas int) string {
