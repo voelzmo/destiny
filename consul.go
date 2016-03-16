@@ -135,6 +135,27 @@ func NewConsul(config Config) Manifest {
 		},
 	}
 
+	testConsumerJob := Job{
+		Name:      "consul_test_consumer",
+		Instances: 1,
+		Networks: []JobNetwork{{
+			Name:      consulNetwork1.Name,
+			StaticIPs: []string{consulNetwork1.StaticIPs(4)[3]},
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   z1ResourcePool.Name,
+		Templates: []JobTemplate{
+			{
+				Name:    "consul_agent",
+				Release: "consul",
+			},
+			{
+				Name:    "consul-test-consumer",
+				Release: "consul",
+			},
+		},
+	}
+
 	properties := Properties{
 		Consul: &PropertiesConsul{
 			Agent: PropertiesConsulAgent{
@@ -160,7 +181,7 @@ func NewConsul(config Config) Manifest {
 		Compilation:   compilation,
 		Update:        update,
 		ResourcePools: []ResourcePool{z1ResourcePool},
-		Jobs:          []Job{z1Job},
+		Jobs:          []Job{z1Job, testConsumerJob},
 		Networks:      []Network{consulNetwork1},
 		Properties:    properties,
 	}

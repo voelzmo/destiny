@@ -54,6 +54,19 @@ jobs:
     release: consul
   update:
     max_in_flight: 1
+- instances: 1
+  name: consul_test_consumer
+  networks:
+  - name: consul1
+    static_ips:
+    - 10.244.4.7
+  persistent_disk: 1024
+  resource_pool: consul_z1
+  templates:
+  - name: consul_agent
+    release: consul
+  - name: consul-test-consumer
+    release: consul
 
 networks:
 - name: consul1

@@ -83,6 +83,26 @@ var _ = Describe("Consul Manifest", func() {
 							MaxInFlight: 1,
 						},
 					},
+					{
+						Name:      "consul_test_consumer",
+						Instances: 1,
+						Networks: []destiny.JobNetwork{{
+							Name:      "consul1",
+							StaticIPs: []string{"10.244.4.7"},
+						}},
+						PersistentDisk: 1024,
+						ResourcePool:   "consul_z1",
+						Templates: []destiny.JobTemplate{
+							{
+								Name:    "consul_agent",
+								Release: "consul",
+							},
+							{
+								Name:    "consul-test-consumer",
+								Release: "consul",
+							},
+						},
+					},
 				},
 				Networks: []destiny.Network{
 					{
@@ -220,6 +240,26 @@ var _ = Describe("Consul Manifest", func() {
 						}},
 						Update: &destiny.JobUpdate{
 							MaxInFlight: 1,
+						},
+					},
+					{
+						Name:      "consul_test_consumer",
+						Instances: 1,
+						Networks: []destiny.JobNetwork{{
+							Name:      "consul1",
+							StaticIPs: []string{"10.0.4.7"},
+						}},
+						PersistentDisk: 1024,
+						ResourcePool:   "consul_z1",
+						Templates: []destiny.JobTemplate{
+							{
+								Name:    "consul_agent",
+								Release: "consul",
+							},
+							{
+								Name:    "consul-test-consumer",
+								Release: "consul",
+							},
 						},
 					},
 				},
