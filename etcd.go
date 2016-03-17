@@ -129,6 +129,7 @@ func NewEtcd(config Config) Manifest {
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
+				AdvertiseURLsDNSSuffix:          "etcd.service.cf.internal",
 			},
 		},
 		Releases: []Release{

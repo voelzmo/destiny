@@ -151,6 +151,7 @@ var _ = Describe("Manifest", func() {
 						PeerRequireSSL:                  false,
 						RequireSSL:                      false,
 						HeartbeatIntervalInMilliseconds: 50,
+						AdvertiseURLsDNSSuffix:          "etcd.service.cf.internal",
 					},
 				},
 			}))

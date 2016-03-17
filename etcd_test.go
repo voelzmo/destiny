@@ -94,6 +94,7 @@ var _ = Describe("Etcd Manifest", func() {
 						PeerRequireSSL:                  false,
 						RequireSSL:                      false,
 						HeartbeatIntervalInMilliseconds: 50,
+						AdvertiseURLsDNSSuffix:          "etcd.service.cf.internal",
 					},
 				},
 			}))
@@ -203,6 +204,7 @@ var _ = Describe("Etcd Manifest", func() {
 						PeerRequireSSL:                  false,
 						RequireSSL:                      false,
 						HeartbeatIntervalInMilliseconds: 50,
+						AdvertiseURLsDNSSuffix:          "etcd.service.cf.internal",
 					},
 				},
 			}))

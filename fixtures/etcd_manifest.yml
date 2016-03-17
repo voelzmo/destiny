@@ -46,6 +46,7 @@ properties:
     peer_require_ssl: false
     require_ssl: false
     heartbeat_interval_in_milliseconds: 50
+    advertise_urls_dns_suffix: etcd.service.cf.internal
 
 releases:
 - name: etcd
