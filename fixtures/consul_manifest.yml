@@ -39,6 +39,7 @@ jobs:
     consul:
       agent:
         mode: server
+        log_level: info
         services:
           router:
             name: gorouter

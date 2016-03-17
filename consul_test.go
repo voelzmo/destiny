@@ -58,7 +58,8 @@ var _ = Describe("Consul Manifest", func() {
 						Properties: &destiny.JobProperties{
 							Consul: destiny.JobPropertiesConsul{
 								Agent: destiny.JobPropertiesConsulAgent{
-									Mode: "server",
+									Mode:     "server",
+									LogLevel: "info",
 									Services: destiny.JobPropertiesConsulAgentServices{
 										"router": destiny.JobPropertiesConsulAgentService{
 											Name: "gorouter",
@@ -218,7 +219,8 @@ var _ = Describe("Consul Manifest", func() {
 						Properties: &destiny.JobProperties{
 							Consul: destiny.JobPropertiesConsul{
 								Agent: destiny.JobPropertiesConsulAgent{
-									Mode: "server",
+									Mode:     "server",
+									LogLevel: "info",
 									Services: destiny.JobPropertiesConsulAgentServices{
 										"router": destiny.JobPropertiesConsulAgentService{
 											Name: "gorouter",

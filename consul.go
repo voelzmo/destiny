@@ -110,7 +110,8 @@ func NewConsul(config Config) Manifest {
 		Properties: &JobProperties{
 			Consul: JobPropertiesConsul{
 				Agent: JobPropertiesConsulAgent{
-					Mode: "server",
+					Mode:     "server",
+					LogLevel: "info",
 					Services: JobPropertiesConsulAgentServices{
 						"router": JobPropertiesConsulAgentService{
 							Name: "gorouter",
