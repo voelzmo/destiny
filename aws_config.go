@@ -1,19 +1,24 @@
 package destiny
 
+import "fmt"
+
 type AWSConfig struct {
-	Subnet string
+	config   Config
+	subnet   string
+	staticIP string
 }
 
-func NewAWSConfig(subnet string) AWSConfig {
+func NewAWSConfig(config Config, subnet string, staticIP string) AWSConfig {
 	return AWSConfig{
-		Subnet: subnet,
+		config:   config,
+		subnet:   subnet,
+		staticIP: staticIP,
 	}
 }
 
 func (a AWSConfig) NetworkSubnet() NetworkSubnetCloudProperties {
 	return NetworkSubnetCloudProperties{
-		Name:   "random",
-		Subnet: a.Subnet,
+		Subnet: a.subnet,
 	}
 }
 
@@ -43,5 +48,34 @@ func (a AWSConfig) CPI() CPI {
 	return CPI{
 		JobName:     "aws_cpi",
 		ReleaseName: "bosh-aws-cpi",
+	}
+}
+
+func (a AWSConfig) Properties() Properties {
+	return Properties{
+		AWS: &PropertiesAWS{
+			AccessKeyID:           a.config.AWS.AccessKeyID,
+			SecretAccessKey:       a.config.AWS.SecretAccessKey,
+			DefaultKeyName:        a.config.AWS.DefaultKeyName,
+			DefaultSecurityGroups: a.config.AWS.DefaultSecurityGroups,
+			Region:                a.config.AWS.Region,
+		},
+		Registry: &PropertiesRegistry{
+			Host:     a.config.Registry.Host,
+			Password: a.config.Registry.Password,
+			Port:     a.config.Registry.Port,
+			Username: a.config.Registry.Username,
+		},
+		Blobstore: &PropertiesBlobstore{
+			Address: a.staticIP,
+			Port:    2520,
+			Agent: PropertiesBlobstoreAgent{
+				User:     "agent",
+				Password: "agent-password",
+			},
+		},
+		Agent: &PropertiesAgent{
+			Mbus: fmt.Sprintf("nats://nats:password@%s:4222", a.staticIP),
+		},
 	}
 }

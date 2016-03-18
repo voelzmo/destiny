@@ -73,6 +73,7 @@ type iaasConfig interface {
 	Compilation() CompilationCloudProperties
 	ResourcePool() ResourcePoolCloudProperties
 	CPI() CPI
+	Properties() Properties
 }
 
 func (m Manifest) ToYAML() ([]byte, error) {
@@ -87,10 +88,10 @@ func FromYAML(yaml []byte) (Manifest, error) {
 	return m, nil
 }
 
-func IAASConfig(config Config) iaasConfig {
+func IAASConfig(config Config, staticIP string) iaasConfig {
 	switch config.IAAS {
 	case AWS:
-		return NewAWSConfig(config.AWS.Subnet)
+		return NewAWSConfig(config, config.AWS.Subnet, staticIP)
 	case Warden:
 		return NewWardenConfig()
 	default:
