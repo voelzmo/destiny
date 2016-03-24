@@ -153,7 +153,6 @@ func NewConsul(config Config) Manifest {
 			ServerCert:  ServerCert,
 			ServerKey:   ServerKey,
 			EncryptKeys: []string{EncryptKey},
-			RequireSSL:  true,
 		},
 	}
 

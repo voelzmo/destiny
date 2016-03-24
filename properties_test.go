@@ -19,7 +19,7 @@ var _ = Describe("Properties", func() {
 					RequireSSL: false,
 				},
 				Consul: &destiny.PropertiesConsul{
-					RequireSSL: false,
+					CACert: "some-ca-cert",
 				},
 				TurbulenceAPI: &destiny.PropertiesTurbulenceAPI{
 					Certificate: "some-certificate",
@@ -52,7 +52,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(etcdProperties)
 
-			Expect(*newProperties.Etcd).To(Equal(destiny.PropertiesEtcd{
+			Expect(newProperties.Etcd).To(Equal(&destiny.PropertiesEtcd{
 				RequireSSL: true,
 			}))
 		})
@@ -60,13 +60,13 @@ var _ = Describe("Properties", func() {
 		It("returns a merged properties with updated consul fields", func() {
 			consulProperties := destiny.Properties{
 				Consul: &destiny.PropertiesConsul{
-					RequireSSL: true,
+					CACert: "some-new-ca-cert",
 				},
 			}
 			newProperties := properties.Merge(consulProperties)
 
-			Expect(*newProperties.Consul).To(Equal(destiny.PropertiesConsul{
-				RequireSSL: true,
+			Expect(newProperties.Consul).To(Equal(&destiny.PropertiesConsul{
+				CACert: "some-new-ca-cert",
 			}))
 		})
 
@@ -78,7 +78,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(turbulenceProperties)
 
-			Expect(*newProperties.TurbulenceAPI).To(Equal(destiny.PropertiesTurbulenceAPI{
+			Expect(newProperties.TurbulenceAPI).To(Equal(&destiny.PropertiesTurbulenceAPI{
 				Certificate: "some-new-certificate",
 			}))
 		})
@@ -93,7 +93,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(wardenProperties)
 
-			Expect(*newProperties.WardenCPI).To(Equal(destiny.PropertiesWardenCPI{
+			Expect(newProperties.WardenCPI).To(Equal(&destiny.PropertiesWardenCPI{
 				Warden: destiny.PropertiesWardenCPIWarden{
 					ConnectAddress: "some-new-connect-address",
 				},
@@ -108,7 +108,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(awsProperties)
 
-			Expect(*newProperties.AWS).To(Equal(destiny.PropertiesAWS{
+			Expect(newProperties.AWS).To(Equal(&destiny.PropertiesAWS{
 				AccessKeyID: "some-new-access-key-id",
 			}))
 		})
@@ -121,7 +121,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(registryProperties)
 
-			Expect(*newProperties.Registry).To(Equal(destiny.PropertiesRegistry{
+			Expect(newProperties.Registry).To(Equal(&destiny.PropertiesRegistry{
 				Host: "some-new-host",
 			}))
 		})
@@ -134,7 +134,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(blobstoreProperties)
 
-			Expect(*newProperties.Blobstore).To(Equal(destiny.PropertiesBlobstore{
+			Expect(newProperties.Blobstore).To(Equal(&destiny.PropertiesBlobstore{
 				Address: "some-new-address",
 			}))
 		})
@@ -147,7 +147,7 @@ var _ = Describe("Properties", func() {
 			}
 			newProperties := properties.Merge(agentProperties)
 
-			Expect(*newProperties.Agent).To(Equal(destiny.PropertiesAgent{
+			Expect(newProperties.Agent).To(Equal(&destiny.PropertiesAgent{
 				Mbus: "some-new-mbus",
 			}))
 		})
