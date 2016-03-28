@@ -147,12 +147,12 @@ func NewConsul(config Config) Manifest {
 					Lan: consulNetwork1.StaticIPs(1),
 				},
 			},
-			CACert:      CACert,
-			AgentCert:   AgentCert,
-			AgentKey:    AgentKey,
-			ServerCert:  ServerCert,
-			ServerKey:   ServerKey,
-			EncryptKeys: []string{EncryptKey},
+			CACert:      ConsulCACert,
+			AgentCert:   ConsulAgentCert,
+			AgentKey:    ConsulAgentKey,
+			ServerCert:  ConsulServerCert,
+			ServerKey:   ConsulServerKey,
+			EncryptKeys: []string{ConsulEncryptKey},
 		},
 	}
 

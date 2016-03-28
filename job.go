@@ -22,7 +22,7 @@ type JobPropertiesConsul struct {
 
 type JobPropertiesConsulAgent struct {
 	Mode     string                           `yaml:"mode"`
-	LogLevel string                           `yaml:"log_level"`
+	LogLevel string                           `yaml:"log_level,omitempty"`
 	Services JobPropertiesConsulAgentServices `yaml:"services,omitempty"`
 }
 

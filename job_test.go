@@ -14,7 +14,7 @@ var _ = Describe("Job", func() {
 				IAAS:    destiny.Warden,
 				IPRange: "10.244.4.0/24",
 			})
-			job := manifest.Jobs[0]
+			job := manifest.Jobs[1]
 			network := manifest.Networks[0]
 			properties := manifest.Properties
 
