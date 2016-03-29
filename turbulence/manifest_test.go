@@ -305,6 +305,128 @@ var _ = Describe("Manifest", func() {
 		})
 	})
 
+	Describe("FromYAML", func() {
+		It("returns a Manifest matching the given YAML", func() {
+			turbulenceManifest, err := ioutil.ReadFile("fixtures/turbulence_manifest.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			manifest, err := turbulence.FromYAML(turbulenceManifest)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
+			Expect(manifest.Name).To(Equal("turbulence"))
+			Expect(manifest.Releases).To(HaveLen(2))
+			Expect(manifest.Releases).To(ContainElement(core.Release{
+				Name:    "turbulence",
+				Version: "latest",
+			}))
+
+			Expect(manifest.Releases).To(ContainElement(core.Release{
+				Name:    "bosh-warden-cpi",
+				Version: "latest",
+			}))
+
+			Expect(manifest.Compilation).To(Equal(core.Compilation{
+				Network:             "turbulence",
+				ReuseCompilationVMs: true,
+				Workers:             3,
+			}))
+
+			Expect(manifest.Update).To(Equal(core.Update{
+				Canaries:        1,
+				CanaryWatchTime: "1000-180000",
+				MaxInFlight:     1,
+				Serial:          true,
+				UpdateWatchTime: "1000-180000",
+			}))
+
+			Expect(manifest.ResourcePools).To(HaveLen(1))
+			Expect(manifest.ResourcePools).To(ContainElement(core.ResourcePool{
+				Name:    "turbulence",
+				Network: "turbulence",
+				Stemcell: core.ResourcePoolStemcell{
+					Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
+					Version: "latest",
+				},
+			}))
+
+			Expect(manifest.Jobs).To(HaveLen(1))
+			Expect(manifest.Jobs[0]).To(Equal(core.Job{
+				Name:      "api",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "turbulence",
+					StaticIPs: []string{"10.244.4.12"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "turbulence",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "turbulence_api",
+						Release: "turbulence",
+					},
+					{
+						Name:    "warden_cpi",
+						Release: "bosh-warden-cpi",
+					},
+				},
+			}))
+
+			Expect(manifest.Networks).To(HaveLen(1))
+			Expect(manifest.Networks).To(ContainElement(core.Network{
+				Name: "turbulence",
+				Subnets: []core.NetworkSubnet{
+					{
+						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
+						Gateway:         "10.244.4.1",
+						Range:           "10.244.4.0/24",
+						Reserved: []string{
+							"10.244.4.2-10.244.4.11",
+							"10.244.4.17-10.244.4.254",
+						},
+						Static: []string{
+							"10.244.4.12",
+							"10.244.4.13",
+						},
+					},
+				},
+				Type: "manual",
+			}))
+
+			Expect(manifest.Properties).To(Equal(turbulence.Properties{
+				WardenCPI: &iaas.PropertiesWardenCPI{
+					Agent: iaas.PropertiesWardenCPIAgent{
+						Blobstore: iaas.PropertiesWardenCPIAgentBlobstore{
+							Options: iaas.PropertiesWardenCPIAgentBlobstoreOptions{
+								Endpoint: "http://10.254.50.4:25251",
+								Password: "agent-password",
+								User:     "agent",
+							},
+							Provider: "dav",
+						},
+						Mbus: "nats://nats:nats-password@10.254.50.4:4222",
+					},
+					Warden: iaas.PropertiesWardenCPIWarden{
+						ConnectAddress: "10.254.50.4:7777",
+						ConnectNetwork: "tcp",
+					},
+				},
+				TurbulenceAPI: &turbulence.PropertiesTurbulenceAPI{
+					Certificate: turbulence.APICertificate,
+					CPIJobName:  "warden_cpi",
+					Director: turbulence.PropertiesTurbulenceAPIDirector{
+						CACert:   turbulence.APIDirectorCACert,
+						Host:     "some-bosh-target",
+						Password: "some-bosh-password",
+						Username: "some-bosh-username",
+					},
+					Password:   "turbulence-password",
+					PrivateKey: turbulence.APIPrivateKey,
+				},
+			}))
+		})
+	})
+
 	Describe("ToYAML", func() {
 		It("returns a YAML representation of the turbulence manifest", func() {
 			turbulenceManifest, err := ioutil.ReadFile("fixtures/turbulence_manifest.yml")

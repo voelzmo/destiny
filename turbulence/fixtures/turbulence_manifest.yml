@@ -1,10 +1,26 @@
 director_uuid: some-director-uuid
+
 name: turbulence
+
 releases:
 - name: turbulence
   version: latest
 - name: bosh-warden-cpi
   version: latest
+
+compilation:
+  cloud_properties: {}
+  network: turbulence
+  reuse_compilation_vms: true
+  workers: 3
+
+update:
+  canaries: 1
+  canary_watch_time: 1000-180000
+  max_in_flight: 1
+  serial: true
+  update_watch_time: 1000-180000
+
 resource_pools:
 - cloud_properties: {}
   name: turbulence
@@ -12,17 +28,7 @@ resource_pools:
   stemcell:
     name: bosh-warden-boshlite-ubuntu-trusty-go_agent
     version: latest
-compilation:
-  cloud_properties: {}
-  network: turbulence
-  reuse_compilation_vms: true
-  workers: 3
-update:
-  canaries: 1
-  canary_watch_time: 1000-180000
-  max_in_flight: 1
-  serial: true
-  update_watch_time: 1000-180000
+
 jobs:
 - instances: 1
   name: api
@@ -37,6 +43,7 @@ jobs:
     release: turbulence
   - name: warden_cpi
     release: bosh-warden-cpi
+
 networks:
 - name: turbulence
   subnets:
