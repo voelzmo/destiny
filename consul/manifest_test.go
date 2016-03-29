@@ -409,6 +409,145 @@ var _ = Describe("Manifest", func() {
 		})
 	})
 
+	Describe("FromYAML", func() {
+		It("returns a Manifest matching the given YAML", func() {
+			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			manifest, err := consul.FromYAML(consulManifest)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
+			Expect(manifest.Name).To(Equal("consul"))
+			Expect(manifest.Releases).To(HaveLen(1))
+			Expect(manifest.Releases).To(ContainElement(core.Release{
+				Name:    "consul",
+				Version: "latest",
+			}))
+			Expect(manifest.Compilation).To(Equal(core.Compilation{
+				Network:             "consul1",
+				ReuseCompilationVMs: true,
+				Workers:             3,
+			}))
+			Expect(manifest.Update).To(Equal(core.Update{
+				Canaries:        1,
+				CanaryWatchTime: "1000-180000",
+				MaxInFlight:     50,
+				Serial:          true,
+				UpdateWatchTime: "1000-180000",
+			}))
+			Expect(manifest.ResourcePools).To(HaveLen(1))
+			Expect(manifest.ResourcePools).To(ContainElement(core.ResourcePool{
+				Name:    "consul_z1",
+				Network: "consul1",
+				Stemcell: core.ResourcePoolStemcell{
+					Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
+					Version: "latest",
+				},
+			}))
+			Expect(manifest.Jobs).To(HaveLen(2))
+			Expect(manifest.Jobs[0]).To(Equal(core.Job{
+				Name:      "consul_z1",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "consul1",
+					StaticIPs: []string{"10.244.4.4"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "consul_z1",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+				},
+				Properties: &core.JobProperties{
+					Consul: core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Mode:     "server",
+							LogLevel: "info",
+							Services: core.JobPropertiesConsulAgentServices{
+								"router": core.JobPropertiesConsulAgentService{
+									Name: "gorouter",
+									Check: &core.JobPropertiesConsulAgentServiceCheck{
+										Name:     "router-check",
+										Script:   "/var/vcap/jobs/router/bin/script",
+										Interval: "1m",
+									},
+									Tags: []string{"routing"},
+								},
+								"cloud_controller": core.JobPropertiesConsulAgentService{},
+							},
+						},
+					},
+				},
+				Update: &core.JobUpdate{
+					MaxInFlight: 1,
+				},
+			}))
+			Expect(manifest.Jobs[1]).To(Equal(core.Job{
+				Name:      "consul_test_consumer",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "consul1",
+					StaticIPs: []string{"10.244.4.9"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "consul_z1",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+					{
+						Name:    "consul-test-consumer",
+						Release: "consul",
+					},
+				},
+			}))
+			Expect(manifest.Networks).To(HaveLen(1))
+			Expect(manifest.Networks).To(ContainElement(core.Network{
+				Name: "consul1",
+				Subnets: []core.NetworkSubnet{
+					{
+						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
+						Gateway:         "10.244.4.1",
+						Range:           "10.244.4.0/24",
+						Reserved: []string{
+							"10.244.4.2-10.244.4.3",
+							"10.244.4.13-10.244.4.254",
+						},
+						Static: []string{
+							"10.244.4.4",
+							"10.244.4.5",
+							"10.244.4.6",
+							"10.244.4.7",
+							"10.244.4.8",
+							"10.244.4.9",
+						},
+					},
+				},
+				Type: "manual",
+			}))
+			Expect(manifest.Properties).To(Equal(consul.Properties{
+				Consul: &consul.PropertiesConsul{
+					Agent: consul.PropertiesConsulAgent{
+						Domain: "cf.internal",
+						Servers: consul.PropertiesConsulAgentServers{
+							Lan: []string{"10.244.4.4"},
+						},
+					},
+					CACert:      consul.CACert,
+					AgentCert:   consul.AgentCert,
+					AgentKey:    consul.AgentKey,
+					ServerCert:  consul.ServerCert,
+					ServerKey:   consul.ServerKey,
+					EncryptKeys: []string{consul.EncryptKey},
+				},
+			}))
+		})
+	})
+
 	Describe("ToYAML", func() {
 		It("returns a YAML representation of the consul manifest", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest.yml")
