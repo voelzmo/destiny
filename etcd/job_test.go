@@ -11,7 +11,7 @@ import (
 var _ = Describe("Job", func() {
 	Describe("SetJobInstanceCount", func() {
 		It("sets the correct values for instances and static_ips given a count", func() {
-			manifest := etcd.NewEtcd(etcd.Config{
+			manifest := etcd.NewManifest(etcd.Config{
 				IPRange: "10.244.4.0/24",
 			}, iaas.NewWardenConfig())
 			job := manifest.Jobs[1]
