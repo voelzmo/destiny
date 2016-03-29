@@ -6,19 +6,6 @@ type Network struct {
 	Type    string          `yaml:"type"`
 }
 
-func (n Network) StaticIPs(count int) []string {
-	var ips []string
-	for _, subnet := range n.Subnets {
-		ips = append(ips, subnet.Static...)
-	}
-
-	if len(ips) >= count {
-		return ips[:count]
-	}
-
-	return []string{}
-}
-
 type NetworkSubnet struct {
 	CloudProperties NetworkSubnetCloudProperties `yaml:"cloud_properties"`
 	Gateway         string                       `yaml:"gateway"`
@@ -30,4 +17,17 @@ type NetworkSubnet struct {
 type NetworkSubnetCloudProperties struct {
 	Name   string `yaml:"name"`
 	Subnet string `yaml:"subnet,omitempty"`
+}
+
+func (n Network) StaticIPs(count int) []string {
+	var ips []string
+	for _, subnet := range n.Subnets {
+		ips = append(ips, subnet.Static...)
+	}
+
+	if len(ips) >= count {
+		return ips[:count]
+	}
+
+	return []string{}
 }
