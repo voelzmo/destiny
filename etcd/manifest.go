@@ -144,6 +144,10 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		},
 		Properties: Properties{
 			Etcd: &PropertiesEtcd{
+				Cluster: []PropertiesEtcdCluster{{
+					Instances: 1,
+					Name:      "etcd_z1",
+				}},
 				Machines:                        etcdNetwork1.StaticIPs(1),
 				PeerRequireSSL:                  true,
 				RequireSSL:                      true,

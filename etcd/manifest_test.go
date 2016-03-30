@@ -123,6 +123,10 @@ var _ = Describe("Manifest", func() {
 				Type: "manual",
 			}))
 			Expect(manifest.Properties.Etcd).To(Equal(&etcd.PropertiesEtcd{
+				Cluster: []etcd.PropertiesEtcdCluster{{
+					Instances: 1,
+					Name:      "etcd_z1",
+				}},
 				Machines: []string{
 					"10.244.4.4",
 				},
@@ -286,6 +290,10 @@ var _ = Describe("Manifest", func() {
 			}))
 
 			Expect(manifest.Properties.Etcd).To(Equal(&etcd.PropertiesEtcd{
+				Cluster: []etcd.PropertiesEtcdCluster{{
+					Instances: 1,
+					Name:      "etcd_z1",
+				}},
 				Machines: []string{
 					"10.0.16.4",
 				},
@@ -563,6 +571,10 @@ var _ = Describe("Manifest", func() {
 				Type: "manual",
 			}))
 			Expect(manifest.Properties.Etcd).To(Equal(&etcd.PropertiesEtcd{
+				Cluster: []etcd.PropertiesEtcdCluster{{
+					Instances: 1,
+					Name:      "etcd_z1",
+				}},
 				Machines: []string{
 					"10.244.4.4",
 				},

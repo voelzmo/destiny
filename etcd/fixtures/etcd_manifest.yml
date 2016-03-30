@@ -59,6 +59,9 @@ networks:
 
 properties:
   etcd:
+    cluster:
+    - instances: 1
+      name: etcd_z1
     machines:
     - 10.244.4.4
     peer_require_ssl: true
