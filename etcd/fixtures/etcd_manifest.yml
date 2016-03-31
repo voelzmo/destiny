@@ -37,6 +37,11 @@ jobs:
     release: etcd
   - name: consul_agent
     release: consul
+  properties:
+    consul:
+      agent:
+        services:
+          etcd: {}
 
 networks:
 - name: etcd1

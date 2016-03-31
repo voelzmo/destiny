@@ -97,6 +97,15 @@ var _ = Describe("Manifest", func() {
 						Release: "consul",
 					},
 				},
+				Properties: &core.JobProperties{
+					Consul: core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Services: core.JobPropertiesConsulAgentServices{
+								"etcd": core.JobPropertiesConsulAgentService{},
+							},
+						},
+					},
+				},
 			}))
 			Expect(manifest.Networks).To(HaveLen(1))
 			Expect(manifest.Networks).To(ContainElement(core.Network{
@@ -260,6 +269,15 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+					},
+				},
+				Properties: &core.JobProperties{
+					Consul: core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Services: core.JobPropertiesConsulAgentServices{
+								"etcd": core.JobPropertiesConsulAgentService{},
+							},
+						},
 					},
 				},
 			}))
@@ -543,6 +561,15 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+					},
+				},
+				Properties: &core.JobProperties{
+					Consul: core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Services: core.JobPropertiesConsulAgentServices{
+								"etcd": core.JobPropertiesConsulAgentService{},
+							},
+						},
 					},
 				},
 			}))

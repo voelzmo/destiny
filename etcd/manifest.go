@@ -129,6 +129,15 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				Release: "consul",
 			},
 		},
+		Properties: &core.JobProperties{
+			Consul: core.JobPropertiesConsul{
+				Agent: core.JobPropertiesConsulAgent{
+					Services: core.JobPropertiesConsulAgentServices{
+						"etcd": core.JobPropertiesConsulAgentService{},
+					},
+				},
+			},
+		},
 	}
 
 	return Manifest{
