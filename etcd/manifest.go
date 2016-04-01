@@ -46,7 +46,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			CloudProperties: cloudProperties,
 			Gateway:         ipRange.IP(1),
 			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(13, 254)},
+			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(14, 254)},
 			Static: []string{
 				ipRange.IP(4),
 				ipRange.IP(5),
@@ -54,6 +54,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				ipRange.IP(7),
 				ipRange.IP(8),
 				ipRange.IP(9),
+				ipRange.IP(10),
 			},
 		}},
 		Type: "manual",
@@ -140,6 +141,27 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		},
 	}
 
+	testconsumerZ1Job := core.Job{
+		Name:      "testconsumer_z1",
+		Instances: 1,
+		Networks: []core.JobNetwork{{
+			Name:      etcdNetwork1.Name,
+			StaticIPs: []string{etcdNetwork1.StaticIPs(7)[6]},
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   z1ResourcePool.Name,
+		Templates: []core.JobTemplate{
+			{
+				Name:    "consul_agent",
+				Release: "consul",
+			},
+			{
+				Name:    "etcd-test-consumer",
+				Release: "etcd",
+			},
+		},
+	}
+
 	return Manifest{
 		DirectorUUID: config.DirectorUUID,
 		Name:         config.Name,
@@ -147,6 +169,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Jobs: []core.Job{
 			consulZ1Job,
 			etcdZ1Job,
+			testconsumerZ1Job,
 		},
 		Networks: []core.Network{
 			etcdNetwork1,

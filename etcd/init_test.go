@@ -9,5 +9,5 @@ import (
 
 func TestEtcd(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "testing/destiny/etcd")
+	RunSpecs(t, "etcd")
 }

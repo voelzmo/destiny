@@ -23,21 +23,27 @@ var _ = Describe("Manifest", func() {
 			}, iaas.NewWardenConfig())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
+
 			Expect(manifest.Name).To(Equal("etcd-some-random-guid"))
+
 			Expect(manifest.Releases).To(HaveLen(2))
+
 			Expect(manifest.Releases).To(ContainElement(core.Release{
 				Name:    "etcd",
 				Version: "latest",
 			}))
+
 			Expect(manifest.Releases).To(ContainElement(core.Release{
 				Name:    "consul",
 				Version: "latest",
 			}))
+
 			Expect(manifest.Compilation).To(Equal(core.Compilation{
 				Network:             "etcd1",
 				ReuseCompilationVMs: true,
 				Workers:             3,
 			}))
+
 			Expect(manifest.Update).To(Equal(core.Update{
 				Canaries:        1,
 				CanaryWatchTime: "1000-180000",
@@ -45,7 +51,9 @@ var _ = Describe("Manifest", func() {
 				Serial:          true,
 				UpdateWatchTime: "1000-180000",
 			}))
+
 			Expect(manifest.ResourcePools).To(HaveLen(1))
+
 			Expect(manifest.ResourcePools).To(ContainElement(core.ResourcePool{
 				Name:    "etcd_z1",
 				Network: "etcd1",
@@ -54,7 +62,9 @@ var _ = Describe("Manifest", func() {
 					Version: "latest",
 				},
 			}))
-			Expect(manifest.Jobs).To(HaveLen(2))
+
+			Expect(manifest.Jobs).To(HaveLen(3))
+
 			Expect(manifest.Jobs[0]).To(Equal(core.Job{
 				Name:      "consul_z1",
 				Instances: 1,
@@ -78,6 +88,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
 			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "etcd_z1",
 				Instances: 1,
@@ -107,7 +118,30 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
+			Expect(manifest.Jobs[2]).To(Equal(core.Job{
+				Name:      "testconsumer_z1",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "etcd1",
+					StaticIPs: []string{"10.244.4.10"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "etcd_z1",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+					{
+						Name:    "etcd-test-consumer",
+						Release: "etcd",
+					},
+				},
+			}))
+
 			Expect(manifest.Networks).To(HaveLen(1))
+
 			Expect(manifest.Networks).To(ContainElement(core.Network{
 				Name: "etcd1",
 				Subnets: []core.NetworkSubnet{
@@ -117,7 +151,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.13-10.244.4.254",
+							"10.244.4.14-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -126,11 +160,13 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.7",
 							"10.244.4.8",
 							"10.244.4.9",
+							"10.244.4.10",
 						},
 					},
 				},
 				Type: "manual",
 			}))
+
 			Expect(manifest.Properties.Etcd).To(Equal(&etcd.PropertiesEtcd{
 				Cluster: []etcd.PropertiesEtcdCluster{{
 					Instances: 1,
@@ -152,6 +188,7 @@ var _ = Describe("Manifest", func() {
 				ServerCert:                      etcd.ServerCert,
 				ServerKey:                       etcd.ServerKey,
 			}))
+
 			Expect(manifest.Properties.Consul).To(Equal(&consul.PropertiesConsul{
 				Agent: consul.PropertiesConsulAgent{
 					Domain: "cf.internal",
@@ -230,7 +267,8 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 
-			Expect(manifest.Jobs).To(HaveLen(2))
+			Expect(manifest.Jobs).To(HaveLen(3))
+
 			Expect(manifest.Jobs[0]).To(Equal(core.Job{
 				Name:      "consul_z1",
 				Instances: 1,
@@ -252,6 +290,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
 			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "etcd_z1",
 				Instances: 1,
@@ -282,6 +321,27 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 
+			Expect(manifest.Jobs[2]).To(Equal(core.Job{
+				Name:      "testconsumer_z1",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "etcd1",
+					StaticIPs: []string{"10.0.16.10"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "etcd_z1",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+					{
+						Name:    "etcd-test-consumer",
+						Release: "etcd",
+					},
+				},
+			}))
+
 			Expect(manifest.Networks).To(HaveLen(1))
 			Expect(manifest.Networks).To(ContainElement(core.Network{
 				Name: "etcd1",
@@ -292,7 +352,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.0.16.0/24",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.13-10.0.16.254",
+							"10.0.16.14-10.0.16.254",
 						},
 						Static: []string{
 							"10.0.16.4",
@@ -301,6 +361,7 @@ var _ = Describe("Manifest", func() {
 							"10.0.16.7",
 							"10.0.16.8",
 							"10.0.16.9",
+							"10.0.16.10",
 						},
 					},
 				},
@@ -520,7 +581,9 @@ var _ = Describe("Manifest", func() {
 					Version: "latest",
 				},
 			}))
-			Expect(manifest.Jobs).To(HaveLen(2))
+
+			Expect(manifest.Jobs).To(HaveLen(3))
+
 			Expect(manifest.Jobs[0]).To(Equal(core.Job{
 				Name:      "consul_z1",
 				Instances: 1,
@@ -544,6 +607,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
 			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "etcd_z1",
 				Instances: 1,
@@ -573,6 +637,28 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
+			Expect(manifest.Jobs[2]).To(Equal(core.Job{
+				Name:      "testconsumer_z1",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "etcd1",
+					StaticIPs: []string{"10.244.4.10"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "etcd_z1",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+					{
+						Name:    "etcd-test-consumer",
+						Release: "etcd",
+					},
+				},
+			}))
+
 			Expect(manifest.Networks).To(HaveLen(1))
 			Expect(manifest.Networks).To(ContainElement(core.Network{
 				Name: "etcd1",
@@ -583,7 +669,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.13-10.244.4.254",
+							"10.244.4.14-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -592,6 +678,7 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.7",
 							"10.244.4.8",
 							"10.244.4.9",
+							"10.244.4.10",
 						},
 					},
 				},

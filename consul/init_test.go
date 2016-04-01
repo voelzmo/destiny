@@ -9,5 +9,5 @@ import (
 
 func TestConsul(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "testing/destiny/consul")
+	RunSpecs(t, "consul")
 }

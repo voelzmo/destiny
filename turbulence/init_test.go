@@ -9,5 +9,5 @@ import (
 
 func TestTurbulence(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "testing/destiny/turbulence")
+	RunSpecs(t, "turbulence")
 }
