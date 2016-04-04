@@ -227,11 +227,13 @@ func (m Manifest) EtcdMembers() []EtcdMember {
 			continue
 		}
 
-		for i := 0; i < job.Instances; i++ {
-			if len(job.Networks[0].StaticIPs) > i {
-				members = append(members, EtcdMember{
-					Address: job.Networks[0].StaticIPs[i],
-				})
+		if job.HasTemplate("etcd", "etcd") {
+			for i := 0; i < job.Instances; i++ {
+				if len(job.Networks[0].StaticIPs) > i {
+					members = append(members, EtcdMember{
+						Address: job.Networks[0].StaticIPs[i],
+					})
+				}
 			}
 		}
 	}

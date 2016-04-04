@@ -417,6 +417,12 @@ var _ = Describe("Manifest", func() {
 							Networks: []core.JobNetwork{{
 								StaticIPs: []string{"10.244.4.2"},
 							}},
+							Templates: []core.JobTemplate{
+								{
+									Name:    "etcd",
+									Release: "etcd",
+								},
+							},
 						},
 					},
 				}
@@ -429,7 +435,7 @@ var _ = Describe("Manifest", func() {
 		})
 
 		Context("when there are multiple jobs with multiple instances", func() {
-			It("returns a list of members in the cluster", func() {
+			It("returns a list of etcd members in the cluster", func() {
 				manifest := etcd.Manifest{
 					Jobs: []core.Job{
 						{
@@ -440,12 +446,36 @@ var _ = Describe("Manifest", func() {
 							Networks: []core.JobNetwork{{
 								StaticIPs: []string{"10.244.4.2"},
 							}},
+							Templates: []core.JobTemplate{
+								{
+									Name:    "consul_agent",
+									Release: "consul",
+								},
+							},
 						},
 						{
 							Instances: 2,
 							Networks: []core.JobNetwork{{
 								StaticIPs: []string{"10.244.5.2", "10.244.5.6"},
 							}},
+							Templates: []core.JobTemplate{
+								{
+									Name:    "etcd",
+									Release: "etcd",
+								},
+							},
+						},
+						{
+							Instances: 2,
+							Networks: []core.JobNetwork{{
+								StaticIPs: []string{"10.244.6.2", "10.244.6.6"},
+							}},
+							Templates: []core.JobTemplate{
+								{
+									Name:    "etcd",
+									Release: "etcd",
+								},
+							},
 						},
 					},
 				}
@@ -453,13 +483,16 @@ var _ = Describe("Manifest", func() {
 				members := manifest.EtcdMembers()
 				Expect(members).To(Equal([]etcd.EtcdMember{
 					{
-						Address: "10.244.4.2",
-					},
-					{
 						Address: "10.244.5.2",
 					},
 					{
 						Address: "10.244.5.6",
+					},
+					{
+						Address: "10.244.6.2",
+					},
+					{
+						Address: "10.244.6.6",
 					},
 				}))
 			})
@@ -490,6 +523,12 @@ var _ = Describe("Manifest", func() {
 							Networks: []core.JobNetwork{{
 								StaticIPs: []string{"10.244.5.2"},
 							}},
+							Templates: []core.JobTemplate{
+								{
+									Name:    "etcd",
+									Release: "etcd",
+								},
+							},
 						},
 					},
 				}
