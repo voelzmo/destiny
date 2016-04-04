@@ -22,11 +22,13 @@ var _ = Describe("Job", func() {
 			Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
 			Expect(job.Networks[0].Name).To(Equal(network.Name))
 			Expect(properties.Etcd.Machines).To(Equal(job.Networks[0].StaticIPs))
+			Expect(properties.Etcd.Cluster[0].Instances).To(Equal(1))
 
 			job, properties = etcd.SetJobInstanceCount(job, network, properties, 3)
 			Expect(job.Instances).To(Equal(3))
 			Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
 			Expect(properties.Etcd.Machines).To(Equal(job.Networks[0].StaticIPs))
+			Expect(properties.Etcd.Cluster[0].Instances).To(Equal(3))
 		})
 	})
 })
