@@ -24,7 +24,7 @@ type EtcdMember struct {
 	Address string
 }
 
-func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
+func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 	config = NewConfigWithDefaults(config)
 
 	etcdRelease := core.Release{
@@ -180,7 +180,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 					Instances: 1,
 					Name:      "etcd_z1",
 				}},
-				Machines:                        etcdNetwork1.StaticIPs(1),
+				Machines:                        []string{"etcd.service.cf.internal"},
 				PeerRequireSSL:                  true,
 				RequireSSL:                      true,
 				HeartbeatIntervalInMilliseconds: 50,
@@ -211,6 +211,151 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		},
 		Releases: []core.Release{
 			consulRelease,
+			etcdRelease,
+		},
+		ResourcePools: []core.ResourcePool{
+			z1ResourcePool,
+		},
+		Update: update,
+	}
+}
+
+func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
+	config = NewConfigWithDefaults(config)
+
+	etcdRelease := core.Release{
+		Name:    "etcd",
+		Version: "latest",
+	}
+
+	ipRange := network.IPRange(config.IPRange)
+	cloudProperties := iaasConfig.NetworkSubnet()
+
+	etcdNetwork1 := core.Network{
+		Name: "etcd1",
+		Subnets: []core.NetworkSubnet{{
+			CloudProperties: cloudProperties,
+			Gateway:         ipRange.IP(1),
+			Range:           string(ipRange),
+			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(14, 254)},
+			Static: []string{
+				ipRange.IP(4),
+				ipRange.IP(5),
+				ipRange.IP(6),
+				ipRange.IP(7),
+				ipRange.IP(8),
+				ipRange.IP(9),
+				ipRange.IP(10),
+			},
+		}},
+		Type: "manual",
+	}
+
+	compilation := core.Compilation{
+		Network:             etcdNetwork1.Name,
+		ReuseCompilationVMs: true,
+		Workers:             3,
+		CloudProperties:     iaasConfig.Compilation(),
+	}
+
+	update := core.Update{
+		Canaries:        1,
+		CanaryWatchTime: "1000-180000",
+		MaxInFlight:     1,
+		Serial:          true,
+		UpdateWatchTime: "1000-180000",
+	}
+
+	stemcell := core.ResourcePoolStemcell{
+		Name:    iaasConfig.Stemcell(),
+		Version: "latest",
+	}
+
+	z1ResourcePool := core.ResourcePool{
+		Name:            "etcd_z1",
+		Network:         etcdNetwork1.Name,
+		Stemcell:        stemcell,
+		CloudProperties: iaasConfig.ResourcePool(),
+	}
+
+	consulZ1Job := core.Job{
+		Name:      "consul_z1",
+		Instances: 0,
+		Networks: []core.JobNetwork{{
+			Name:      etcdNetwork1.Name,
+			StaticIPs: []string{},
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   z1ResourcePool.Name,
+	}
+
+	etcdZ1Job := core.Job{
+		Name:      "etcd_z1",
+		Instances: 1,
+		Networks: []core.JobNetwork{{
+			Name:      etcdNetwork1.Name,
+			StaticIPs: etcdNetwork1.StaticIPs(1),
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   z1ResourcePool.Name,
+		Templates: []core.JobTemplate{
+			{
+				Name:    "etcd",
+				Release: "etcd",
+			},
+		},
+	}
+
+	testconsumerZ1Job := core.Job{
+		Name:      "testconsumer_z1",
+		Instances: 1,
+		Networks: []core.JobNetwork{{
+			Name:      etcdNetwork1.Name,
+			StaticIPs: []string{etcdNetwork1.StaticIPs(7)[6]},
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   z1ResourcePool.Name,
+		Templates: []core.JobTemplate{
+			{
+				Name:    "etcd-test-consumer",
+				Release: "etcd",
+			},
+		},
+	}
+
+	return Manifest{
+		DirectorUUID: config.DirectorUUID,
+		Name:         config.Name,
+		Compilation:  compilation,
+		Jobs: []core.Job{
+			consulZ1Job,
+			etcdZ1Job,
+			testconsumerZ1Job,
+		},
+		Networks: []core.Network{
+			etcdNetwork1,
+		},
+		Properties: Properties{
+			Etcd: &PropertiesEtcd{
+				Cluster: []PropertiesEtcdCluster{{
+					Instances: 1,
+					Name:      "etcd_z1",
+				}},
+				Machines:                        etcdNetwork1.StaticIPs(1),
+				PeerRequireSSL:                  false,
+				RequireSSL:                      false,
+				HeartbeatIntervalInMilliseconds: 50,
+				CACert:     config.Secrets.Etcd.CACert,
+				ClientCert: config.Secrets.Etcd.ClientCert,
+				ClientKey:  config.Secrets.Etcd.ClientKey,
+				PeerCACert: config.Secrets.Etcd.PeerCACert,
+				PeerCert:   config.Secrets.Etcd.PeerCert,
+				PeerKey:    config.Secrets.Etcd.PeerKey,
+				ServerCert: config.Secrets.Etcd.ServerCert,
+				ServerKey:  config.Secrets.Etcd.ServerKey,
+			},
+		},
+		Releases: []core.Release{
 			etcdRelease,
 		},
 		ResourcePools: []core.ResourcePool{

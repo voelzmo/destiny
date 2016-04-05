@@ -82,7 +82,7 @@ properties:
     - instances: 1
       name: etcd_z1
     machines:
-    - 10.244.4.4
+    - etcd.service.cf.internal
     peer_require_ssl: true
     require_ssl: true
     heartbeat_interval_in_milliseconds: 50
