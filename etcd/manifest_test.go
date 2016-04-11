@@ -536,14 +536,6 @@ var _ = Describe("Manifest", func() {
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
-				CACert:     etcd.CACert,
-				ClientCert: etcd.ClientCert,
-				ClientKey:  etcd.ClientKey,
-				PeerCACert: etcd.PeerCACert,
-				PeerCert:   etcd.PeerCert,
-				PeerKey:    etcd.PeerKey,
-				ServerCert: etcd.ServerCert,
-				ServerKey:  etcd.ServerKey,
 			}))
 		})
 
@@ -689,14 +681,6 @@ var _ = Describe("Manifest", func() {
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
-				CACert:     etcd.CACert,
-				ClientCert: etcd.ClientCert,
-				ClientKey:  etcd.ClientKey,
-				PeerCACert: etcd.PeerCACert,
-				PeerCert:   etcd.PeerCert,
-				PeerKey:    etcd.PeerKey,
-				ServerCert: etcd.ServerCert,
-				ServerKey:  etcd.ServerKey,
 			}))
 		})
 	})
