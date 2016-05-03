@@ -19,14 +19,14 @@ type NetworkSubnetCloudProperties struct {
 	Subnet string `yaml:"subnet,omitempty"`
 }
 
-func (n Network) StaticIPs(count int) []string {
+func (n Network) StaticIPs(count int, offset int) []string {
 	var ips []string
 	for _, subnet := range n.Subnets {
 		ips = append(ips, subnet.Static...)
 	}
 
 	if len(ips) >= count {
-		return ips[:count]
+		return ips[offset : offset+count]
 	}
 
 	return []string{}

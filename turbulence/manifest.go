@@ -80,7 +80,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Name:      "api",
 		Networks: []core.JobNetwork{{
 			Name:      turbulenceNetwork.Name,
-			StaticIPs: turbulenceNetwork.StaticIPs(1),
+			StaticIPs: turbulenceNetwork.StaticIPs(1, 0),
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   turbulenceResourcePool.Name,
