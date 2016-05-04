@@ -6,7 +6,7 @@ func SetJobInstanceCount(job core.Job, network core.Network, properties Properti
 	job.Instances = count
 	for i, net := range job.Networks {
 		if net.Name == network.Name {
-			net.StaticIPs = network.StaticIPs(count, 0)
+			net.StaticIPs = network.StaticIPs(count)
 			properties.Consul.Agent.Servers.Lan = net.StaticIPs
 		}
 		job.Networks[i] = net

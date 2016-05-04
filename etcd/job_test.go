@@ -12,8 +12,7 @@ var _ = Describe("Job", func() {
 	Describe("SetJobInstanceCount", func() {
 		It("sets the correct values for instances and static_ips given a count", func() {
 			manifest := etcd.NewManifest(etcd.Config{
-				IPRange:  "10.244.4.0/24",
-				IPOffset: 5,
+				IPRange: "10.244.4.0/24",
 			}, iaas.NewWardenConfig())
 			job := manifest.Jobs[1]
 			network := manifest.Networks[0]
@@ -25,17 +24,16 @@ var _ = Describe("Job", func() {
 			Expect(properties.Etcd.Machines).To(Equal(job.Networks[0].StaticIPs))
 			Expect(properties.Etcd.Cluster[0].Instances).To(Equal(1))
 
-			job, properties = etcd.SetJobInstanceCount(job, network, properties, 3, 5)
+			job, properties = etcd.SetJobInstanceCount(job, network, properties, 3)
 			Expect(job.Instances).To(Equal(3))
-			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.9", "10.244.4.10", "10.244.4.11"}))
+			Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
 			Expect(properties.Etcd.Machines).To(Equal(job.Networks[0].StaticIPs))
 			Expect(properties.Etcd.Cluster[0].Instances).To(Equal(3))
 		})
 
 		It("does not override the machines property if ssl is enabled", func() {
 			manifest := etcd.NewTLSManifest(etcd.Config{
-				IPRange:  "10.244.4.0/24",
-				IPOffset: 5,
+				IPRange: "10.244.4.0/24",
 			}, iaas.NewWardenConfig())
 			job := manifest.Jobs[1]
 			network := manifest.Networks[0]
@@ -47,7 +45,7 @@ var _ = Describe("Job", func() {
 			Expect(properties.Etcd.Machines).To(Equal([]string{"etcd.service.cf.internal"}))
 			Expect(properties.Etcd.Cluster[0].Instances).To(Equal(1))
 
-			job, properties = etcd.SetJobInstanceCount(job, network, properties, 3, 5)
+			job, properties = etcd.SetJobInstanceCount(job, network, properties, 3)
 			Expect(job.Instances).To(Equal(3))
 			Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
 			Expect(properties.Etcd.Machines).To(Equal([]string{"etcd.service.cf.internal"}))

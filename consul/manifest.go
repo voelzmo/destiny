@@ -84,7 +84,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      consulNetwork1.Name,
-			StaticIPs: consulNetwork1.StaticIPs(1, 0),
+			StaticIPs: consulNetwork1.StaticIPs(1),
 		}},
 		PersistentDisk: 1024,
 		Properties: &core.JobProperties{
@@ -122,7 +122,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      consulNetwork1.Name,
-			StaticIPs: []string{consulNetwork1.StaticIPs(6, 0)[5]},
+			StaticIPs: []string{consulNetwork1.StaticIPs(6)[5]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -143,7 +143,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			Agent: PropertiesConsulAgent{
 				Domain: "cf.internal",
 				Servers: PropertiesConsulAgentServers{
-					Lan: consulNetwork1.StaticIPs(1, 0),
+					Lan: consulNetwork1.StaticIPs(1),
 				},
 			},
 			CACert:      CACert,

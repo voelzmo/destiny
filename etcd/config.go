@@ -6,7 +6,6 @@ type Config struct {
 	DirectorUUID string
 	Name         string
 	IPRange      string
-	IPOffset     int
 	Secrets      ConfigSecrets
 }
 
