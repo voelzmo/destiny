@@ -27,7 +27,7 @@ var _ = Describe("Job", func() {
 
 			job, properties = etcd.SetJobInstanceCount(job, network, properties, 3, 5)
 			Expect(job.Instances).To(Equal(3))
-			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.9", "10.244.4.10", "10.244.4.11"}))
+			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.15", "10.244.4.16", "10.244.4.17"}))
 			Expect(properties.Etcd.Machines).To(Equal(job.Networks[0].StaticIPs))
 			Expect(properties.Etcd.Cluster[0].Instances).To(Equal(3))
 		})
