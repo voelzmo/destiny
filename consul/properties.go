@@ -25,10 +25,11 @@ type PropertiesConsul struct {
 }
 
 type PropertiesConsulAgent struct {
-	Domain   string                       `yaml:"domain"`
-	LogLevel string                       `yaml:"log_level,omitempty"`
-	Servers  PropertiesConsulAgentServers `yaml:"servers"`
-	Mode     string                       `yaml:"mode,omitempty"`
+	Domain     string                       `yaml:"domain"`
+	LogLevel   string                       `yaml:"log_level,omitempty"`
+	Servers    PropertiesConsulAgentServers `yaml:"servers"`
+	Mode       string                       `yaml:"mode,omitempty"`
+	Datacenter string                       `yaml:"datacenter,omitempty"`
 }
 
 type PropertiesConsulAgentServers struct {

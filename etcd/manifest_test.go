@@ -197,10 +197,10 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				CACert:      consul.CACert,
-				AgentCert:   consul.AgentCert,
-				AgentKey:    consul.AgentKey,
-				ServerCert:  consul.ServerCert,
-				ServerKey:   consul.ServerKey,
+				AgentCert:   consul.DC1AgentCert,
+				AgentKey:    consul.DC1AgentKey,
+				ServerCert:  consul.DC1ServerCert,
+				ServerKey:   consul.DC1ServerKey,
 				EncryptKeys: []string{consul.EncryptKey},
 			}))
 		})
@@ -398,10 +398,10 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				CACert:      consul.CACert,
-				AgentCert:   consul.AgentCert,
-				AgentKey:    consul.AgentKey,
-				ServerCert:  consul.ServerCert,
-				ServerKey:   consul.ServerKey,
+				AgentCert:   consul.DC1AgentCert,
+				AgentKey:    consul.DC1AgentKey,
+				ServerCert:  consul.DC1ServerCert,
+				ServerKey:   consul.DC1ServerKey,
 				EncryptKeys: []string{consul.EncryptKey},
 			}))
 		})

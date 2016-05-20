@@ -5,6 +5,7 @@ type Config struct {
 	Name          string
 	IPRange       string
 	ConsulSecrets ConfigSecretsConsul
+	DC            string
 }
 
 type ConfigSecretsConsul struct {

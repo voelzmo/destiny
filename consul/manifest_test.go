@@ -3,11 +3,13 @@ package consul_test
 import (
 	"io/ioutil"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf-experimental/destiny/consul"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
 	. "github.com/pivotal-cf-experimental/gomegamatchers"
 )
 
@@ -136,17 +138,18 @@ var _ = Describe("Manifest", func() {
 				Properties: consul.Properties{
 					Consul: &consul.PropertiesConsul{
 						Agent: consul.PropertiesConsulAgent{
-							Domain:   "cf.internal",
-							LogLevel: "",
+							Domain:     "cf.internal",
+							Datacenter: "dc1",
+							LogLevel:   "",
 							Servers: consul.PropertiesConsulAgentServers{
 								Lan: []string{"10.244.4.4"},
 							},
 						},
 						CACert:      consul.CACert,
-						AgentCert:   consul.AgentCert,
-						AgentKey:    consul.AgentKey,
-						ServerCert:  consul.ServerCert,
-						ServerKey:   consul.ServerKey,
+						AgentCert:   consul.DC1AgentCert,
+						AgentKey:    consul.DC1AgentKey,
+						ServerCert:  consul.DC1ServerCert,
+						ServerKey:   consul.DC1ServerKey,
 						EncryptKeys: []string{consul.EncryptKey},
 					},
 				},
@@ -294,22 +297,45 @@ var _ = Describe("Manifest", func() {
 				Properties: consul.Properties{
 					Consul: &consul.PropertiesConsul{
 						Agent: consul.PropertiesConsulAgent{
-							Domain:   "cf.internal",
-							LogLevel: "",
+							Domain:     "cf.internal",
+							Datacenter: "dc1",
+							LogLevel:   "",
 							Servers: consul.PropertiesConsulAgentServers{
 								Lan: []string{"10.0.4.4"},
 							},
 						},
 						CACert:      consul.CACert,
-						AgentCert:   consul.AgentCert,
-						AgentKey:    consul.AgentKey,
-						ServerCert:  consul.ServerCert,
-						ServerKey:   consul.ServerKey,
+						AgentCert:   consul.DC1AgentCert,
+						AgentKey:    consul.DC1AgentKey,
+						ServerCert:  consul.DC1ServerCert,
+						ServerKey:   consul.DC1ServerKey,
 						EncryptKeys: []string{consul.EncryptKey},
 					},
 				},
 			}))
 		})
+
+		DescribeTable("TLS configuration",
+			func(dcName, agentCert, agentKey, serverCert, serverKey string) {
+				manifest := consul.NewManifest(consul.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					IPRange:      "10.244.4.0/24",
+					DC:           dcName,
+				}, iaas.NewWardenConfig())
+
+				Expect(manifest.Properties.Consul.Agent.Datacenter).To(Equal(dcName))
+				Expect(manifest.Properties.Consul.AgentCert).To(Equal(agentCert))
+				Expect(manifest.Properties.Consul.AgentKey).To(Equal(agentKey))
+				Expect(manifest.Properties.Consul.ServerCert).To(Equal(serverCert))
+				Expect(manifest.Properties.Consul.ServerKey).To(Equal(serverKey))
+				Expect(manifest.Properties.Consul.CACert).To(Equal(consul.CACert))
+			},
+			Entry("generates a manifest with dc1.cf.internal signed certs", "dc1", consul.DC1AgentCert, consul.DC1AgentKey, consul.DC1ServerCert, consul.DC1ServerKey),
+			Entry("generates a manifest with dc2.cf.internal signed certs", "dc2", consul.DC2AgentCert, consul.DC2AgentKey, consul.DC2ServerCert, consul.DC2ServerKey),
+			Entry("generates a manifest with dc3.cf.internal signed certs", "dc3", consul.DC3AgentCert, consul.DC3AgentKey, consul.DC3ServerCert, consul.DC3ServerKey),
+		)
+
 	})
 
 	Describe("ConsulMembers", func() {
@@ -532,16 +558,17 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{
 					Agent: consul.PropertiesConsulAgent{
-						Domain: "cf.internal",
+						Domain:     "cf.internal",
+						Datacenter: "dc1",
 						Servers: consul.PropertiesConsulAgentServers{
 							Lan: []string{"10.244.4.4"},
 						},
 					},
 					CACert:      consul.CACert,
-					AgentCert:   consul.AgentCert,
-					AgentKey:    consul.AgentKey,
-					ServerCert:  consul.ServerCert,
-					ServerKey:   consul.ServerKey,
+					AgentCert:   consul.DC1AgentCert,
+					AgentKey:    consul.DC1AgentKey,
+					ServerCert:  consul.DC1ServerCert,
+					ServerKey:   consul.DC1ServerKey,
 					EncryptKeys: []string{consul.EncryptKey},
 				},
 			}))

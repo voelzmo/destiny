@@ -146,14 +146,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 					Lan: consulNetwork1.StaticIPs(1),
 				},
 			},
-			CACert:      CACert,
-			AgentCert:   AgentCert,
-			AgentKey:    AgentKey,
-			ServerCert:  ServerCert,
-			ServerKey:   ServerKey,
 			EncryptKeys: []string{EncryptKey},
 		},
 	}
+
+	overrideTLS(properties.Consul, config.DC)
 
 	return Manifest{
 		DirectorUUID:  config.DirectorUUID,
@@ -197,4 +194,35 @@ func FromYAML(yaml []byte) (Manifest, error) {
 		return m, err
 	}
 	return m, nil
+}
+
+func overrideTLS(properties *PropertiesConsul, dc string) {
+	switch dc {
+	case "dc1":
+		properties.Agent.Datacenter = dc
+		properties.AgentCert = DC1AgentCert
+		properties.AgentKey = DC1AgentKey
+		properties.ServerCert = DC1ServerCert
+		properties.ServerKey = DC1ServerKey
+	case "dc2":
+		properties.Agent.Datacenter = dc
+		properties.AgentCert = DC2AgentCert
+		properties.AgentKey = DC2AgentKey
+		properties.ServerCert = DC2ServerCert
+		properties.ServerKey = DC2ServerKey
+	case "dc3":
+		properties.Agent.Datacenter = dc
+		properties.AgentCert = DC3AgentCert
+		properties.AgentKey = DC3AgentKey
+		properties.ServerCert = DC3ServerCert
+		properties.ServerKey = DC3ServerKey
+	default:
+		properties.Agent.Datacenter = "dc1"
+		properties.AgentCert = DC1AgentCert
+		properties.AgentKey = DC1AgentKey
+		properties.ServerCert = DC1ServerCert
+		properties.ServerKey = DC1ServerKey
+	}
+
+	properties.CACert = CACert
 }

@@ -35,19 +35,19 @@ func NewConfigWithDefaults(config Config) Config {
 	}
 
 	if config.Secrets.Consul.AgentKey == "" {
-		config.Secrets.Consul.AgentKey = consul.AgentKey
+		config.Secrets.Consul.AgentKey = consul.DC1AgentKey
 	}
 
 	if config.Secrets.Consul.AgentCert == "" {
-		config.Secrets.Consul.AgentCert = consul.AgentCert
+		config.Secrets.Consul.AgentCert = consul.DC1AgentCert
 	}
 
 	if config.Secrets.Consul.ServerKey == "" {
-		config.Secrets.Consul.ServerKey = consul.ServerKey
+		config.Secrets.Consul.ServerKey = consul.DC1ServerKey
 	}
 
 	if config.Secrets.Consul.ServerCert == "" {
-		config.Secrets.Consul.ServerCert = consul.ServerCert
+		config.Secrets.Consul.ServerCert = consul.DC1ServerCert
 	}
 
 	if config.Secrets.Etcd.CACert == "" {
