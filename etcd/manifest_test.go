@@ -232,10 +232,10 @@ var _ = Describe("Manifest", func() {
 				ReuseCompilationVMs: true,
 				Workers:             3,
 				CloudProperties: core.CompilationCloudProperties{
-					InstanceType:     "m3.medium",
+					InstanceType:     "c3.large",
 					AvailabilityZone: "us-east-1a",
 					EphemeralDisk: &core.CompilationCloudPropertiesEphemeralDisk{
-						Size: 1024,
+						Size: 2048,
 						Type: "gp2",
 					},
 				},
@@ -562,10 +562,10 @@ var _ = Describe("Manifest", func() {
 				ReuseCompilationVMs: true,
 				Workers:             3,
 				CloudProperties: core.CompilationCloudProperties{
-					InstanceType:     "m3.medium",
+					InstanceType:     "c3.large",
 					AvailabilityZone: "us-east-1a",
 					EphemeralDisk: &core.CompilationCloudPropertiesEphemeralDisk{
-						Size: 1024,
+						Size: 2048,
 						Type: "gp2",
 					},
 				},

@@ -28,10 +28,10 @@ func (a AWSConfig) NetworkSubnet() core.NetworkSubnetCloudProperties {
 
 func (a AWSConfig) Compilation() core.CompilationCloudProperties {
 	return core.CompilationCloudProperties{
-		InstanceType:     "m3.medium",
+		InstanceType:     "c3.large",
 		AvailabilityZone: "us-east-1a",
 		EphemeralDisk: &core.CompilationCloudPropertiesEphemeralDisk{
-			Size: 1024,
+			Size: 2048,
 			Type: "gp2",
 		},
 	}
