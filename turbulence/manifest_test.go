@@ -3,12 +3,13 @@ package turbulence_test
 import (
 	"io/ioutil"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
 	"github.com/pivotal-cf-experimental/destiny/turbulence"
-	. "github.com/pivotal-cf-experimental/gomegamatchers"
+	"github.com/pivotal-cf-experimental/gomegamatchers"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Manifest", func() {
@@ -445,7 +446,7 @@ var _ = Describe("Manifest", func() {
 
 			yaml, err := manifest.ToYAML()
 			Expect(err).NotTo(HaveOccurred())
-			Expect(yaml).To(MatchYAML(turbulenceManifest))
+			Expect(yaml).To(gomegamatchers.MatchYAML(turbulenceManifest))
 		})
 	})
 })
