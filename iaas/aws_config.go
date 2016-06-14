@@ -42,7 +42,7 @@ func (a AWSConfig) ResourcePool() core.ResourcePoolCloudProperties {
 		InstanceType:     "m3.medium",
 		AvailabilityZone: "us-east-1a",
 		EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
-			Size: 1024,
+			Size: 10240,
 			Type: "gp2",
 		},
 	}
