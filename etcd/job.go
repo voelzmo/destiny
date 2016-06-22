@@ -9,6 +9,7 @@ func SetJobInstanceCount(job core.Job, network core.Network, properties Properti
 			net.StaticIPs = network.StaticIPs(count)
 
 			if !properties.Etcd.RequireSSL {
+				properties.EtcdTestConsumer.Etcd.Machines = net.StaticIPs
 				properties.Etcd.Machines = net.StaticIPs
 			}
 

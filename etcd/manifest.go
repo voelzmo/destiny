@@ -156,7 +156,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 				Release: "consul",
 			},
 			{
-				Name:    "etcd-test-consumer",
+				Name:    "etcd_testconsumer",
 				Release: "etcd",
 			},
 		},
@@ -175,6 +175,15 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 			etcdNetwork1,
 		},
 		Properties: Properties{
+			EtcdTestConsumer: &PropertiesEtcdTestConsumer{
+				Etcd: PropertiesEtcdTestConsumerEtcd{
+					RequireSSL: true,
+					Machines:   []string{"etcd.service.cf.internal"},
+					CACert:     config.Secrets.Etcd.CACert,
+					ClientCert: config.Secrets.Etcd.ClientCert,
+					ClientKey:  config.Secrets.Etcd.ClientKey,
+				},
+			},
 			Etcd: &PropertiesEtcd{
 				Cluster: []PropertiesEtcdCluster{{
 					Instances: 1,
@@ -317,7 +326,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		ResourcePool:   z1ResourcePool.Name,
 		Templates: []core.JobTemplate{
 			{
-				Name:    "etcd-test-consumer",
+				Name:    "etcd_testconsumer",
 				Release: "etcd",
 			},
 		},
@@ -345,6 +354,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
+			},
+			EtcdTestConsumer: &PropertiesEtcdTestConsumer{
+				Etcd: PropertiesEtcdTestConsumerEtcd{
+					Machines: etcdNetwork1.StaticIPs(1),
+				},
 			},
 		},
 		Releases: []core.Release{

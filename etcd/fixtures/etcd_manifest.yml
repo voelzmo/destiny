@@ -53,7 +53,7 @@ jobs:
   templates:
   - name: consul_agent
     release: consul
-  - name: etcd-test-consumer
+  - name: etcd_testconsumer
     release: etcd
 
 networks:
@@ -77,6 +77,14 @@ networks:
   type: manual
 
 properties:
+  etcd_testconsumer:
+    etcd:
+      machines:
+      - etcd.service.cf.internal
+      require_ssl: true
+      ca_cert: etcd-ca-cert
+      client_cert: etcd-client-cert
+      client_key: etcd-client-key
   etcd:
     cluster:
     - instances: 1

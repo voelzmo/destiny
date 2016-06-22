@@ -134,7 +134,7 @@ var _ = Describe("Manifest", func() {
 						Release: "consul",
 					},
 					{
-						Name:    "etcd-test-consumer",
+						Name:    "etcd_testconsumer",
 						Release: "etcd",
 					},
 				},
@@ -187,6 +187,18 @@ var _ = Describe("Manifest", func() {
 				PeerKey:                         etcd.PeerKey,
 				ServerCert:                      etcd.ServerCert,
 				ServerKey:                       etcd.ServerKey,
+			}))
+
+			Expect(manifest.Properties.EtcdTestConsumer).To(Equal(&etcd.PropertiesEtcdTestConsumer{
+				Etcd: etcd.PropertiesEtcdTestConsumerEtcd{
+					Machines: []string{
+						"etcd.service.cf.internal",
+					},
+					RequireSSL: true,
+					CACert:     etcd.CACert,
+					ClientCert: etcd.ClientCert,
+					ClientKey:  etcd.ClientKey,
+				},
 			}))
 
 			Expect(manifest.Properties.Consul).To(Equal(&consul.PropertiesConsul{
@@ -336,7 +348,7 @@ var _ = Describe("Manifest", func() {
 						Release: "consul",
 					},
 					{
-						Name:    "etcd-test-consumer",
+						Name:    "etcd_testconsumer",
 						Release: "etcd",
 					},
 				},
@@ -388,6 +400,18 @@ var _ = Describe("Manifest", func() {
 				PeerKey:                         etcd.PeerKey,
 				ServerCert:                      etcd.ServerCert,
 				ServerKey:                       etcd.ServerKey,
+			}))
+
+			Expect(manifest.Properties.EtcdTestConsumer).To(Equal(&etcd.PropertiesEtcdTestConsumer{
+				Etcd: etcd.PropertiesEtcdTestConsumerEtcd{
+					Machines: []string{
+						"etcd.service.cf.internal",
+					},
+					RequireSSL: true,
+					CACert:     etcd.CACert,
+					ClientCert: etcd.ClientCert,
+					ClientKey:  etcd.ClientKey,
+				},
 			}))
 
 			Expect(manifest.Properties.Consul).To(Equal(&consul.PropertiesConsul{
@@ -492,7 +516,7 @@ var _ = Describe("Manifest", func() {
 				ResourcePool:   "etcd_z1",
 				Templates: []core.JobTemplate{
 					{
-						Name:    "etcd-test-consumer",
+						Name:    "etcd_testconsumer",
 						Release: "etcd",
 					},
 				},
@@ -536,6 +560,15 @@ var _ = Describe("Manifest", func() {
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
+			}))
+
+			Expect(manifest.Properties.EtcdTestConsumer).To(Equal(&etcd.PropertiesEtcdTestConsumer{
+				Etcd: etcd.PropertiesEtcdTestConsumerEtcd{
+					Machines: []string{
+						"10.244.4.4",
+					},
+					RequireSSL: false,
+				},
 			}))
 		})
 
@@ -638,7 +671,7 @@ var _ = Describe("Manifest", func() {
 				ResourcePool:   "etcd_z1",
 				Templates: []core.JobTemplate{
 					{
-						Name:    "etcd-test-consumer",
+						Name:    "etcd_testconsumer",
 						Release: "etcd",
 					},
 				},
@@ -681,6 +714,15 @@ var _ = Describe("Manifest", func() {
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
+			}))
+
+			Expect(manifest.Properties.EtcdTestConsumer).To(Equal(&etcd.PropertiesEtcdTestConsumer{
+				Etcd: etcd.PropertiesEtcdTestConsumerEtcd{
+					Machines: []string{
+						"10.0.16.4",
+					},
+					RequireSSL: false,
+				},
 			}))
 		})
 	})
@@ -970,7 +1012,7 @@ var _ = Describe("Manifest", func() {
 						Release: "consul",
 					},
 					{
-						Name:    "etcd-test-consumer",
+						Name:    "etcd_testconsumer",
 						Release: "etcd",
 					},
 				},

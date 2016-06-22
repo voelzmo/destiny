@@ -1,6 +1,8 @@
 package etcd
 
-import "github.com/pivotal-cf-experimental/destiny/consul"
+import (
+	"github.com/pivotal-cf-experimental/destiny/consul"
+)
 
 type Config struct {
 	DirectorUUID string
