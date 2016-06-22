@@ -103,7 +103,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 			},
 		},
 		Properties: &core.JobProperties{
-			Consul: core.JobPropertiesConsul{
+			Consul: &core.JobPropertiesConsul{
 				Agent: core.JobPropertiesConsulAgent{
 					Mode: "server",
 				},
@@ -131,7 +131,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 			},
 		},
 		Properties: &core.JobProperties{
-			Consul: core.JobPropertiesConsul{
+			Consul: &core.JobPropertiesConsul{
 				Agent: core.JobPropertiesConsulAgent{
 					Services: core.JobPropertiesConsulAgentServices{
 						"etcd": core.JobPropertiesConsulAgentService{},

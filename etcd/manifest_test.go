@@ -81,7 +81,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Mode: "server",
 						},
@@ -109,7 +109,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Services: core.JobPropertiesConsulAgentServices{
 								"etcd": core.JobPropertiesConsulAgentService{},
@@ -295,7 +295,7 @@ var _ = Describe("Manifest", func() {
 					Release: "consul",
 				}},
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Mode: "server",
 						},
@@ -323,7 +323,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Services: core.JobPropertiesConsulAgentServices{
 								"etcd": core.JobPropertiesConsulAgentService{},
@@ -865,7 +865,7 @@ var _ = Describe("Manifest", func() {
 
 	Describe("ToYAML", func() {
 		It("returns a YAML representation of the etcd manifest", func() {
-			etcdManifest, err := ioutil.ReadFile("fixtures/etcd_manifest.yml")
+			etcdManifest, err := ioutil.ReadFile("fixtures/tls.yml")
 			Expect(err).NotTo(HaveOccurred())
 
 			manifest := etcd.NewTLSManifest(etcd.Config{
@@ -902,7 +902,7 @@ var _ = Describe("Manifest", func() {
 
 	Describe("FromYAML", func() {
 		It("returns a Manifest matching the given YAML", func() {
-			etcdManifest, err := ioutil.ReadFile("fixtures/etcd_manifest.yml")
+			etcdManifest, err := ioutil.ReadFile("fixtures/tls.yml")
 			Expect(err).NotTo(HaveOccurred())
 
 			manifest, err := etcd.FromYAML(etcdManifest)
@@ -959,7 +959,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Mode: "server",
 						},
@@ -987,7 +987,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Services: core.JobPropertiesConsulAgentServices{
 								"etcd": core.JobPropertiesConsulAgentService{},

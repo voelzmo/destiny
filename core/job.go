@@ -27,11 +27,44 @@ type JobTemplate struct {
 }
 
 type JobProperties struct {
-	Consul JobPropertiesConsul `yaml:"consul"`
+	Consul           *JobPropertiesConsul           `yaml:"consul,omitempty"`
+	Etcd             *JobPropertiesEtcd             `yaml:"etcd,omitempty"`
+	EtcdTestConsumer *JobPropertiesEtcdTestConsumer `yaml:"etcd_testconsumer,omitempty"`
 }
 
 type JobPropertiesConsul struct {
 	Agent JobPropertiesConsulAgent `yaml:"agent"`
+}
+
+type JobPropertiesEtcd struct {
+	Machines                        []string                   `yaml:"machines"`
+	PeerRequireSSL                  bool                       `yaml:"peer_require_ssl"`
+	RequireSSL                      bool                       `yaml:"require_ssl"`
+	HeartbeatIntervalInMilliseconds int                        `yaml:"heartbeat_interval_in_milliseconds"`
+	Cluster                         []JobPropertiesEtcdCluster `yaml:"cluster,omitempty"`
+	AdvertiseURLsDNSSuffix          string                     `yaml:"advertise_urls_dns_suffix,omitempty"`
+	CACert                          string                     `yaml:"ca_cert,omitempty"`
+	ClientCert                      string                     `yaml:"client_cert,omitempty"`
+	ClientKey                       string                     `yaml:"client_key,omitempty"`
+	PeerCACert                      string                     `yaml:"peer_ca_cert,omitempty"`
+	PeerCert                        string                     `yaml:"peer_cert,omitempty"`
+	PeerKey                         string                     `yaml:"peer_key,omitempty"`
+	ServerCert                      string                     `yaml:"server_cert,omitempty"`
+	ServerKey                       string                     `yaml:"server_key,omitempty"`
+}
+
+type JobPropertiesEtcdTestConsumer struct {
+	Etcd JobPropertiesEtcdTestConsumerEtcd `yaml:"etcd"`
+}
+
+type JobPropertiesEtcdTestConsumerEtcd struct {
+	Machines   []string `yaml:"machines"`
+	RequireSSL bool     `yaml:"require_ssl"`
+}
+
+type JobPropertiesEtcdCluster struct {
+	Name      string `yaml:"name"`
+	Instances int    `yaml:"instances"`
 }
 
 type JobPropertiesConsulAgent struct {
