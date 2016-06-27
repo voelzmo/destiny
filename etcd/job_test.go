@@ -110,7 +110,8 @@ var _ = Describe("Manifest", func() {
 				},
 			}
 
-			manifest = manifest.ReplaceEtcdWithProxyJob("etcd_z1")
+			manifest, err := manifest.ReplaceEtcdWithProxyJob("etcd_z1")
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.Jobs).To(Equal([]core.Job{
 				{
@@ -138,6 +139,14 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+		})
+
+		Context("failure cases", func() {
+			It("returns an error when job is not found", func() {
+				manifest := etcd.Manifest{}
+				_, err := manifest.ReplaceEtcdWithProxyJob("etcd_z1")
+				Expect(err).To(MatchError("job not found"))
+			})
 		})
 	})
 })

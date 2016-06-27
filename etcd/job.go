@@ -1,6 +1,10 @@
 package etcd
 
-import "github.com/pivotal-cf-experimental/destiny/core"
+import (
+	"errors"
+
+	"github.com/pivotal-cf-experimental/destiny/core"
+)
 
 func SetJobInstanceCount(job core.Job, network core.Network, properties Properties, count int) (core.Job, Properties) {
 	job.Instances = count
@@ -30,7 +34,7 @@ func (m Manifest) RemoveJob(jobName string) Manifest {
 	return m
 }
 
-func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) Manifest {
+func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) (Manifest, error) {
 	for _, job := range m.Jobs {
 		if job.Name == jobToReplace {
 			for i, template := range job.Templates {
@@ -39,9 +43,10 @@ func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) Manifest {
 						Name:    "etcd_proxy",
 						Release: "etcd",
 					}
+					return m, nil
 				}
 			}
 		}
 	}
-	return m
+	return m, errors.New("job not found")
 }
