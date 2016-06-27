@@ -20,3 +20,28 @@ func SetJobInstanceCount(job core.Job, network core.Network, properties Properti
 
 	return job, properties
 }
+
+func (m Manifest) RemoveJob(jobName string) Manifest {
+	for i, job := range m.Jobs {
+		if job.Name == jobName {
+			m.Jobs = append(m.Jobs[:i], m.Jobs[i+1:]...)
+		}
+	}
+	return m
+}
+
+func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) Manifest {
+	for _, job := range m.Jobs {
+		if job.Name == jobToReplace {
+			for i, template := range job.Templates {
+				if template.Name == "etcd" {
+					job.Templates[i] = core.JobTemplate{
+						Name:    "etcd_proxy",
+						Release: "etcd",
+					}
+				}
+			}
+		}
+	}
+	return m
+}
