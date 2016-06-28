@@ -46,7 +46,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 			CloudProperties: cloudProperties,
 			Gateway:         ipRange.IP(1),
 			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(14, 254)},
+			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(16, 254)},
 			Static: []string{
 				ipRange.IP(4),
 				ipRange.IP(5),
@@ -55,6 +55,8 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 				ipRange.IP(8),
 				ipRange.IP(9),
 				ipRange.IP(10),
+				ipRange.IP(11),
+				ipRange.IP(12),
 			},
 		}},
 		Type: "manual",
@@ -146,7 +148,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: []string{etcdNetwork1.StaticIPs(7)[6]},
+			StaticIPs: []string{etcdNetwork1.StaticIPs(9)[8]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -246,7 +248,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			CloudProperties: cloudProperties,
 			Gateway:         ipRange.IP(1),
 			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(14, 254)},
+			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(16, 254)},
 			Static: []string{
 				ipRange.IP(4),
 				ipRange.IP(5),
@@ -255,6 +257,8 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				ipRange.IP(8),
 				ipRange.IP(9),
 				ipRange.IP(10),
+				ipRange.IP(11),
+				ipRange.IP(12),
 			},
 		}},
 		Type: "manual",
@@ -320,7 +324,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: []string{etcdNetwork1.StaticIPs(7)[6]},
+			StaticIPs: []string{etcdNetwork1.StaticIPs(9)[8]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,

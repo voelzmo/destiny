@@ -73,7 +73,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 					Range:           "10.244.4.0/24",
 					Reserved: []string{
 						"10.244.4.2-10.244.4.3",
-						"10.244.4.20-10.244.4.254",
+						"10.244.4.22-10.244.4.254",
 					},
 					Static: []string{
 						"10.244.4.4",
@@ -88,6 +88,8 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 						"10.244.4.13",
 						"10.244.4.14",
 						"10.244.4.15",
+						"10.244.4.16",
+						"10.244.4.17",
 					},
 				},
 			},
@@ -102,9 +104,9 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
 				StaticIPs: []string{
-					"10.244.4.7",
-					"10.244.4.8",
 					"10.244.4.9",
+					"10.244.4.10",
+					"10.244.4.11",
 				},
 			}},
 			PersistentDisk: 1024,
@@ -126,33 +128,19 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 
 		Expect(manifest.Jobs[1]).To(Equal(core.Job{
 			Name:      "etcd_z1",
-			Instances: 3,
+			Instances: 1,
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
 				StaticIPs: []string{
-					"10.244.4.10",
-					"10.244.4.11",
-					"10.244.4.12",
+					"10.244.4.4",
 				},
 			}},
 			PersistentDisk: 1024,
 			ResourcePool:   "etcd_z1",
 			Templates: []core.JobTemplate{
 				{
-					Name:    "etcd",
+					Name:    "etcd_proxy",
 					Release: "etcd",
-				},
-			},
-			Properties: &core.JobProperties{
-				Etcd: &core.JobPropertiesEtcd{
-					Machines: []string{
-						"10.244.4.10",
-						"10.244.4.11",
-						"10.244.4.12",
-					},
-					PeerRequireSSL:                  false,
-					RequireSSL:                      false,
-					HeartbeatIntervalInMilliseconds: 50,
 				},
 			},
 		}))
@@ -163,9 +151,9 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
 				StaticIPs: []string{
+					"10.244.4.12",
 					"10.244.4.13",
 					"10.244.4.14",
-					"10.244.4.15",
 				},
 			}},
 			PersistentDisk: 1024,
@@ -180,9 +168,9 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 				EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
 					Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
 						Machines: []string{
-							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
+							"10.244.4.15",
+							"10.244.4.16",
+							"10.244.4.17",
 						},
 						RequireSSL: false,
 					},
@@ -196,9 +184,9 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
 				StaticIPs: []string{
-					"10.244.4.4",
-					"10.244.4.5",
-					"10.244.4.6",
+					"10.244.4.15",
+					"10.244.4.16",
+					"10.244.4.17",
 				},
 			}},
 			PersistentDisk: 1024,
@@ -224,7 +212,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 				Etcd: &core.JobPropertiesEtcd{
 					Cluster: []core.JobPropertiesEtcdCluster{{
 						Instances: 3,
-						Name:      "etcd_tls",
+						Name:      "etcd_tls_z1",
 					}},
 					Machines: []string{
 						"etcd.service.cf.internal",
@@ -250,9 +238,9 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 				Domain: "cf.internal",
 				Servers: consul.PropertiesConsulAgentServers{
 					Lan: []string{
-						"10.244.4.7",
-						"10.244.4.8",
 						"10.244.4.9",
+						"10.244.4.10",
+						"10.244.4.11",
 					},
 				},
 			},
@@ -262,6 +250,17 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			ServerCert:  consul.DC1ServerCert,
 			ServerKey:   consul.DC1ServerKey,
 			EncryptKeys: []string{consul.EncryptKey},
+		}))
+
+		Expect(manifest.Properties.EtcdProxy).To(Equal(&etcd.PropertiesEtcdProxy{
+			Etcd: etcd.PropertiesEtcdProxyEtcd{
+				URL:        "https://etcd.service.cf.internal",
+				CACert:     etcd.CACert,
+				ClientCert: etcd.ClientCert,
+				ClientKey:  etcd.ClientKey,
+				RequireSSL: true,
+				Port:       4001,
+			},
 		}))
 	})
 

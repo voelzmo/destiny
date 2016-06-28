@@ -124,7 +124,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "etcd1",
-					StaticIPs: []string{"10.244.4.10"},
+					StaticIPs: []string{"10.244.4.12"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "etcd_z1",
@@ -151,7 +151,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.14-10.244.4.254",
+							"10.244.4.16-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -161,6 +161,8 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.8",
 							"10.244.4.9",
 							"10.244.4.10",
+							"10.244.4.11",
+							"10.244.4.12",
 						},
 					},
 				},
@@ -338,7 +340,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "etcd1",
-					StaticIPs: []string{"10.0.16.10"},
+					StaticIPs: []string{"10.0.16.12"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "etcd_z1",
@@ -364,7 +366,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.0.16.0/24",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.14-10.0.16.254",
+							"10.0.16.16-10.0.16.254",
 						},
 						Static: []string{
 							"10.0.16.4",
@@ -374,6 +376,8 @@ var _ = Describe("Manifest", func() {
 							"10.0.16.8",
 							"10.0.16.9",
 							"10.0.16.10",
+							"10.0.16.11",
+							"10.0.16.12",
 						},
 					},
 				},
@@ -510,7 +514,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "etcd1",
-					StaticIPs: []string{"10.244.4.10"},
+					StaticIPs: []string{"10.244.4.12"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "etcd_z1",
@@ -533,7 +537,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.14-10.244.4.254",
+							"10.244.4.16-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -543,6 +547,8 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.8",
 							"10.244.4.9",
 							"10.244.4.10",
+							"10.244.4.11",
+							"10.244.4.12",
 						},
 					},
 				},
@@ -665,7 +671,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "etcd1",
-					StaticIPs: []string{"10.0.16.10"},
+					StaticIPs: []string{"10.0.16.12"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "etcd_z1",
@@ -687,7 +693,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.0.16.0/24",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.14-10.0.16.254",
+							"10.0.16.16-10.0.16.254",
 						},
 						Static: []string{
 							"10.0.16.4",
@@ -697,6 +703,8 @@ var _ = Describe("Manifest", func() {
 							"10.0.16.8",
 							"10.0.16.9",
 							"10.0.16.10",
+							"10.0.16.11",
+							"10.0.16.12",
 						},
 					},
 				},
@@ -1002,7 +1010,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "etcd1",
-					StaticIPs: []string{"10.244.4.10"},
+					StaticIPs: []string{"10.244.4.12"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "etcd_z1",
@@ -1028,7 +1036,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.14-10.244.4.254",
+							"10.244.4.16-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -1038,6 +1046,8 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.8",
 							"10.244.4.9",
 							"10.244.4.10",
+							"10.244.4.11",
+							"10.244.4.12",
 						},
 					},
 				},

@@ -56,7 +56,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 				CloudProperties: cloudProperties,
 				Gateway:         ipRange.IP(1),
 				Range:           string(ipRange),
-				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(20, 254)},
+				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(22, 254)},
 				Static: []string{
 					ipRange.IP(4),
 					ipRange.IP(5),
@@ -70,6 +70,8 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 					ipRange.IP(13),
 					ipRange.IP(14),
 					ipRange.IP(15),
+					ipRange.IP(16),
+					ipRange.IP(17),
 				},
 			}},
 			Type: "manual",
@@ -82,9 +84,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(7),
-				ipRange.IP(8),
 				ipRange.IP(9),
+				ipRange.IP(10),
+				ipRange.IP(11),
 			},
 		}},
 		PersistentDisk: 1024,
@@ -106,33 +108,19 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 
 	etcdNoTLS := core.Job{
 		Name:      "etcd_z1",
-		Instances: 3,
+		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(10),
-				ipRange.IP(11),
-				ipRange.IP(12),
+				ipRange.IP(4),
 			},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   "etcd_z1",
 		Templates: []core.JobTemplate{
 			{
-				Name:    "etcd",
+				Name:    "etcd_proxy",
 				Release: "etcd",
-			},
-		},
-		Properties: &core.JobProperties{
-			Etcd: &core.JobPropertiesEtcd{
-				Machines: []string{
-					ipRange.IP(10),
-					ipRange.IP(11),
-					ipRange.IP(12),
-				},
-				PeerRequireSSL:                  false,
-				RequireSSL:                      false,
-				HeartbeatIntervalInMilliseconds: 50,
 			},
 		},
 	}
@@ -143,9 +131,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
+				ipRange.IP(12),
 				ipRange.IP(13),
 				ipRange.IP(14),
-				ipRange.IP(15),
 			},
 		}},
 		PersistentDisk: 1024,
@@ -160,9 +148,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 			EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
 				Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
 					Machines: []string{
-						ipRange.IP(10),
-						ipRange.IP(11),
-						ipRange.IP(12),
+						ipRange.IP(15),
+						ipRange.IP(16),
+						ipRange.IP(17),
 					},
 					RequireSSL: false,
 				},
@@ -176,9 +164,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(4),
-				ipRange.IP(5),
-				ipRange.IP(6),
+				ipRange.IP(15),
+				ipRange.IP(16),
+				ipRange.IP(17),
 			},
 		}},
 		PersistentDisk: 1024,
@@ -204,7 +192,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 			Etcd: &core.JobPropertiesEtcd{
 				Cluster: []core.JobPropertiesEtcdCluster{{
 					Instances: 3,
-					Name:      "etcd_tls",
+					Name:      "etcd_tls_z1",
 				}},
 				Machines: []string{
 					"etcd.service.cf.internal",
@@ -231,9 +219,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 				Domain: "cf.internal",
 				Servers: consul.PropertiesConsulAgentServers{
 					Lan: []string{
-						ipRange.IP(7),
-						ipRange.IP(8),
 						ipRange.IP(9),
+						ipRange.IP(10),
+						ipRange.IP(11),
 					},
 				},
 			},
@@ -243,6 +231,16 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 			ServerCert:  config.Secrets.Consul.ServerCert,
 			ServerKey:   config.Secrets.Consul.ServerKey,
 			EncryptKeys: []string{config.Secrets.Consul.EncryptKey},
+		},
+		EtcdProxy: &PropertiesEtcdProxy{
+			Etcd: PropertiesEtcdProxyEtcd{
+				URL:        "https://etcd.service.cf.internal",
+				CACert:     config.Secrets.Etcd.CACert,
+				ClientCert: config.Secrets.Etcd.ClientCert,
+				ClientKey:  config.Secrets.Etcd.ClientKey,
+				RequireSSL: true,
+				Port:       4001,
+			},
 		},
 	}
 
