@@ -127,58 +127,6 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Jobs[1]).To(Equal(core.Job{
-			Name:      "etcd_z1",
-			Instances: 1,
-			Networks: []core.JobNetwork{{
-				Name: "etcd1",
-				StaticIPs: []string{
-					"10.244.4.4",
-				},
-			}},
-			PersistentDisk: 1024,
-			ResourcePool:   "etcd_z1",
-			Templates: []core.JobTemplate{
-				{
-					Name:    "etcd_proxy",
-					Release: "etcd",
-				},
-			},
-		}))
-
-		Expect(manifest.Jobs[2]).To(Equal(core.Job{
-			Name:      "testconsumer_z1",
-			Instances: 3,
-			Networks: []core.JobNetwork{{
-				Name: "etcd1",
-				StaticIPs: []string{
-					"10.244.4.12",
-					"10.244.4.13",
-					"10.244.4.14",
-				},
-			}},
-			PersistentDisk: 1024,
-			ResourcePool:   "etcd_z1",
-			Templates: []core.JobTemplate{
-				{
-					Name:    "etcd_testconsumer",
-					Release: "etcd",
-				},
-			},
-			Properties: &core.JobProperties{
-				EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
-					Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
-						Machines: []string{
-							"10.244.4.15",
-							"10.244.4.16",
-							"10.244.4.17",
-						},
-						RequireSSL: false,
-					},
-				},
-			},
-		}))
-
-		Expect(manifest.Jobs[3]).To(Equal(core.Job{
 			Name:      "etcd_tls_z1",
 			Instances: 3,
 			Networks: []core.JobNetwork{{
@@ -229,6 +177,58 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 					PeerKey:                         etcd.PeerKey,
 					ServerCert:                      etcd.ServerCert,
 					ServerKey:                       etcd.ServerKey,
+				},
+			},
+		}))
+
+		Expect(manifest.Jobs[2]).To(Equal(core.Job{
+			Name:      "etcd_z1",
+			Instances: 1,
+			Networks: []core.JobNetwork{{
+				Name: "etcd1",
+				StaticIPs: []string{
+					"10.244.4.4",
+				},
+			}},
+			PersistentDisk: 1024,
+			ResourcePool:   "etcd_z1",
+			Templates: []core.JobTemplate{
+				{
+					Name:    "etcd_proxy",
+					Release: "etcd",
+				},
+			},
+		}))
+
+		Expect(manifest.Jobs[3]).To(Equal(core.Job{
+			Name:      "testconsumer_z1",
+			Instances: 3,
+			Networks: []core.JobNetwork{{
+				Name: "etcd1",
+				StaticIPs: []string{
+					"10.244.4.12",
+					"10.244.4.13",
+					"10.244.4.14",
+				},
+			}},
+			PersistentDisk: 1024,
+			ResourcePool:   "etcd_z1",
+			Templates: []core.JobTemplate{
+				{
+					Name:    "etcd_testconsumer",
+					Release: "etcd",
+				},
+			},
+			Properties: &core.JobProperties{
+				EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
+					Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
+						Machines: []string{
+							"10.244.4.15",
+							"10.244.4.16",
+							"10.244.4.17",
+						},
+						RequireSSL: false,
+					},
 				},
 			},
 		}))

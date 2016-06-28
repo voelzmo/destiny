@@ -21,40 +21,6 @@ jobs:
   - name: consul_agent
     release: consul
 
-- name: etcd_z1
-  instances: 1
-  networks:
-  - name: etcd1
-    static_ips:
-    - 10.244.4.4
-  resource_pool: etcd_z1
-  persistent_disk: 1024
-  templates:
-  - release: etcd
-    name: etcd_proxy
-
-- name: testconsumer_z1
-  instances: 3
-  networks:
-  - name: etcd1
-    static_ips:
-    - 10.244.4.12
-    - 10.244.4.13
-    - 10.244.4.14
-  resource_pool: etcd_z1
-  persistent_disk: 1024
-  properties:
-    etcd_testconsumer:
-      etcd:
-        machines:
-        - 10.244.4.15
-        - 10.244.4.16
-        - 10.244.4.17
-        require_ssl: false
-  templates:
-  - release: etcd
-    name: etcd_testconsumer
-
 - name: etcd_tls_z1
   instances: 3
   networks:
@@ -93,6 +59,41 @@ jobs:
     release: consul
   - name: etcd
     release: etcd
+
+- name: etcd_z1
+  instances: 1
+  networks:
+  - name: etcd1
+    static_ips:
+    - 10.244.4.4
+  resource_pool: etcd_z1
+  persistent_disk: 1024
+  templates:
+  - release: etcd
+    name: etcd_proxy
+
+- name: testconsumer_z1
+  instances: 3
+  networks:
+  - name: etcd1
+    static_ips:
+    - 10.244.4.12
+    - 10.244.4.13
+    - 10.244.4.14
+  resource_pool: etcd_z1
+  persistent_disk: 1024
+  properties:
+    etcd_testconsumer:
+      etcd:
+        machines:
+        - 10.244.4.15
+        - 10.244.4.16
+        - 10.244.4.17
+        require_ssl: false
+  templates:
+  - release: etcd
+    name: etcd_testconsumer
+
 
 networks:
 - name: etcd1

@@ -106,58 +106,6 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		},
 	}
 
-	etcdNoTLS := core.Job{
-		Name:      "etcd_z1",
-		Instances: 1,
-		Networks: []core.JobNetwork{{
-			Name: "etcd1",
-			StaticIPs: []string{
-				ipRange.IP(4),
-			},
-		}},
-		PersistentDisk: 1024,
-		ResourcePool:   "etcd_z1",
-		Templates: []core.JobTemplate{
-			{
-				Name:    "etcd_proxy",
-				Release: "etcd",
-			},
-		},
-	}
-
-	testconsumerJob := core.Job{
-		Name:      "testconsumer_z1",
-		Instances: 3,
-		Networks: []core.JobNetwork{{
-			Name: "etcd1",
-			StaticIPs: []string{
-				ipRange.IP(12),
-				ipRange.IP(13),
-				ipRange.IP(14),
-			},
-		}},
-		PersistentDisk: 1024,
-		ResourcePool:   "etcd_z1",
-		Templates: []core.JobTemplate{
-			{
-				Name:    "etcd_testconsumer",
-				Release: "etcd",
-			},
-		},
-		Properties: &core.JobProperties{
-			EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
-				Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
-					Machines: []string{
-						ipRange.IP(15),
-						ipRange.IP(16),
-						ipRange.IP(17),
-					},
-					RequireSSL: false,
-				},
-			},
-		},
-	}
-
 	etcdTLS := core.Job{
 		Name:      "etcd_tls_z1",
 		Instances: 3,
@@ -213,6 +161,58 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		},
 	}
 
+	etcdNoTLS := core.Job{
+		Name:      "etcd_z1",
+		Instances: 1,
+		Networks: []core.JobNetwork{{
+			Name: "etcd1",
+			StaticIPs: []string{
+				ipRange.IP(4),
+			},
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   "etcd_z1",
+		Templates: []core.JobTemplate{
+			{
+				Name:    "etcd_proxy",
+				Release: "etcd",
+			},
+		},
+	}
+
+	testconsumerJob := core.Job{
+		Name:      "testconsumer_z1",
+		Instances: 3,
+		Networks: []core.JobNetwork{{
+			Name: "etcd1",
+			StaticIPs: []string{
+				ipRange.IP(12),
+				ipRange.IP(13),
+				ipRange.IP(14),
+			},
+		}},
+		PersistentDisk: 1024,
+		ResourcePool:   "etcd_z1",
+		Templates: []core.JobTemplate{
+			{
+				Name:    "etcd_testconsumer",
+				Release: "etcd",
+			},
+		},
+		Properties: &core.JobProperties{
+			EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
+				Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
+					Machines: []string{
+						ipRange.IP(15),
+						ipRange.IP(16),
+						ipRange.IP(17),
+					},
+					RequireSSL: false,
+				},
+			},
+		},
+	}
+
 	properties := Properties{
 		Consul: &consul.PropertiesConsul{
 			Agent: consul.PropertiesConsulAgent{
@@ -254,9 +254,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks:      networks,
 		Jobs: []core.Job{
 			consulJob,
+			etcdTLS,
 			etcdNoTLS,
 			testconsumerJob,
-			etcdTLS,
 		},
 		Properties: properties,
 	}
