@@ -3,7 +3,7 @@ director_uuid: some-director-uuid
 name: etcd
 
 jobs:
-- name: consul
+- name: consul_z1
   instances: 3
   networks:
   - name: etcd1
@@ -21,7 +21,7 @@ jobs:
   - name: consul_agent
     release: consul
 
-- name: etcd_no_tls
+- name: etcd_z1
   instances: 3
   networks:
   - name: etcd1
@@ -44,7 +44,7 @@ jobs:
   - release: etcd
     name: etcd
 
-- name: testconsumer
+- name: testconsumer_z1
   instances: 3
   networks:
   - name: etcd1
@@ -66,7 +66,7 @@ jobs:
   - release: etcd
     name: etcd_testconsumer
 
-- name: etcd_tls
+- name: etcd_tls_z1
   instances: 3
   networks:
   - name: etcd1

@@ -77,7 +77,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	consulJob := core.Job{
-		Name:      "consul",
+		Name:      "consul_z1",
 		Instances: 3,
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
@@ -105,7 +105,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	etcdNoTLS := core.Job{
-		Name:      "etcd_no_tls",
+		Name:      "etcd_z1",
 		Instances: 3,
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
@@ -138,7 +138,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	testconsumerJob := core.Job{
-		Name:      "testconsumer",
+		Name:      "testconsumer_z1",
 		Instances: 3,
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
@@ -171,7 +171,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	etcdTLS := core.Job{
-		Name:      "etcd_tls",
+		Name:      "etcd_tls_z1",
 		Instances: 3,
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",

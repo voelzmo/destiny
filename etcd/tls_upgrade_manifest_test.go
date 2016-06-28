@@ -97,7 +97,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		Expect(manifest.Jobs).To(HaveLen(4))
 
 		Expect(manifest.Jobs[0]).To(Equal(core.Job{
-			Name:      "consul",
+			Name:      "consul_z1",
 			Instances: 3,
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
@@ -125,7 +125,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Jobs[1]).To(Equal(core.Job{
-			Name:      "etcd_no_tls",
+			Name:      "etcd_z1",
 			Instances: 3,
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
@@ -158,7 +158,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Jobs[2]).To(Equal(core.Job{
-			Name:      "testconsumer",
+			Name:      "testconsumer_z1",
 			Instances: 3,
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
@@ -191,7 +191,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Jobs[3]).To(Equal(core.Job{
-			Name:      "etcd_tls",
+			Name:      "etcd_tls_z1",
 			Instances: 3,
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
