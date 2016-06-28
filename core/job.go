@@ -60,6 +60,9 @@ type JobPropertiesEtcdTestConsumer struct {
 type JobPropertiesEtcdTestConsumerEtcd struct {
 	Machines   []string `yaml:"machines"`
 	RequireSSL bool     `yaml:"require_ssl"`
+	CACert     string   `yaml:"ca_cert"`
+	ClientCert string   `yaml:"client_cert"`
+	ClientKey  string   `yaml:"client_key"`
 }
 
 type JobPropertiesEtcdCluster struct {

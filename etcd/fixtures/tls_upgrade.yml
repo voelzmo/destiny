@@ -86,11 +86,14 @@ jobs:
     etcd_testconsumer:
       etcd:
         machines:
-        - 10.244.4.15
-        - 10.244.4.16
-        - 10.244.4.17
-        require_ssl: false
+        - etcd.service.cf.internal
+        require_ssl: true
+        ca_cert: etcd-ca-cert
+        client_cert: etcd-client-cert
+        client_key: etcd-client-key
   templates:
+  - release: consul
+    name: consul_agent
   - release: etcd
     name: etcd_testconsumer
 

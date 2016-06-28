@@ -215,6 +215,10 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			ResourcePool:   "etcd_z1",
 			Templates: []core.JobTemplate{
 				{
+					Name:    "consul_agent",
+					Release: "consul",
+				},
+				{
 					Name:    "etcd_testconsumer",
 					Release: "etcd",
 				},
@@ -223,11 +227,12 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 				EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
 					Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
 						Machines: []string{
-							"10.244.4.15",
-							"10.244.4.16",
-							"10.244.4.17",
+							"etcd.service.cf.internal",
 						},
-						RequireSSL: false,
+						RequireSSL: true,
+						CACert:     etcd.CACert,
+						ClientCert: etcd.ClientCert,
+						ClientKey:  etcd.ClientKey,
 					},
 				},
 			},

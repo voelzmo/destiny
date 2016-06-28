@@ -195,6 +195,10 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		ResourcePool:   "etcd_z1",
 		Templates: []core.JobTemplate{
 			{
+				Name:    "consul_agent",
+				Release: "consul",
+			},
+			{
 				Name:    "etcd_testconsumer",
 				Release: "etcd",
 			},
@@ -203,11 +207,12 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 			EtcdTestConsumer: &core.JobPropertiesEtcdTestConsumer{
 				Etcd: core.JobPropertiesEtcdTestConsumerEtcd{
 					Machines: []string{
-						ipRange.IP(15),
-						ipRange.IP(16),
-						ipRange.IP(17),
+						"etcd.service.cf.internal",
 					},
-					RequireSSL: false,
+					RequireSSL: true,
+					CACert:     config.Secrets.Etcd.CACert,
+					ClientCert: config.Secrets.Etcd.ClientCert,
+					ClientKey:  config.Secrets.Etcd.ClientKey,
 				},
 			},
 		},
