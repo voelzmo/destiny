@@ -35,8 +35,34 @@ func (m Manifest) RemoveJob(jobName string) Manifest {
 }
 
 func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) (Manifest, error) {
+	m, err := m.replaceEtcdTemplateWithProxy(jobToReplace)
+	if err != nil {
+		return m, err
+	}
+
 	for _, job := range m.Jobs {
-		if job.Name == jobToReplace {
+		if job.Properties != nil {
+			if job.Properties.Etcd.RequireSSL {
+				m.Properties.EtcdProxy = &PropertiesEtcdProxy{
+					Etcd: PropertiesEtcdProxyEtcd{
+						URL:        "https://etcd.service.cf.internal",
+						CACert:     job.Properties.Etcd.CACert,
+						ClientCert: job.Properties.Etcd.ClientCert,
+						ClientKey:  job.Properties.Etcd.ClientKey,
+						RequireSSL: true,
+						Port:       4001,
+					},
+				}
+			}
+		}
+	}
+
+	return m, nil
+}
+
+func (m Manifest) replaceEtcdTemplateWithProxy(jobName string) (Manifest, error) {
+	for _, job := range m.Jobs {
+		if job.Name == jobName {
 			for i, template := range job.Templates {
 				if template.Name == "etcd" {
 					job.Templates[i] = core.JobTemplate{

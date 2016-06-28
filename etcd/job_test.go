@@ -1,9 +1,12 @@
 package etcd_test
 
 import (
+	"io/ioutil"
+
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/etcd"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
+	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -80,22 +83,18 @@ var _ = Describe("Manifest", func() {
 	})
 
 	Describe("ReplaceEtcdWithProxyJob", func() {
-		It("returns a manifest with a proxy job", func() {
-			manifest := etcd.Manifest{
+		var (
+			manifest etcd.Manifest
+		)
+
+		BeforeEach(func() {
+			manifest = etcd.Manifest{
 				Jobs: []core.Job{
 					{
 						Name: "some-other-job",
 					},
 					{
-
-						Name:      "etcd_z1",
-						Instances: 1,
-						Networks: []core.JobNetwork{{
-							Name:      "etcd1",
-							StaticIPs: []string{"10.244.4.4"},
-						}},
-						PersistentDisk: 1024,
-						ResourcePool:   "etcd_z1",
+						Name: "etcd_no_tls",
 						Templates: []core.JobTemplate{
 							{
 								Name:    "consul",
@@ -107,10 +106,23 @@ var _ = Describe("Manifest", func() {
 							},
 						},
 					},
+					{
+						Name: "etcd_tls",
+						Properties: &core.JobProperties{
+							Etcd: &core.JobPropertiesEtcd{
+								RequireSSL: true,
+								CACert:     "some-ca-cert",
+								ClientCert: "some-client-cert",
+								ClientKey:  "some-client-key",
+							},
+						},
+					},
 				},
 			}
+		})
 
-			manifest, err := manifest.ReplaceEtcdWithProxyJob("etcd_z1")
+		It("returns a manifest with a proxy job", func() {
+			manifest, err := manifest.ReplaceEtcdWithProxyJob("etcd_no_tls")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.Jobs).To(Equal([]core.Job{
@@ -118,15 +130,7 @@ var _ = Describe("Manifest", func() {
 					Name: "some-other-job",
 				},
 				{
-
-					Name:      "etcd_z1",
-					Instances: 1,
-					Networks: []core.JobNetwork{{
-						Name:      "etcd1",
-						StaticIPs: []string{"10.244.4.4"},
-					}},
-					PersistentDisk: 1024,
-					ResourcePool:   "etcd_z1",
+					Name: "etcd_no_tls",
 					Templates: []core.JobTemplate{
 						{
 							Name:    "consul",
@@ -138,7 +142,42 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 				},
+				{
+					Name: "etcd_tls",
+					Properties: &core.JobProperties{
+						Etcd: &core.JobPropertiesEtcd{
+							RequireSSL: true,
+							CACert:     "some-ca-cert",
+							ClientCert: "some-client-cert",
+							ClientKey:  "some-client-key",
+						},
+					},
+				},
 			}))
+
+			Expect(manifest.Properties.EtcdProxy).To(Equal(&etcd.PropertiesEtcdProxy{
+				Etcd: etcd.PropertiesEtcdProxyEtcd{
+					URL:        "https://etcd.service.cf.internal",
+					CACert:     "some-ca-cert",
+					ClientCert: "some-client-cert",
+					ClientKey:  "some-client-key",
+					RequireSSL: true,
+					Port:       4001,
+				},
+			}))
+		})
+
+		It("generates correct YAML", func() {
+			manifest, err := manifest.ReplaceEtcdWithProxyJob("etcd_no_tls")
+			Expect(err).NotTo(HaveOccurred())
+
+			yaml, err := manifest.ToYAML()
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedYAML, err := ioutil.ReadFile("fixtures/proxy_replacement.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(yaml).To(gomegamatchers.MatchYAML(expectedYAML))
 		})
 
 		Context("failure cases", func() {

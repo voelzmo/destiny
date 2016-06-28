@@ -9,6 +9,7 @@ import (
 type Properties struct {
 	Etcd             *PropertiesEtcd             `yaml:"etcd,omitempty"`
 	EtcdTestConsumer *PropertiesEtcdTestConsumer `yaml:"etcd_testconsumer,omitempty"`
+	EtcdProxy        *PropertiesEtcdProxy        `yaml:"etcd_proxy,omitempty"`
 	Consul           *consul.PropertiesConsul    `yaml:"consul,omitempty"`
 	WardenCPI        *iaas.PropertiesWardenCPI   `yaml:"warden_cpi,omitempty"`
 	AWS              *iaas.PropertiesAWS         `yaml:"aws,omitempty"`
@@ -49,4 +50,17 @@ type PropertiesEtcdTestConsumerEtcd struct {
 	CACert     string   `yaml:"ca_cert"`
 	ClientCert string   `yaml:"client_cert"`
 	ClientKey  string   `yaml:"client_key"`
+}
+
+type PropertiesEtcdProxy struct {
+	Etcd PropertiesEtcdProxyEtcd `yaml:"etcd"`
+}
+
+type PropertiesEtcdProxyEtcd struct {
+	URL        string `yaml:"url"`
+	CACert     string `yaml:"ca_cert"`
+	ClientCert string `yaml:"client_cert"`
+	ClientKey  string `yaml:"client_key"`
+	RequireSSL bool   `yaml:"require_ssl"`
+	Port       int    `yaml:"port"`
 }
