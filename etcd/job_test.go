@@ -91,7 +91,11 @@ var _ = Describe("Manifest", func() {
 			manifest = etcd.Manifest{
 				Jobs: []core.Job{
 					{
-						Name: "some-other-job",
+						Name: "some-other-job-1",
+					},
+					{
+						Name:       "some-other-job-2",
+						Properties: &core.JobProperties{},
 					},
 					{
 						Name: "etcd_no_tls",
@@ -127,7 +131,11 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Jobs).To(Equal([]core.Job{
 				{
-					Name: "some-other-job",
+					Name: "some-other-job-1",
+				},
+				{
+					Name:       "some-other-job-2",
+					Properties: &core.JobProperties{},
 				},
 				{
 					Name: "etcd_no_tls",

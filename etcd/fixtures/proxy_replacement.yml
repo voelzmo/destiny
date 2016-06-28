@@ -2,11 +2,18 @@ director_uuid: ""
 name: ""
 jobs:
 - instances: 0
-  name: some-other-job
+  name: some-other-job-1
   networks: []
   resource_pool: ""
   templates: []
   persistent_disk: 0
+- instances: 0
+  name: some-other-job-2
+  networks: []
+  resource_pool: ""
+  templates: []
+  persistent_disk: 0
+  properties: {}
 - instances: 0
   name: etcd_no_tls
   networks: []

@@ -41,18 +41,16 @@ func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) (Manifest, error)
 	}
 
 	for _, job := range m.Jobs {
-		if job.Properties != nil {
-			if job.Properties.Etcd.RequireSSL {
-				m.Properties.EtcdProxy = &PropertiesEtcdProxy{
-					Etcd: PropertiesEtcdProxyEtcd{
-						URL:        "https://etcd.service.cf.internal",
-						CACert:     job.Properties.Etcd.CACert,
-						ClientCert: job.Properties.Etcd.ClientCert,
-						ClientKey:  job.Properties.Etcd.ClientKey,
-						RequireSSL: true,
-						Port:       4001,
-					},
-				}
+		if job.Properties != nil && job.Properties.Etcd != nil && job.Properties.Etcd.RequireSSL {
+			m.Properties.EtcdProxy = &PropertiesEtcdProxy{
+				Etcd: PropertiesEtcdProxyEtcd{
+					URL:        "https://etcd.service.cf.internal",
+					CACert:     job.Properties.Etcd.CACert,
+					ClientCert: job.Properties.Etcd.ClientCert,
+					ClientKey:  job.Properties.Etcd.ClientKey,
+					RequireSSL: true,
+					Port:       4001,
+				},
 			}
 		}
 	}
