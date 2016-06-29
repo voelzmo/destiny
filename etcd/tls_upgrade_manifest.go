@@ -56,7 +56,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 				CloudProperties: cloudProperties,
 				Gateway:         ipRange.IP(1),
 				Range:           string(ipRange),
-				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(22, 254)},
+				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(50, 254)},
 				Static: []string{
 					ipRange.IP(4),
 					ipRange.IP(5),
@@ -72,6 +72,29 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 					ipRange.IP(15),
 					ipRange.IP(16),
 					ipRange.IP(17),
+					ipRange.IP(18),
+					ipRange.IP(19),
+					ipRange.IP(20),
+					ipRange.IP(21),
+					ipRange.IP(22),
+					ipRange.IP(23),
+					ipRange.IP(24),
+					ipRange.IP(25),
+					ipRange.IP(26),
+					ipRange.IP(27),
+					ipRange.IP(28),
+					ipRange.IP(29),
+					ipRange.IP(30),
+					ipRange.IP(31),
+					ipRange.IP(32),
+					ipRange.IP(33),
+					ipRange.IP(34),
+					ipRange.IP(35),
+					ipRange.IP(36),
+					ipRange.IP(37),
+					ipRange.IP(38),
+					ipRange.IP(39),
+					ipRange.IP(40),
 				},
 			}},
 			Type: "manual",
@@ -112,9 +135,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(15),
-				ipRange.IP(16),
-				ipRange.IP(17),
+				ipRange.IP(30),
+				ipRange.IP(31),
+				ipRange.IP(32),
 			},
 		}},
 		PersistentDisk: 1024,
@@ -174,6 +197,10 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		ResourcePool:   "etcd_z1",
 		Templates: []core.JobTemplate{
 			{
+				Name:    "consul_agent",
+				Release: "consul",
+			},
+			{
 				Name:    "etcd_proxy",
 				Release: "etcd",
 			},
@@ -182,13 +209,15 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 
 	testconsumerJob := core.Job{
 		Name:      "testconsumer_z1",
-		Instances: 3,
+		Instances: 5,
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
 				ipRange.IP(12),
 				ipRange.IP(13),
 				ipRange.IP(14),
+				ipRange.IP(15),
+				ipRange.IP(16),
 			},
 		}},
 		PersistentDisk: 1024,
@@ -238,13 +267,13 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 			EncryptKeys: []string{config.Secrets.Consul.EncryptKey},
 		},
 		EtcdProxy: &PropertiesEtcdProxy{
+			RequireSSL: true,
+			Port:       4001,
 			Etcd: PropertiesEtcdProxyEtcd{
-				URL:        "https://etcd.service.cf.internal",
+				URL:        "https://etcd.service.cf.internal:4001",
 				CACert:     config.Secrets.Etcd.CACert,
 				ClientCert: config.Secrets.Etcd.ClientCert,
 				ClientKey:  config.Secrets.Etcd.ClientKey,
-				RequireSSL: true,
-				Port:       4001,
 			},
 		},
 	}

@@ -26,9 +26,9 @@ jobs:
   networks:
   - name: etcd1
     static_ips:
-    - 10.244.4.15
-    - 10.244.4.16
-    - 10.244.4.17
+    - 10.244.4.30
+    - 10.244.4.31
+    - 10.244.4.32
   persistent_disk: 1024
   properties:
     consul:
@@ -69,17 +69,21 @@ jobs:
   resource_pool: etcd_z1
   persistent_disk: 1024
   templates:
+  - release: consul
+    name: consul_agent
   - release: etcd
     name: etcd_proxy
 
 - name: testconsumer_z1
-  instances: 3
+  instances: 5
   networks:
   - name: etcd1
     static_ips:
     - 10.244.4.12
     - 10.244.4.13
     - 10.244.4.14
+    - 10.244.4.15
+    - 10.244.4.16
   resource_pool: etcd_z1
   persistent_disk: 1024
   properties:
@@ -97,7 +101,6 @@ jobs:
   - release: etcd
     name: etcd_testconsumer
 
-
 networks:
 - name: etcd1
   subnets:
@@ -107,7 +110,7 @@ networks:
     range: 10.244.4.0/24
     reserved:
     - 10.244.4.2-10.244.4.3
-    - 10.244.4.22-10.244.4.254
+    - 10.244.4.50-10.244.4.254
     static:
     - 10.244.4.4
     - 10.244.4.5
@@ -123,6 +126,29 @@ networks:
     - 10.244.4.15
     - 10.244.4.16
     - 10.244.4.17
+    - 10.244.4.18
+    - 10.244.4.19
+    - 10.244.4.20
+    - 10.244.4.21
+    - 10.244.4.22
+    - 10.244.4.23
+    - 10.244.4.24
+    - 10.244.4.25
+    - 10.244.4.26
+    - 10.244.4.27
+    - 10.244.4.28
+    - 10.244.4.29
+    - 10.244.4.30
+    - 10.244.4.31
+    - 10.244.4.32
+    - 10.244.4.33
+    - 10.244.4.34
+    - 10.244.4.35
+    - 10.244.4.36
+    - 10.244.4.37
+    - 10.244.4.38
+    - 10.244.4.39
+    - 10.244.4.40
   type: manual
 
 compilation:
@@ -169,10 +195,10 @@ properties:
     server_cert: consul-server-cert
     server_key: consul-server-key
   etcd_proxy:
+    require_ssl: true
+    port: 4001
     etcd:
-      url: https://etcd.service.cf.internal
+      url: https://etcd.service.cf.internal:4001
       ca_cert: etcd-ca-cert
       client_cert: etcd-client-cert
       client_key: etcd-client-key
-      require_ssl: true
-      port: 4001

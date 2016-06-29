@@ -73,7 +73,7 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 					Range:           "10.244.4.0/24",
 					Reserved: []string{
 						"10.244.4.2-10.244.4.3",
-						"10.244.4.22-10.244.4.254",
+						"10.244.4.50-10.244.4.254",
 					},
 					Static: []string{
 						"10.244.4.4",
@@ -90,6 +90,29 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 						"10.244.4.15",
 						"10.244.4.16",
 						"10.244.4.17",
+						"10.244.4.18",
+						"10.244.4.19",
+						"10.244.4.20",
+						"10.244.4.21",
+						"10.244.4.22",
+						"10.244.4.23",
+						"10.244.4.24",
+						"10.244.4.25",
+						"10.244.4.26",
+						"10.244.4.27",
+						"10.244.4.28",
+						"10.244.4.29",
+						"10.244.4.30",
+						"10.244.4.31",
+						"10.244.4.32",
+						"10.244.4.33",
+						"10.244.4.34",
+						"10.244.4.35",
+						"10.244.4.36",
+						"10.244.4.37",
+						"10.244.4.38",
+						"10.244.4.39",
+						"10.244.4.40",
 					},
 				},
 			},
@@ -132,9 +155,9 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
 				StaticIPs: []string{
-					"10.244.4.15",
-					"10.244.4.16",
-					"10.244.4.17",
+					"10.244.4.30",
+					"10.244.4.31",
+					"10.244.4.32",
 				},
 			}},
 			PersistentDisk: 1024,
@@ -194,6 +217,10 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 			ResourcePool:   "etcd_z1",
 			Templates: []core.JobTemplate{
 				{
+					Name:    "consul_agent",
+					Release: "consul",
+				},
+				{
 					Name:    "etcd_proxy",
 					Release: "etcd",
 				},
@@ -202,13 +229,15 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 
 		Expect(manifest.Jobs[3]).To(Equal(core.Job{
 			Name:      "testconsumer_z1",
-			Instances: 3,
+			Instances: 5,
 			Networks: []core.JobNetwork{{
 				Name: "etcd1",
 				StaticIPs: []string{
 					"10.244.4.12",
 					"10.244.4.13",
 					"10.244.4.14",
+					"10.244.4.15",
+					"10.244.4.16",
 				},
 			}},
 			PersistentDisk: 1024,
@@ -258,13 +287,13 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Properties.EtcdProxy).To(Equal(&etcd.PropertiesEtcdProxy{
+			RequireSSL: true,
+			Port:       4001,
 			Etcd: etcd.PropertiesEtcdProxyEtcd{
-				URL:        "https://etcd.service.cf.internal",
+				URL:        "https://etcd.service.cf.internal:4001",
 				CACert:     etcd.CACert,
 				ClientCert: etcd.ClientCert,
 				ClientKey:  etcd.ClientKey,
-				RequireSSL: true,
-				Port:       4001,
 			},
 		}))
 	})

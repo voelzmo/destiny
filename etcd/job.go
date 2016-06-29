@@ -1,28 +1,28 @@
 package etcd
 
-import (
-	"errors"
+import "github.com/pivotal-cf-experimental/destiny/core"
 
-	"github.com/pivotal-cf-experimental/destiny/core"
-)
-
-func SetJobInstanceCount(job core.Job, network core.Network, properties Properties, count int) (core.Job, Properties) {
+func SetJobInstanceCount(job core.Job, network core.Network, count int, staticIPOffset int) core.Job {
 	job.Instances = count
 	for i, net := range job.Networks {
 		if net.Name == network.Name {
-			net.StaticIPs = network.StaticIPs(count)
-
-			if !properties.Etcd.RequireSSL {
-				properties.EtcdTestConsumer.Etcd.Machines = net.StaticIPs
-				properties.Etcd.Machines = net.StaticIPs
-			}
-
-			properties.Etcd.Cluster[0].Instances = count
+			net.StaticIPs = network.StaticIPs(count + staticIPOffset)[staticIPOffset:]
 		}
 		job.Networks[i] = net
 	}
 
-	return job, properties
+	return job
+}
+
+func SetEtcdProperties(job core.Job, properties Properties) Properties {
+	if !properties.Etcd.RequireSSL {
+		properties.EtcdTestConsumer.Etcd.Machines = job.Networks[0].StaticIPs
+		properties.Etcd.Machines = job.Networks[0].StaticIPs
+	}
+
+	properties.Etcd.Cluster[0].Instances = job.Instances
+
+	return properties
 }
 
 func (m Manifest) RemoveJob(jobName string) Manifest {
@@ -32,45 +32,4 @@ func (m Manifest) RemoveJob(jobName string) Manifest {
 		}
 	}
 	return m
-}
-
-func (m Manifest) ReplaceEtcdWithProxyJob(jobToReplace string) (Manifest, error) {
-	m, err := m.replaceEtcdTemplateWithProxy(jobToReplace)
-	if err != nil {
-		return m, err
-	}
-
-	for _, job := range m.Jobs {
-		if job.Properties != nil && job.Properties.Etcd != nil && job.Properties.Etcd.RequireSSL {
-			m.Properties.EtcdProxy = &PropertiesEtcdProxy{
-				Etcd: PropertiesEtcdProxyEtcd{
-					URL:        "https://etcd.service.cf.internal",
-					CACert:     job.Properties.Etcd.CACert,
-					ClientCert: job.Properties.Etcd.ClientCert,
-					ClientKey:  job.Properties.Etcd.ClientKey,
-					RequireSSL: true,
-					Port:       4001,
-				},
-			}
-		}
-	}
-
-	return m, nil
-}
-
-func (m Manifest) replaceEtcdTemplateWithProxy(jobName string) (Manifest, error) {
-	for _, job := range m.Jobs {
-		if job.Name == jobName {
-			for i, template := range job.Templates {
-				if template.Name == "etcd" {
-					job.Templates[i] = core.JobTemplate{
-						Name:    "etcd_proxy",
-						Release: "etcd",
-					}
-					return m, nil
-				}
-			}
-		}
-	}
-	return m, errors.New("job not found")
 }
