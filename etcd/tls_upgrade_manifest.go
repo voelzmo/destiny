@@ -28,6 +28,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Network:             "etcd1",
 		ReuseCompilationVMs: true,
 		Workers:             3,
+		CloudProperties:     iaasConfig.Compilation(),
 	}
 
 	update := core.Update{
@@ -38,14 +39,17 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		UpdateWatchTime: "1000-180000",
 	}
 
+	stemcell := core.ResourcePoolStemcell{
+		Name:    iaasConfig.Stemcell(),
+		Version: "latest",
+	}
+
 	resourcePools := []core.ResourcePool{
 		{
-			Name:    "etcd_z1",
-			Network: "etcd1",
-			Stemcell: core.ResourcePoolStemcell{
-				Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
-				Version: "latest",
-			},
+			Name:            "etcd_z1",
+			Network:         "etcd1",
+			CloudProperties: iaasConfig.ResourcePool(),
+			Stemcell:        stemcell,
 		},
 	}
 
