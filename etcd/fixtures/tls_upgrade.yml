@@ -195,10 +195,10 @@ properties:
     server_cert: consul-server-cert
     server_key: consul-server-key
   etcd_proxy:
-    require_ssl: true
     port: 4001
     etcd:
-      url: https://etcd.service.cf.internal:4001
+      dns_suffix: etcd.service.cf.internal
+      port: 4001
       ca_cert: etcd-ca-cert
       client_cert: etcd-client-cert
       client_key: etcd-client-key

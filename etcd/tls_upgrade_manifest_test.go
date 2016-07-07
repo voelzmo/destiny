@@ -287,10 +287,10 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Properties.EtcdProxy).To(Equal(&etcd.PropertiesEtcdProxy{
-			RequireSSL: true,
-			Port:       4001,
+			Port: 4001,
 			Etcd: etcd.PropertiesEtcdProxyEtcd{
-				URL:        "https://etcd.service.cf.internal:4001",
+				DNSSuffix:  "etcd.service.cf.internal",
+				Port:       4001,
 				CACert:     etcd.CACert,
 				ClientCert: etcd.ClientCert,
 				ClientKey:  etcd.ClientKey,
@@ -589,10 +589,10 @@ var _ = Describe("NewTLSUpgradeManifest", func() {
 		}))
 
 		Expect(manifest.Properties.EtcdProxy).To(Equal(&etcd.PropertiesEtcdProxy{
-			RequireSSL: true,
-			Port:       4001,
+			Port: 4001,
 			Etcd: etcd.PropertiesEtcdProxyEtcd{
-				URL:        "https://etcd.service.cf.internal:4001",
+				DNSSuffix:  "etcd.service.cf.internal",
+				Port:       4001,
 				CACert:     etcd.CACert,
 				ClientCert: etcd.ClientCert,
 				ClientKey:  etcd.ClientKey,

@@ -271,10 +271,10 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 			EncryptKeys: []string{config.Secrets.Consul.EncryptKey},
 		},
 		EtcdProxy: &PropertiesEtcdProxy{
-			RequireSSL: true,
-			Port:       4001,
+			Port: 4001,
 			Etcd: PropertiesEtcdProxyEtcd{
-				URL:        "https://etcd.service.cf.internal:4001",
+				DNSSuffix:  "etcd.service.cf.internal",
+				Port:       4001,
 				CACert:     config.Secrets.Etcd.CACert,
 				ClientCert: config.Secrets.Etcd.ClientCert,
 				ClientKey:  config.Secrets.Etcd.ClientKey,

@@ -53,13 +53,13 @@ type PropertiesEtcdTestConsumerEtcd struct {
 }
 
 type PropertiesEtcdProxy struct {
-	Etcd       PropertiesEtcdProxyEtcd `yaml:"etcd"`
-	RequireSSL bool                    `yaml:"require_ssl"`
-	Port       int                     `yaml:"port"`
+	Etcd PropertiesEtcdProxyEtcd `yaml:"etcd"`
+	Port int                     `yaml:"port"`
 }
 
 type PropertiesEtcdProxyEtcd struct {
-	URL        string `yaml:"url"`
+	DNSSuffix  string `yaml:"dns_suffix"`
+	Port       int    `yaml:"port"`
 	CACert     string `yaml:"ca_cert"`
 	ClientCert string `yaml:"client_cert"`
 	ClientKey  string `yaml:"client_key"`
