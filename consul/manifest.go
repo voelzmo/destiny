@@ -1,10 +1,10 @@
 package consul
 
 import (
-	"github.com/cloudfoundry-incubator/candiedyaml"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
 	"github.com/pivotal-cf-experimental/destiny/network"
+	"gopkg.in/yaml.v2"
 )
 
 type Manifest struct {
@@ -185,12 +185,12 @@ func (m Manifest) ConsulMembers() []ConsulMember {
 }
 
 func (m Manifest) ToYAML() ([]byte, error) {
-	return candiedyaml.Marshal(m)
+	return yaml.Marshal(m)
 }
 
-func FromYAML(yaml []byte) (Manifest, error) {
+func FromYAML(manifestYAML []byte) (Manifest, error) {
 	var m Manifest
-	if err := candiedyaml.Unmarshal(yaml, &m); err != nil {
+	if err := yaml.Unmarshal(manifestYAML, &m); err != nil {
 		return m, err
 	}
 	return m, nil
