@@ -3,6 +3,7 @@ package consul
 import (
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
+	"github.com/pivotal-cf-experimental/destiny/network"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,24 +49,22 @@ func NewManifestV2(config Config, iaasConfig iaas.Config) ManifestV2 {
 		Stemcells:    stemcells(),
 		Update:       update(),
 		InstanceGroups: []core.InstanceGroup{
-			consulInstanceGroup(),
-			consulTestConsumerInstanceGroup(),
+			consulInstanceGroup(config.Networks),
+			consulTestConsumerInstanceGroup(config.Networks),
 		},
-		Properties: properties(),
+		Properties: properties(config.Networks),
 	}
 }
 
-func consulInstanceGroup() core.InstanceGroup {
+func consulInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
 	return core.InstanceGroup{
 		Instances: 1,
 		Name:      "consul",
-		AZs:       []string{"z1"},
+		AZs:       core.AZs(len(networks)),
 		Networks: []core.InstanceGroupNetwork{
 			{
-				Name: "consul1",
-				StaticIPs: []string{
-					"10.244.4.4",
-				},
+				Name:      "consul1",
+				StaticIPs: consulInstanceGroupStaticIPs(networks),
 			},
 		},
 		VMType:             "default",
@@ -103,7 +102,8 @@ func consulInstanceGroup() core.InstanceGroup {
 	}
 }
 
-func consulTestConsumerInstanceGroup() core.InstanceGroup {
+func consulTestConsumerInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
+	ipRange := network.IPRange(networks[0].IPRange)
 	return core.InstanceGroup{
 		Instances: 1,
 		Name:      "consul_test_consumer",
@@ -112,7 +112,7 @@ func consulTestConsumerInstanceGroup() core.InstanceGroup {
 			{
 				Name: "consul1",
 				StaticIPs: []string{
-					"10.244.4.9",
+					ipRange.IP(9),
 				},
 			},
 		},
@@ -132,14 +132,14 @@ func consulTestConsumerInstanceGroup() core.InstanceGroup {
 	}
 }
 
-func properties() PropertiesV2 {
+func properties(networks []ConfigNetwork) PropertiesV2 {
 	return PropertiesV2{
 		Consul: ConsulProperties{
 			Agent: AgentProperties{
 				Domain:     "cf.internal",
 				Datacenter: "dc1",
 				Servers: AgentServerProperties{
-					Lan: []string{"10.244.4.4"},
+					Lan: consulInstanceGroupStaticIPs(networks),
 				},
 			},
 			AgentCert: DC1AgentCert,
@@ -152,6 +152,18 @@ func properties() PropertiesV2 {
 			ServerKey:  DC1ServerKey,
 		},
 	}
+}
+
+func consulInstanceGroupStaticIPs(networks []ConfigNetwork) []string {
+	staticIPs := []string{}
+	for _, cfgNetwork := range networks {
+		ipRange := network.IPRange(cfgNetwork.IPRange)
+		for n := 0; n < cfgNetwork.Nodes; n++ {
+			staticIPs = append(staticIPs, ipRange.IP(n+4))
+		}
+	}
+
+	return staticIPs
 }
 
 func (m ManifestV2) ToYAML() ([]byte, error) {
