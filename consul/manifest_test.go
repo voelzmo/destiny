@@ -81,7 +81,7 @@ var _ = Describe("Manifest", func() {
 				}},
 				PersistentDisk: 1024,
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Mode:     "server",
 							LogLevel: "info",
@@ -119,7 +119,7 @@ var _ = Describe("Manifest", func() {
 				}},
 				PersistentDisk: 1024,
 				Properties: &core.JobProperties{
-					Consul: core.JobPropertiesConsul{
+					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
 							Mode:     "server",
 							LogLevel: "info",
