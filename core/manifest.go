@@ -23,6 +23,12 @@ type Release struct {
 	Version string `yaml:"version"`
 }
 
+type Stemcell struct {
+	Alias   string
+	OS      string
+	Version string
+}
+
 type ResourcePool struct {
 	CloudProperties ResourcePoolCloudProperties `yaml:"cloud_properties"`
 	Name            string                      `yaml:"name"`
@@ -47,11 +53,11 @@ type ResourcePoolStemcell struct {
 }
 
 type Update struct {
-	Canaries        int    `yaml:"canaries"`
-	CanaryWatchTime string `yaml:"canary_watch_time"`
+	Canaries        int    `yaml:"canaries,omitempty"`
+	CanaryWatchTime string `yaml:"canary_watch_time,omitempty"`
 	MaxInFlight     int    `yaml:"max_in_flight"`
-	Serial          bool   `yaml:"serial"`
-	UpdateWatchTime string `yaml:"update_watch_time"`
+	Serial          bool   `yaml:"serial,omitempty"`
+	UpdateWatchTime string `yaml:"update_watch_time,omitempty"`
 }
 
 type PropertiesBlobstore struct {
