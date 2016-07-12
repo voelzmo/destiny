@@ -13,7 +13,7 @@ import (
 )
 
 var _ = Describe("ManifestV2", func() {
-	It("returns a BOSH 2.0 manifest and cloud config", func() {
+	It("returns a BOSH 2.0 manifest for bosh-lite", func() {
 		manifest := consul.NewManifestV2(consul.Config{
 			DirectorUUID: "some-director-uuid",
 			Name:         "consul-some-random-guid",

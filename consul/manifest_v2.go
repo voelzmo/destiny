@@ -55,35 +55,6 @@ func NewManifestV2(config Config, iaasConfig iaas.Config) ManifestV2 {
 	}
 }
 
-func releases() []core.Release {
-	return []core.Release{
-		{
-			Name:    "consul",
-			Version: "latest",
-		},
-	}
-}
-
-func stemcells() []core.Stemcell {
-	return []core.Stemcell{
-		{
-			Alias:   "default",
-			OS:      "ubuntu-trusty",
-			Version: "latest",
-		},
-	}
-}
-
-func update() core.Update {
-	return core.Update{
-		Canaries:        1,
-		CanaryWatchTime: "1000-180000",
-		MaxInFlight:     50,
-		Serial:          true,
-		UpdateWatchTime: "1000-180000",
-	}
-}
-
 func consulInstanceGroup() core.InstanceGroup {
 	return core.InstanceGroup{
 		Instances: 1,

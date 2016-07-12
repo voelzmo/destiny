@@ -26,11 +26,6 @@ type ConsulMember struct {
 }
 
 func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
-	release := core.Release{
-		Name:    "consul",
-		Version: "latest",
-	}
-
 	config = populateDefaultConfigNodes(config)
 
 	ipRanges := []network.IPRange{}
@@ -79,14 +74,6 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		ReuseCompilationVMs: true,
 		Workers:             3,
 		CloudProperties:     iaasConfig.Compilation(),
-	}
-
-	update := core.Update{
-		Canaries:        1,
-		CanaryWatchTime: "1000-180000",
-		MaxInFlight:     50,
-		Serial:          true,
-		UpdateWatchTime: "1000-180000",
 	}
 
 	stemcell := core.ResourcePoolStemcell{
@@ -191,9 +178,9 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 	return Manifest{
 		DirectorUUID:  config.DirectorUUID,
 		Name:          config.Name,
-		Releases:      []core.Release{release},
+		Releases:      releases(),
+		Update:        update(),
 		Compilation:   compilation,
-		Update:        update,
 		ResourcePools: resourcePools,
 		Jobs:          jobs,
 		Networks:      consulNetworks,
