@@ -19,139 +19,214 @@ var _ = Describe("Manifest", func() {
 			manifest := consul.NewManifest(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
-				IPRange:      "10.244.4.0/24",
+				Networks: []consul.ConfigNetwork{
+					{
+						IPRange: "10.244.4.0/24",
+						Nodes:   2,
+					},
+					{
+						IPRange: "10.244.5.0/24",
+						Nodes:   1,
+					},
+				},
 			}, iaas.NewWardenConfig())
 
-			Expect(manifest).To(Equal(consul.Manifest{
-				DirectorUUID: "some-director-uuid",
-				Name:         "consul-some-random-guid",
-				Releases: []core.Release{{
-					Name:    "consul",
-					Version: "latest",
+			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
+			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
+			Expect(manifest.Releases).To(Equal([]core.Release{{
+				Name:    "consul",
+				Version: "latest",
+			}}))
+
+			Expect(manifest.Compilation).To(Equal(core.Compilation{
+				Network:             "consul1",
+				ReuseCompilationVMs: true,
+				Workers:             3,
+			}))
+
+			Expect(manifest.Update).To(Equal(core.Update{
+				Canaries:        1,
+				CanaryWatchTime: "1000-180000",
+				MaxInFlight:     50,
+				Serial:          true,
+				UpdateWatchTime: "1000-180000",
+			}))
+
+			Expect(manifest.ResourcePools).To(Equal([]core.ResourcePool{
+				{
+					Name:    "consul_z1",
+					Network: "consul1",
+					Stemcell: core.ResourcePoolStemcell{
+						Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
+						Version: "latest",
+					},
+				},
+				{
+					Name:    "consul_z2",
+					Network: "consul2",
+					Stemcell: core.ResourcePoolStemcell{
+						Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
+						Version: "latest",
+					},
+				},
+			}))
+
+			Expect(manifest.Jobs).To(HaveLen(3))
+			Expect(manifest.Jobs[0]).To(Equal(core.Job{
+				Name:      "consul_z1",
+				Instances: 2,
+				Networks: []core.JobNetwork{{
+					Name:      "consul1",
+					StaticIPs: []string{"10.244.4.4", "10.244.4.5"},
 				}},
-				Compilation: core.Compilation{
-					Network:             "consul1",
-					ReuseCompilationVMs: true,
-					Workers:             3,
-				},
-				Update: core.Update{
-					Canaries:        1,
-					CanaryWatchTime: "1000-180000",
-					MaxInFlight:     50,
-					Serial:          true,
-					UpdateWatchTime: "1000-180000",
-				},
-				ResourcePools: []core.ResourcePool{
-					{
-						Name:    "consul_z1",
-						Network: "consul1",
-						Stemcell: core.ResourcePoolStemcell{
-							Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
-							Version: "latest",
-						},
-					},
-				},
-				Jobs: []core.Job{
-					{
-						Name:      "consul_z1",
-						Instances: 1,
-						Networks: []core.JobNetwork{{
-							Name:      "consul1",
-							StaticIPs: []string{"10.244.4.4"},
-						}},
-						PersistentDisk: 1024,
-						Properties: &core.JobProperties{
-							Consul: &core.JobPropertiesConsul{
-								Agent: core.JobPropertiesConsulAgent{
-									Mode:     "server",
-									LogLevel: "info",
-									Services: core.JobPropertiesConsulAgentServices{
-										"router": core.JobPropertiesConsulAgentService{
-											Name: "gorouter",
-											Check: &core.JobPropertiesConsulAgentServiceCheck{
-												Name:     "router-check",
-												Script:   "/var/vcap/jobs/router/bin/script",
-												Interval: "1m",
-											},
-											Tags: []string{"routing"},
-										},
-										"cloud_controller": core.JobPropertiesConsulAgentService{},
+				PersistentDisk: 1024,
+				Properties: &core.JobProperties{
+					Consul: core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Mode:     "server",
+							LogLevel: "info",
+							Services: core.JobPropertiesConsulAgentServices{
+								"router": core.JobPropertiesConsulAgentService{
+									Name: "gorouter",
+									Check: &core.JobPropertiesConsulAgentServiceCheck{
+										Name:     "router-check",
+										Script:   "/var/vcap/jobs/router/bin/script",
+										Interval: "1m",
 									},
+									Tags: []string{"routing"},
 								},
-							},
-						},
-						ResourcePool: "consul_z1",
-						Templates: []core.JobTemplate{{
-							Name:    "consul_agent",
-							Release: "consul",
-						}},
-						Update: &core.JobUpdate{
-							MaxInFlight: 1,
-						},
-					},
-					{
-						Name:      "consul_test_consumer",
-						Instances: 1,
-						Networks: []core.JobNetwork{{
-							Name:      "consul1",
-							StaticIPs: []string{"10.244.4.9"},
-						}},
-						PersistentDisk: 1024,
-						ResourcePool:   "consul_z1",
-						Templates: []core.JobTemplate{
-							{
-								Name:    "consul_agent",
-								Release: "consul",
-							},
-							{
-								Name:    "consul-test-consumer",
-								Release: "consul",
+								"cloud_controller": core.JobPropertiesConsulAgentService{},
 							},
 						},
 					},
 				},
-				Networks: []core.Network{
-					{
-						Name: "consul1",
-						Subnets: []core.NetworkSubnet{
-							{
-								CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
-								Gateway:         "10.244.4.1",
-								Range:           "10.244.4.0/24",
-								Reserved: []string{
-									"10.244.4.2-10.244.4.3",
-									"10.244.4.13-10.244.4.254",
+				ResourcePool: "consul_z1",
+				Templates: []core.JobTemplate{{
+					Name:    "consul_agent",
+					Release: "consul",
+				}},
+				Update: &core.JobUpdate{
+					MaxInFlight: 1,
+				},
+			}))
+
+			Expect(manifest.Jobs[1]).To(Equal(core.Job{
+				Name:      "consul_z2",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "consul2",
+					StaticIPs: []string{"10.244.5.4"},
+				}},
+				PersistentDisk: 1024,
+				Properties: &core.JobProperties{
+					Consul: core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Mode:     "server",
+							LogLevel: "info",
+							Services: core.JobPropertiesConsulAgentServices{
+								"router": core.JobPropertiesConsulAgentService{
+									Name: "gorouter",
+									Check: &core.JobPropertiesConsulAgentServiceCheck{
+										Name:     "router-check",
+										Script:   "/var/vcap/jobs/router/bin/script",
+										Interval: "1m",
+									},
+									Tags: []string{"routing"},
 								},
-								Static: []string{
-									"10.244.4.4",
-									"10.244.4.5",
-									"10.244.4.6",
-									"10.244.4.7",
-									"10.244.4.8",
-									"10.244.4.9",
-								},
+								"cloud_controller": core.JobPropertiesConsulAgentService{},
 							},
 						},
-						Type: "manual",
 					},
 				},
-				Properties: consul.Properties{
-					Consul: &consul.PropertiesConsul{
-						Agent: consul.PropertiesConsulAgent{
-							Domain:     "cf.internal",
-							Datacenter: "dc1",
-							LogLevel:   "",
-							Servers: consul.PropertiesConsulAgentServers{
-								Lan: []string{"10.244.4.4"},
-							},
-						},
-						CACert:      consul.CACert,
-						AgentCert:   consul.DC1AgentCert,
-						AgentKey:    consul.DC1AgentKey,
-						ServerCert:  consul.DC1ServerCert,
-						ServerKey:   consul.DC1ServerKey,
-						EncryptKeys: []string{consul.EncryptKey},
+				ResourcePool: "consul_z2",
+				Templates: []core.JobTemplate{{
+					Name:    "consul_agent",
+					Release: "consul",
+				}},
+				Update: &core.JobUpdate{
+					MaxInFlight: 1,
+				},
+			}))
+
+			Expect(manifest.Jobs[2]).To(Equal(core.Job{
+				Name:      "consul_test_consumer",
+				Instances: 1,
+				Networks: []core.JobNetwork{{
+					Name:      "consul1",
+					StaticIPs: []string{"10.244.4.9"},
+				}},
+				PersistentDisk: 1024,
+				ResourcePool:   "consul_z1",
+				Templates: []core.JobTemplate{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
 					},
+					{
+						Name:    "consul-test-consumer",
+						Release: "consul",
+					},
+				},
+			}))
+
+			Expect(manifest.Networks).To(HaveLen(2))
+			Expect(manifest.Networks[0]).To(Equal(core.Network{
+				Name: "consul1",
+				Subnets: []core.NetworkSubnet{
+					{
+						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
+						Gateway:         "10.244.4.1",
+						Range:           "10.244.4.0/24",
+						Reserved: []string{
+							"10.244.4.2-10.244.4.3",
+							"10.244.4.13-10.244.4.254",
+						},
+						Static: []string{
+							"10.244.4.4",
+							"10.244.4.5",
+							"10.244.4.6",
+							"10.244.4.7",
+							"10.244.4.8",
+							"10.244.4.9",
+						},
+					},
+				},
+				Type: "manual",
+			}))
+			Expect(manifest.Networks[1]).To(Equal(core.Network{
+				Name: "consul2",
+				Subnets: []core.NetworkSubnet{
+					{
+						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
+						Gateway:         "10.244.5.1",
+						Range:           "10.244.5.0/24",
+						Reserved: []string{
+							"10.244.5.2-10.244.5.3",
+							"10.244.5.13-10.244.5.254",
+						},
+						Static: []string{
+							"10.244.5.4",
+						},
+					},
+				},
+				Type: "manual",
+			}))
+
+			Expect(manifest.Properties).To(Equal(consul.Properties{
+				Consul: &consul.PropertiesConsul{
+					Agent: consul.PropertiesConsulAgent{
+						Domain:     "cf.internal",
+						Datacenter: "dc1",
+						Servers: consul.PropertiesConsulAgentServers{
+							Lan: []string{"10.244.4.4", "10.244.4.5", "10.244.5.4"},
+						},
+					},
+					CACert:      consul.CACert,
+					AgentCert:   consul.DC1AgentCert,
+					AgentKey:    consul.DC1AgentKey,
+					ServerCert:  consul.DC1ServerCert,
+					ServerKey:   consul.DC1ServerKey,
+					EncryptKeys: []string{consul.EncryptKey},
 				},
 			}))
 		})
@@ -160,7 +235,12 @@ var _ = Describe("Manifest", func() {
 			manifest := consul.NewManifest(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
-				IPRange:      "10.0.4.0/24",
+				Networks: []consul.ConfigNetwork{
+					{
+						IPRange: "10.0.4.0/24",
+						Nodes:   1,
+					},
+				},
 			}, iaas.AWSConfig{
 				Subnet: "subnet-1234",
 			})
@@ -315,13 +395,36 @@ var _ = Describe("Manifest", func() {
 			}))
 		})
 
+		Context("when config nodes is not specified", func() {
+			It("sets job instances to 1 and assigns a static IP", func() {
+				manifest := consul.NewManifest(consul.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					Networks: []consul.ConfigNetwork{
+						{
+							IPRange: "10.0.4.0/24",
+						},
+					},
+				}, iaas.AWSConfig{
+					Subnet: "subnet-1234",
+				})
+
+				Expect(manifest.Jobs[0].Instances).To(Equal(1))
+			})
+		})
+
 		DescribeTable("TLS configuration",
 			func(dcName, agentCert, agentKey, serverCert, serverKey string) {
 				manifest := consul.NewManifest(consul.Config{
 					DirectorUUID: "some-director-uuid",
 					Name:         "consul-some-random-guid",
-					IPRange:      "10.244.4.0/24",
-					DC:           dcName,
+					Networks: []consul.ConfigNetwork{
+						{
+							IPRange: "10.244.4.0/24",
+							Nodes:   1,
+						},
+					},
+					DC: dcName,
 				}, iaas.NewWardenConfig())
 
 				Expect(manifest.Properties.Consul.Agent.Datacenter).To(Equal(dcName))
@@ -583,7 +686,12 @@ var _ = Describe("Manifest", func() {
 			manifest := consul.NewManifest(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul",
-				IPRange:      "10.244.4.0/24",
+				Networks: []consul.ConfigNetwork{
+					{
+						IPRange: "10.244.4.0/24",
+						Nodes:   1,
+					},
+				},
 			}, iaas.NewWardenConfig())
 
 			yaml, err := manifest.ToYAML()

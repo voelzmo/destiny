@@ -1,6 +1,8 @@
 package consul
 
 import (
+	"fmt"
+
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
 	"github.com/pivotal-cf-experimental/destiny/network"
@@ -29,31 +31,51 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Version: "latest",
 	}
 
-	ipRange := network.IPRange(config.IPRange)
+	config = populateDefaultConfigNodes(config)
+
+	ipRanges := []network.IPRange{}
+
+	for _, cfgNetwork := range config.Networks {
+		ipRanges = append(ipRanges, network.IPRange(cfgNetwork.IPRange))
+	}
 
 	cloudProperties := iaasConfig.NetworkSubnet()
 
-	consulNetwork1 := core.Network{
-		Name: "consul1",
-		Subnets: []core.NetworkSubnet{{
-			CloudProperties: cloudProperties,
-			Gateway:         ipRange.IP(1),
-			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(13, 254)},
-			Static: []string{
+	consulNetworks := []core.Network{}
+	for i, ipRange := range ipRanges {
+		var staticIPs []string
+
+		if i == 0 {
+			staticIPs = []string{
 				ipRange.IP(4),
 				ipRange.IP(5),
 				ipRange.IP(6),
 				ipRange.IP(7),
 				ipRange.IP(8),
 				ipRange.IP(9),
-			},
-		}},
-		Type: "manual",
+			}
+		} else {
+			staticIPs = []string{
+				ipRange.IP(4),
+			}
+		}
+
+		consulNetwork := core.Network{
+			Name: fmt.Sprintf("consul%d", i+1),
+			Subnets: []core.NetworkSubnet{{
+				CloudProperties: cloudProperties,
+				Gateway:         ipRange.IP(1),
+				Range:           string(ipRange),
+				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(13, 254)},
+				Static:          staticIPs,
+			}},
+			Type: "manual",
+		}
+		consulNetworks = append(consulNetworks, consulNetwork)
 	}
 
 	compilation := core.Compilation{
-		Network:             consulNetwork1.Name,
+		Network:             consulNetworks[0].Name,
 		ReuseCompilationVMs: true,
 		Workers:             3,
 		CloudProperties:     iaasConfig.Compilation(),
@@ -72,60 +94,74 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Version: "latest",
 	}
 
-	z1ResourcePool := core.ResourcePool{
-		Name:            "consul_z1",
-		Network:         consulNetwork1.Name,
-		Stemcell:        stemcell,
-		CloudProperties: iaasConfig.ResourcePool(),
+	resourcePools := []core.ResourcePool{}
+	for i := range consulNetworks {
+		resourcePool := core.ResourcePool{
+			Name:            fmt.Sprintf("consul_z%d", i+1),
+			Network:         consulNetworks[i].Name,
+			Stemcell:        stemcell,
+			CloudProperties: iaasConfig.ResourcePool(),
+		}
+		resourcePools = append(resourcePools, resourcePool)
 	}
 
-	z1Job := core.Job{
-		Name:      "consul_z1",
-		Instances: 1,
-		Networks: []core.JobNetwork{{
-			Name:      consulNetwork1.Name,
-			StaticIPs: consulNetwork1.StaticIPs(1),
-		}},
-		PersistentDisk: 1024,
-		Properties: &core.JobProperties{
-			Consul: &core.JobPropertiesConsul{
-				Agent: core.JobPropertiesConsulAgent{
-					Mode:     "server",
-					LogLevel: "info",
-					Services: core.JobPropertiesConsulAgentServices{
-						"router": core.JobPropertiesConsulAgentService{
-							Name: "gorouter",
-							Check: &core.JobPropertiesConsulAgentServiceCheck{
-								Name:     "router-check",
-								Script:   "/var/vcap/jobs/router/bin/script",
-								Interval: "1m",
+	jobs := []core.Job{}
+	consulClusterStaticIPs := []string{}
+
+	for i := range consulNetworks {
+		instances := config.Networks[i].Nodes
+
+		job := core.Job{
+			Name:      fmt.Sprintf("consul_z%d", i+1),
+			Instances: instances,
+			Networks: []core.JobNetwork{{
+				Name:      consulNetworks[i].Name,
+				StaticIPs: consulNetworks[i].StaticIPs(instances),
+			}},
+			PersistentDisk: 1024,
+			Properties: &core.JobProperties{
+				Consul: core.JobPropertiesConsul{
+					Agent: core.JobPropertiesConsulAgent{
+						Mode:     "server",
+						LogLevel: "info",
+						Services: core.JobPropertiesConsulAgentServices{
+							"router": core.JobPropertiesConsulAgentService{
+								Name: "gorouter",
+								Check: &core.JobPropertiesConsulAgentServiceCheck{
+									Name:     "router-check",
+									Script:   "/var/vcap/jobs/router/bin/script",
+									Interval: "1m",
+								},
+								Tags: []string{"routing"},
 							},
-							Tags: []string{"routing"},
+							"cloud_controller": core.JobPropertiesConsulAgentService{},
 						},
-						"cloud_controller": core.JobPropertiesConsulAgentService{},
 					},
 				},
 			},
-		},
-		ResourcePool: z1ResourcePool.Name,
-		Templates: []core.JobTemplate{{
-			Name:    "consul_agent",
-			Release: "consul",
-		}},
-		Update: &core.JobUpdate{
-			MaxInFlight: 1,
-		},
+			ResourcePool: resourcePools[i].Name,
+			Templates: []core.JobTemplate{{
+				Name:    "consul_agent",
+				Release: "consul",
+			}},
+			Update: &core.JobUpdate{
+				MaxInFlight: 1,
+			},
+		}
+
+		jobs = append(jobs, job)
+		consulClusterStaticIPs = append(consulClusterStaticIPs, consulNetworks[i].StaticIPs(instances)...)
 	}
 
-	testConsumerJob := core.Job{
+	jobs = append(jobs, core.Job{
 		Name:      "consul_test_consumer",
 		Instances: 1,
 		Networks: []core.JobNetwork{{
-			Name:      consulNetwork1.Name,
-			StaticIPs: []string{consulNetwork1.StaticIPs(6)[5]},
+			Name:      consulNetworks[0].Name,
+			StaticIPs: []string{consulNetworks[0].StaticIPs(6)[5]},
 		}},
 		PersistentDisk: 1024,
-		ResourcePool:   z1ResourcePool.Name,
+		ResourcePool:   resourcePools[0].Name,
 		Templates: []core.JobTemplate{
 			{
 				Name:    "consul_agent",
@@ -136,14 +172,14 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				Release: "consul",
 			},
 		},
-	}
+	})
 
 	properties := Properties{
 		Consul: &PropertiesConsul{
 			Agent: PropertiesConsulAgent{
 				Domain: "cf.internal",
 				Servers: PropertiesConsulAgentServers{
-					Lan: consulNetwork1.StaticIPs(1),
+					Lan: consulClusterStaticIPs,
 				},
 			},
 			EncryptKeys: []string{EncryptKey},
@@ -158,9 +194,9 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Releases:      []core.Release{release},
 		Compilation:   compilation,
 		Update:        update,
-		ResourcePools: []core.ResourcePool{z1ResourcePool},
-		Jobs:          []core.Job{z1Job, testConsumerJob},
-		Networks:      []core.Network{consulNetwork1},
+		ResourcePools: resourcePools,
+		Jobs:          jobs,
+		Networks:      consulNetworks,
 		Properties:    properties,
 	}
 }
@@ -225,4 +261,14 @@ func overrideTLS(properties *PropertiesConsul, dc string) {
 	}
 
 	properties.CACert = CACert
+}
+
+func populateDefaultConfigNodes(config Config) Config {
+	for i, cfgNetworks := range config.Networks {
+		if cfgNetworks.Nodes == 0 {
+			config.Networks[i].Nodes = 1
+		}
+	}
+
+	return config
 }

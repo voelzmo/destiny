@@ -12,7 +12,12 @@ var _ = Describe("Job", func() {
 	Describe("SetJobInstanceCount", func() {
 		It("sets the correct values for instances and static_ips given a count", func() {
 			manifest := consul.NewManifest(consul.Config{
-				IPRange: "10.244.4.0/24",
+				Networks: []consul.ConfigNetwork{
+					{
+						IPRange: "10.244.4.0/24",
+						Nodes:   1,
+					},
+				},
 			}, iaas.NewWardenConfig())
 			job := manifest.Jobs[0]
 			network := manifest.Networks[0]

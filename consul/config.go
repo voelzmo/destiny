@@ -3,9 +3,14 @@ package consul
 type Config struct {
 	DirectorUUID  string
 	Name          string
-	IPRange       string
 	ConsulSecrets ConfigSecretsConsul
 	DC            string
+	Networks      []ConfigNetwork
+}
+
+type ConfigNetwork struct {
+	IPRange string
+	Nodes   int
 }
 
 type ConfigSecretsConsul struct {
