@@ -85,7 +85,7 @@ func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
 		ReuseCompilationVMs: true,
 		AZ:                  "z1",
 		VMType:              "default",
-		Network:             "default",
+		Network:             "private",
 	}
 
 	azs := []AZ{}
@@ -98,7 +98,7 @@ func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
 
 		ipRange := network.IPRange(cfgNetwork.IPRange)
 		networks = append(networks, Network{
-			Name: "default",
+			Name: "private",
 			Subnets: []Subnet{
 				{
 					CloudProperties: SubnetCloudProperties{

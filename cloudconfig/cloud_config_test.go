@@ -47,12 +47,12 @@ var _ = Describe("CloudConfig", func() {
 				ReuseCompilationVMs: true,
 				AZ:                  "z1",
 				VMType:              "default",
-				Network:             "default",
+				Network:             "private",
 			}))
 
 			Expect(cc.Networks).To(Equal([]cloudconfig.Network{
 				{
-					Name: "default",
+					Name: "private",
 					Subnets: []cloudconfig.Subnet{
 						{
 							CloudProperties: cloudconfig.SubnetCloudProperties{
@@ -114,12 +114,12 @@ var _ = Describe("CloudConfig", func() {
 				ReuseCompilationVMs: true,
 				AZ:                  "z1",
 				VMType:              "default",
-				Network:             "default",
+				Network:             "private",
 			}))
 
 			Expect(cc.Networks).To(Equal([]cloudconfig.Network{
 				{
-					Name: "default",
+					Name: "private",
 					Subnets: []cloudconfig.Subnet{
 						{
 							CloudProperties: cloudconfig.SubnetCloudProperties{

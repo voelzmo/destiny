@@ -13,10 +13,10 @@ compilation:
   reuse_compilation_vms: true
   az: z1
   vm_type: default
-  network: default
+  network: private
 
 networks:
-- name: default
+- name: private
   subnets:
   - cloud_properties:
       name: random
