@@ -157,9 +157,7 @@ var _ = Describe("ManifestV2", func() {
 						Nodes:   1,
 					},
 				},
-			}, iaas.AWSConfig{
-				Subnet: "subnet-1234",
-			})
+			}, iaas.AWSConfig{})
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
