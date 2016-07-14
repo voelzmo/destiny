@@ -5,7 +5,6 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/pivotal-cf-experimental/destiny/iaas"
 	"github.com/pivotal-cf-experimental/destiny/network"
 )
 
@@ -66,7 +65,14 @@ type SubnetCloudProperties struct {
 	Name string
 }
 
-func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
+const (
+	gatewayIPRangeIndex         = 1
+	loReservedIPRangeStartIndex = 2
+	loReservedIPRangeEndIndex   = 3
+	hiReservedIPRangeEndIndex   = 254
+)
+
+func NewWardenCloudConfig(config Config) CloudConfig {
 	vmTypes := []VMType{
 		{
 			Name: "default",
@@ -81,7 +87,7 @@ func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
 	}
 
 	compilation := Compilation{
-		Workers:             5,
+		Workers:             3,
 		ReuseCompilationVMs: true,
 		AZ:                  "z1",
 		VMType:              "default",
@@ -99,9 +105,14 @@ func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
 
 		ipRange := network.IPRange(cfgAZ.IPRange)
 
+		hiReservedIPRangeStartIndex := loReservedIPRangeEndIndex + 1 + cfgAZ.StaticIPs
+		if i == 0 {
+			hiReservedIPRangeStartIndex += compilation.Workers
+		}
+
 		staticIPs := []string{}
 		for j := 0; j < cfgAZ.StaticIPs; j++ {
-			staticIPs = append(staticIPs, ipRange.IP(4+j))
+			staticIPs = append(staticIPs, ipRange.IP(loReservedIPRangeEndIndex+1+j))
 		}
 
 		subnets = append(subnets, Subnet{
@@ -109,22 +120,23 @@ func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
 				Name: "random",
 			},
 			Range:   string(ipRange),
-			Gateway: ipRange.IP(1),
+			Gateway: ipRange.IP(gatewayIPRangeIndex),
 			AZ:      azName,
 			Reserved: []string{
-				ipRange.Range(2, 3),
-				ipRange.Range(13, 254),
+				ipRange.Range(loReservedIPRangeStartIndex, loReservedIPRangeEndIndex),
+				ipRange.Range(hiReservedIPRangeStartIndex, hiReservedIPRangeEndIndex),
 			},
 			Static: staticIPs,
 		})
 	}
 
-	networks := []Network{}
-	networks = append(networks, Network{
-		Name:    "private",
-		Subnets: subnets,
-		Type:    "manual",
-	})
+	networks := []Network{
+		{
+			Name:    "private",
+			Subnets: subnets,
+			Type:    "manual",
+		},
+	}
 
 	return CloudConfig{
 		AZs:         azs,
