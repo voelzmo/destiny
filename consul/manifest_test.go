@@ -543,7 +543,8 @@ var _ = Describe("Manifest", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest, err := consul.FromYAML(consulManifest)
+			var manifest consul.Manifest
+			err = consul.FromYAML(consulManifest, &manifest)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
@@ -657,6 +658,111 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Type: "manual",
+			}))
+			Expect(manifest.Properties).To(Equal(consul.Properties{
+				Consul: &consul.PropertiesConsul{
+					Agent: consul.PropertiesConsulAgent{
+						Domain:     "cf.internal",
+						Datacenter: "dc1",
+						Servers: consul.PropertiesConsulAgentServers{
+							Lan: []string{"10.244.4.4"},
+						},
+					},
+					CACert:      consul.CACert,
+					AgentCert:   consul.DC1AgentCert,
+					AgentKey:    consul.DC1AgentKey,
+					ServerCert:  consul.DC1ServerCert,
+					ServerKey:   consul.DC1ServerKey,
+					EncryptKeys: []string{consul.EncryptKey},
+				},
+			}))
+		})
+
+		It("returns a ManifestV2 matching the given YAML", func() {
+			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest_v2.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			var manifest consul.ManifestV2
+			err = consul.FromYAML(consulManifest, &manifest)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
+			Expect(manifest.Name).To(Equal("consul"))
+			Expect(manifest.Releases).To(HaveLen(1))
+			Expect(manifest.Releases).To(ContainElement(core.Release{
+				Name:    "consul",
+				Version: "latest",
+			}))
+			Expect(manifest.Update).To(Equal(core.Update{
+				Canaries:        1,
+				CanaryWatchTime: "1000-180000",
+				MaxInFlight:     50,
+				Serial:          true,
+				UpdateWatchTime: "1000-180000",
+			}))
+			Expect(manifest.InstanceGroups).To(HaveLen(2))
+			Expect(manifest.InstanceGroups[0]).To(Equal(core.InstanceGroup{
+				Name:      "consul",
+				Instances: 1,
+				AZs:       []string{"z1"},
+				Networks: []core.InstanceGroupNetwork{{
+					Name:      "private",
+					StaticIPs: []string{"10.244.4.4"},
+				}},
+				VMType:             "default",
+				Stemcell:           "default",
+				PersistentDiskType: "default",
+				Update: core.Update{
+					MaxInFlight: 1,
+				},
+				Jobs: []core.InstanceGroupJob{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+				},
+				Properties: core.InstanceGroupProperties{
+					Consul: core.InstanceGroupPropertiesConsul{
+						Agent: core.InstanceGroupPropertiesConsulAgent{
+							Mode:     "server",
+							LogLevel: "info",
+							Services: map[string]core.InstanceGroupPropertiesConsulAgentService{
+								"router": core.InstanceGroupPropertiesConsulAgentService{
+									Name: "gorouter",
+									Check: core.InstanceGroupPropertiesConsulAgentServiceCheck{
+										Name:     "router-check",
+										Script:   "/var/vcap/jobs/router/bin/script",
+										Interval: "1m",
+									},
+									Tags: []string{"routing"},
+								},
+								"cloud_controller": core.InstanceGroupPropertiesConsulAgentService{},
+							},
+						},
+					},
+				},
+			}))
+			Expect(manifest.InstanceGroups[1]).To(Equal(core.InstanceGroup{
+				Name:      "consul_test_consumer",
+				AZs:       []string{"z1"},
+				Instances: 1,
+				Networks: []core.InstanceGroupNetwork{{
+					Name:      "private",
+					StaticIPs: []string{"10.244.4.9"},
+				}},
+				VMType:             "default",
+				Stemcell:           "default",
+				PersistentDiskType: "default",
+				Jobs: []core.InstanceGroupJob{
+					{
+						Name:    "consul_agent",
+						Release: "consul",
+					},
+					{
+						Name:    "consul-test-consumer",
+						Release: "consul",
+					},
+				},
 			}))
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{

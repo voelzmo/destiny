@@ -14,31 +14,7 @@ type ManifestV2 struct {
 	Stemcells      []core.Stemcell      `yaml:"stemcells"`
 	Update         core.Update          `yaml:"update"`
 	InstanceGroups []core.InstanceGroup `yaml:"instance_groups"`
-	Properties     PropertiesV2         `yaml:"properties"`
-}
-
-type PropertiesV2 struct {
-	Consul ConsulProperties `yaml:"consul"`
-}
-
-type ConsulProperties struct {
-	Agent       AgentProperties `yaml:"agent"`
-	AgentCert   string          `yaml:"agent_cert"`
-	AgentKey    string          `yaml:"agent_key"`
-	CACert      string          `yaml:"ca_cert"`
-	EncryptKeys []string        `yaml:"encrypt_keys"`
-	ServerCert  string          `yaml:"server_cert"`
-	ServerKey   string          `yaml:"server_key"`
-}
-
-type AgentProperties struct {
-	Domain     string                `yaml:"domain"`
-	Datacenter string                `yaml:"datacenter"`
-	Servers    AgentServerProperties `yaml:"servers"`
-}
-
-type AgentServerProperties struct {
-	Lan []string `yaml:"lan"`
+	Properties     Properties           `yaml:"properties"`
 }
 
 func NewManifestV2(config Config, iaasConfig iaas.Config) ManifestV2 {
@@ -73,28 +49,28 @@ func consulInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
 		Update: core.Update{
 			MaxInFlight: 1,
 		},
-		Jobs: []core.JobV2{
+		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "consul_agent",
 				Release: "consul",
 			},
 		},
 		Properties: core.InstanceGroupProperties{
-			Consul: core.ConsulInstanceGroupProperties{
-				Agent: core.ConsulAgentProperties{
+			Consul: core.InstanceGroupPropertiesConsul{
+				Agent: core.InstanceGroupPropertiesConsulAgent{
 					Mode:     "server",
 					LogLevel: "info",
-					Services: map[string]core.ConsulAgentServiceProperties{
-						"router": core.ConsulAgentServiceProperties{
+					Services: map[string]core.InstanceGroupPropertiesConsulAgentService{
+						"router": core.InstanceGroupPropertiesConsulAgentService{
 							Name: "gorouter",
-							Check: core.ConsulServiceCheckProperties{
+							Check: core.InstanceGroupPropertiesConsulAgentServiceCheck{
 								Name:     "router-check",
 								Script:   "/var/vcap/jobs/router/bin/script",
 								Interval: "1m",
 							},
 							Tags: []string{"routing"},
 						},
-						"cloud_controller": core.ConsulAgentServiceProperties{},
+						"cloud_controller": core.InstanceGroupPropertiesConsulAgentService{},
 					},
 				},
 			},
@@ -119,7 +95,7 @@ func consulTestConsumerInstanceGroup(networks []ConfigNetwork) core.InstanceGrou
 		VMType:             "default",
 		Stemcell:           "default",
 		PersistentDiskType: "default",
-		Jobs: []core.JobV2{
+		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "consul_agent",
 				Release: "consul",
@@ -132,13 +108,13 @@ func consulTestConsumerInstanceGroup(networks []ConfigNetwork) core.InstanceGrou
 	}
 }
 
-func properties(networks []ConfigNetwork) PropertiesV2 {
-	return PropertiesV2{
-		Consul: ConsulProperties{
-			Agent: AgentProperties{
+func properties(networks []ConfigNetwork) Properties {
+	return Properties{
+		Consul: &PropertiesConsul{
+			Agent: PropertiesConsulAgent{
 				Domain:     "cf.internal",
 				Datacenter: "dc1",
-				Servers: AgentServerProperties{
+				Servers: PropertiesConsulAgentServers{
 					Lan: consulInstanceGroupStaticIPs(networks),
 				},
 			},

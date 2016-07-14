@@ -71,28 +71,28 @@ var _ = Describe("ManifestV2", func() {
 					Update: core.Update{
 						MaxInFlight: 1,
 					},
-					Jobs: []core.JobV2{
+					Jobs: []core.InstanceGroupJob{
 						{
 							Name:    "consul_agent",
 							Release: "consul",
 						},
 					},
 					Properties: core.InstanceGroupProperties{
-						Consul: core.ConsulInstanceGroupProperties{
-							Agent: core.ConsulAgentProperties{
+						Consul: core.InstanceGroupPropertiesConsul{
+							Agent: core.InstanceGroupPropertiesConsulAgent{
 								Mode:     "server",
 								LogLevel: "info",
-								Services: map[string]core.ConsulAgentServiceProperties{
-									"router": core.ConsulAgentServiceProperties{
+								Services: map[string]core.InstanceGroupPropertiesConsulAgentService{
+									"router": core.InstanceGroupPropertiesConsulAgentService{
 										Name: "gorouter",
-										Check: core.ConsulServiceCheckProperties{
+										Check: core.InstanceGroupPropertiesConsulAgentServiceCheck{
 											Name:     "router-check",
 											Script:   "/var/vcap/jobs/router/bin/script",
 											Interval: "1m",
 										},
 										Tags: []string{"routing"},
 									},
-									"cloud_controller": core.ConsulAgentServiceProperties{},
+									"cloud_controller": core.InstanceGroupPropertiesConsulAgentService{},
 								},
 							},
 						},
@@ -113,7 +113,7 @@ var _ = Describe("ManifestV2", func() {
 					VMType:             "default",
 					Stemcell:           "default",
 					PersistentDiskType: "default",
-					Jobs: []core.JobV2{
+					Jobs: []core.InstanceGroupJob{
 						{
 							Name:    "consul_agent",
 							Release: "consul",
@@ -126,12 +126,12 @@ var _ = Describe("ManifestV2", func() {
 				},
 			}))
 
-			Expect(manifest.Properties).To(Equal(consul.PropertiesV2{
-				Consul: consul.ConsulProperties{
-					Agent: consul.AgentProperties{
+			Expect(manifest.Properties).To(Equal(consul.Properties{
+				Consul: &consul.PropertiesConsul{
+					Agent: consul.PropertiesConsulAgent{
 						Domain:     "cf.internal",
 						Datacenter: "dc1",
-						Servers: consul.AgentServerProperties{
+						Servers: consul.PropertiesConsulAgentServers{
 							Lan: []string{"10.244.4.4"},
 						},
 					},
@@ -204,28 +204,28 @@ var _ = Describe("ManifestV2", func() {
 					Update: core.Update{
 						MaxInFlight: 1,
 					},
-					Jobs: []core.JobV2{
+					Jobs: []core.InstanceGroupJob{
 						{
 							Name:    "consul_agent",
 							Release: "consul",
 						},
 					},
 					Properties: core.InstanceGroupProperties{
-						Consul: core.ConsulInstanceGroupProperties{
-							Agent: core.ConsulAgentProperties{
+						Consul: core.InstanceGroupPropertiesConsul{
+							Agent: core.InstanceGroupPropertiesConsulAgent{
 								Mode:     "server",
 								LogLevel: "info",
-								Services: map[string]core.ConsulAgentServiceProperties{
-									"router": core.ConsulAgentServiceProperties{
+								Services: map[string]core.InstanceGroupPropertiesConsulAgentService{
+									"router": core.InstanceGroupPropertiesConsulAgentService{
 										Name: "gorouter",
-										Check: core.ConsulServiceCheckProperties{
+										Check: core.InstanceGroupPropertiesConsulAgentServiceCheck{
 											Name:     "router-check",
 											Script:   "/var/vcap/jobs/router/bin/script",
 											Interval: "1m",
 										},
 										Tags: []string{"routing"},
 									},
-									"cloud_controller": core.ConsulAgentServiceProperties{},
+									"cloud_controller": core.InstanceGroupPropertiesConsulAgentService{},
 								},
 							},
 						},
@@ -246,7 +246,7 @@ var _ = Describe("ManifestV2", func() {
 					VMType:             "default",
 					Stemcell:           "default",
 					PersistentDiskType: "default",
-					Jobs: []core.JobV2{
+					Jobs: []core.InstanceGroupJob{
 						{
 							Name:    "consul_agent",
 							Release: "consul",
@@ -259,12 +259,12 @@ var _ = Describe("ManifestV2", func() {
 				},
 			}))
 
-			Expect(manifest.Properties).To(Equal(consul.PropertiesV2{
-				Consul: consul.ConsulProperties{
-					Agent: consul.AgentProperties{
+			Expect(manifest.Properties).To(Equal(consul.Properties{
+				Consul: &consul.PropertiesConsul{
+					Agent: consul.PropertiesConsulAgent{
 						Domain:     "cf.internal",
 						Datacenter: "dc1",
-						Servers: consul.AgentServerProperties{
+						Servers: consul.PropertiesConsulAgentServers{
 							Lan: []string{"10.0.4.4"},
 						},
 					},

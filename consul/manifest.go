@@ -211,12 +211,12 @@ func (m Manifest) ToYAML() ([]byte, error) {
 	return yaml.Marshal(m)
 }
 
-func FromYAML(manifestYAML []byte) (Manifest, error) {
-	var m Manifest
-	if err := yaml.Unmarshal(manifestYAML, &m); err != nil {
-		return m, err
+func FromYAML(manifestYAML []byte, m interface{}) error {
+	if err := yaml.Unmarshal(manifestYAML, m); err != nil {
+		return err
 	}
-	return m, nil
+
+	return nil
 }
 
 func overrideTLS(properties *PropertiesConsul, dc string) {
