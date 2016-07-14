@@ -10,12 +10,12 @@ import (
 )
 
 type Config struct {
-	Networks []ConfigNetwork
+	AZs []ConfigAZ
 }
 
-type ConfigNetwork struct {
-	IPRange string
-	Nodes   int
+type ConfigAZ struct {
+	IPRange   string
+	StaticIPs int
 }
 
 type CloudConfig struct {
@@ -89,41 +89,42 @@ func NewCloudConfig(config Config, iaasConfig iaas.Config) CloudConfig {
 	}
 
 	azs := []AZ{}
-	networks := []Network{}
-	for i, cfgNetwork := range config.Networks {
+	subnets := []Subnet{}
+
+	for i, cfgAZ := range config.AZs {
 		azName := fmt.Sprintf("z%d", i+1)
 		azs = append(azs, AZ{
 			Name: azName,
 		})
 
-		ipRange := network.IPRange(cfgNetwork.IPRange)
-		networks = append(networks, Network{
-			Name: "private",
-			Subnets: []Subnet{
-				{
-					CloudProperties: SubnetCloudProperties{
-						Name: "random",
-					},
-					Range:   string(ipRange),
-					Gateway: ipRange.IP(1),
-					AZ:      azName,
-					Reserved: []string{
-						ipRange.Range(2, 3),
-						ipRange.Range(13, 254),
-					},
-					Static: []string{
-						ipRange.IP(4),
-						ipRange.IP(5),
-						ipRange.IP(6),
-						ipRange.IP(7),
-						ipRange.IP(8),
-						ipRange.IP(9),
-					},
-				},
+		ipRange := network.IPRange(cfgAZ.IPRange)
+
+		staticIPs := []string{}
+		for j := 0; j < cfgAZ.StaticIPs; j++ {
+			staticIPs = append(staticIPs, ipRange.IP(4+j))
+		}
+
+		subnets = append(subnets, Subnet{
+			CloudProperties: SubnetCloudProperties{
+				Name: "random",
 			},
-			Type: "manual",
+			Range:   string(ipRange),
+			Gateway: ipRange.IP(1),
+			AZ:      azName,
+			Reserved: []string{
+				ipRange.Range(2, 3),
+				ipRange.Range(13, 254),
+			},
+			Static: staticIPs,
 		})
 	}
+
+	networks := []Network{}
+	networks = append(networks, Network{
+		Name:    "private",
+		Subnets: subnets,
+		Type:    "manual",
+	})
 
 	return CloudConfig{
 		AZs:         azs,

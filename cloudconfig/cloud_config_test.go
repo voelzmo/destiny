@@ -15,18 +15,24 @@ var _ = Describe("CloudConfig", func() {
 	Describe("NewCloudConfig", func() {
 		It("generates a valid cloud config for bosh lite", func() {
 			cc := cloudconfig.NewCloudConfig(cloudconfig.Config{
-				Networks: []cloudconfig.ConfigNetwork{
+				AZs: []cloudconfig.ConfigAZ{
 					{
-						IPRange: "10.244.4.0/24",
-						Nodes:   1,
+						IPRange:   "10.244.4.0/24",
+						StaticIPs: 4,
+					},
+					{
+						IPRange:   "10.244.5.0/24",
+						StaticIPs: 3,
 					},
 				},
 			}, iaas.NewWardenConfig())
 
-			Expect(cc.AZs).To(Equal([]cloudconfig.AZ{
-				{
-					Name: "z1",
-				},
+			Expect(len(cc.AZs)).To(Equal(2))
+			Expect(cc.AZs[0]).To(Equal(cloudconfig.AZ{
+				Name: "z1",
+			}))
+			Expect(cc.AZs[1]).To(Equal(cloudconfig.AZ{
+				Name: "z2",
 			}))
 
 			Expect(cc.VMTypes).To(Equal([]cloudconfig.VMType{
@@ -70,8 +76,23 @@ var _ = Describe("CloudConfig", func() {
 								"10.244.4.5",
 								"10.244.4.6",
 								"10.244.4.7",
-								"10.244.4.8",
-								"10.244.4.9",
+							},
+						},
+						{
+							CloudProperties: cloudconfig.SubnetCloudProperties{
+								Name: "random",
+							},
+							Range:   "10.244.5.0/24",
+							Gateway: "10.244.5.1",
+							AZ:      "z2",
+							Reserved: []string{
+								"10.244.5.2-10.244.5.3",
+								"10.244.5.13-10.244.5.254",
+							},
+							Static: []string{
+								"10.244.5.4",
+								"10.244.5.5",
+								"10.244.5.6",
 							},
 						},
 					},
@@ -82,10 +103,10 @@ var _ = Describe("CloudConfig", func() {
 
 		It("generates a valid cloud config for aws", func() {
 			cc := cloudconfig.NewCloudConfig(cloudconfig.Config{
-				Networks: []cloudconfig.ConfigNetwork{
+				AZs: []cloudconfig.ConfigAZ{
 					{
-						IPRange: "10.0.4.0/24",
-						Nodes:   1,
+						IPRange:   "10.0.4.0/24",
+						StaticIPs: 1,
 					},
 				},
 			}, iaas.AWSConfig{})
@@ -134,11 +155,6 @@ var _ = Describe("CloudConfig", func() {
 							},
 							Static: []string{
 								"10.0.4.4",
-								"10.0.4.5",
-								"10.0.4.6",
-								"10.0.4.7",
-								"10.0.4.8",
-								"10.0.4.9",
 							},
 						},
 					},
@@ -154,10 +170,10 @@ var _ = Describe("CloudConfig", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			cc := cloudconfig.NewCloudConfig(cloudconfig.Config{
-				Networks: []cloudconfig.ConfigNetwork{
+				AZs: []cloudconfig.ConfigAZ{
 					{
-						IPRange: "10.244.4.0/24",
-						Nodes:   1,
+						IPRange:   "10.244.4.0/24",
+						StaticIPs: 6,
 					},
 				},
 			}, iaas.NewWardenConfig())

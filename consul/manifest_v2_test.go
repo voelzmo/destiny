@@ -59,7 +59,7 @@ var _ = Describe("ManifestV2", func() {
 					AZs:       []string{"z1"},
 					Networks: []core.InstanceGroupNetwork{
 						{
-							Name: "consul1",
+							Name: "private",
 							StaticIPs: []string{
 								"10.244.4.4",
 							},
@@ -104,7 +104,7 @@ var _ = Describe("ManifestV2", func() {
 					AZs:       []string{"z1"},
 					Networks: []core.InstanceGroupNetwork{
 						{
-							Name: "consul1",
+							Name: "private",
 							StaticIPs: []string{
 								"10.244.4.9",
 							},
@@ -192,7 +192,7 @@ var _ = Describe("ManifestV2", func() {
 					AZs:       []string{"z1"},
 					Networks: []core.InstanceGroupNetwork{
 						{
-							Name: "consul1",
+							Name: "private",
 							StaticIPs: []string{
 								"10.0.4.4",
 							},
@@ -237,7 +237,7 @@ var _ = Describe("ManifestV2", func() {
 					AZs:       []string{"z1"},
 					Networks: []core.InstanceGroupNetwork{
 						{
-							Name: "consul1",
+							Name: "private",
 							StaticIPs: []string{
 								"10.0.4.9",
 							},

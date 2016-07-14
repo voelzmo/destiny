@@ -63,7 +63,7 @@ func consulInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
 		AZs:       core.AZs(len(networks)),
 		Networks: []core.InstanceGroupNetwork{
 			{
-				Name:      "consul1",
+				Name:      "private",
 				StaticIPs: consulInstanceGroupStaticIPs(networks),
 			},
 		},
@@ -110,7 +110,7 @@ func consulTestConsumerInstanceGroup(networks []ConfigNetwork) core.InstanceGrou
 		AZs:       []string{"z1"},
 		Networks: []core.InstanceGroupNetwork{
 			{
-				Name: "consul1",
+				Name: "private",
 				StaticIPs: []string{
 					ipRange.IP(9),
 				},

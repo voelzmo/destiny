@@ -23,7 +23,7 @@ instance_groups:
   name: consul
   azs: [z1]
   networks:
-  - name: consul1
+  - name: private
     static_ips:
     - 10.244.4.4
   vm_type: default
@@ -52,7 +52,7 @@ instance_groups:
   name: consul_test_consumer
   azs: [z1]
   networks:
-  - name: consul1
+  - name: private
     static_ips:
     - 10.244.4.9
   vm_type: default
