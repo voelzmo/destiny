@@ -48,6 +48,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				ipRange.IP(7),
 				ipRange.IP(8),
 				ipRange.IP(9),
+				ipRange.IP(10),
+				ipRange.IP(11),
+				ipRange.IP(12),
+				ipRange.IP(13),
+				ipRange.IP(14),
 			}
 		} else {
 			staticIPs = []string{
@@ -61,7 +66,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 				CloudProperties: cloudProperties,
 				Gateway:         ipRange.IP(1),
 				Range:           string(ipRange),
-				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(13, 254)},
+				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(20, 254)},
 				Static:          staticIPs,
 			}},
 			Type: "manual",
@@ -142,10 +147,14 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 
 	jobs = append(jobs, core.Job{
 		Name:      "consul_test_consumer",
-		Instances: 1,
+		Instances: 3,
 		Networks: []core.JobNetwork{{
-			Name:      consulNetworks[0].Name,
-			StaticIPs: []string{consulNetworks[0].StaticIPs(6)[5]},
+			Name: consulNetworks[0].Name,
+			StaticIPs: []string{
+				consulNetworks[0].StaticIPs(9)[6],
+				consulNetworks[0].StaticIPs(9)[7],
+				consulNetworks[0].StaticIPs(9)[8],
+			},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   resourcePools[0].Name,

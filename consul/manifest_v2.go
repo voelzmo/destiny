@@ -11,48 +11,72 @@ type ManifestV2 struct {
 	DirectorUUID   string               `yaml:"director_uuid"`
 	Name           string               `yaml:"name"`
 	Releases       []core.Release       `yaml:"releases"`
-	Stemcells      []core.Stemcell      `yaml:"stemcells"`
+	Stemcells      []Stemcell           `yaml:"stemcells"`
 	Update         core.Update          `yaml:"update"`
 	InstanceGroups []core.InstanceGroup `yaml:"instance_groups"`
 	Properties     Properties           `yaml:"properties"`
 }
 
-func NewManifestV2(config Config, iaasConfig iaas.Config) ManifestV2 {
+type Stemcell struct {
+	Alias   string
+	Name    string
+	Version string
+}
+
+func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) ManifestV2 {
 	return ManifestV2{
 		DirectorUUID: config.DirectorUUID,
 		Name:         config.Name,
 		Releases:     releases(),
-		Stemcells:    stemcells(),
-		Update:       update(),
-		InstanceGroups: []core.InstanceGroup{
-			consulInstanceGroup(config.Networks),
-			consulTestConsumerInstanceGroup(config.Networks),
+		Stemcells: []Stemcell{
+			{
+				Alias:   "default",
+				Version: "latest",
+				Name:    iaasConfig.Stemcell(),
+			},
 		},
-		Properties: properties(config.Networks),
+		Update: update(),
+		InstanceGroups: []core.InstanceGroup{
+			consulInstanceGroup(config.AZs),
+			consulTestConsumerInstanceGroup(config.AZs),
+		},
+		Properties: properties(config.AZs),
 	}
 }
 
-func consulInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
+func consulInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
+	totalNodes := 0
+	for _, az := range azs {
+		totalNodes += az.Nodes
+	}
+
 	return core.InstanceGroup{
-		Instances: 1,
+		Instances: totalNodes,
 		Name:      "consul",
-		AZs:       core.AZs(len(networks)),
+		AZs:       core.AZs(len(azs)),
 		Networks: []core.InstanceGroupNetwork{
 			{
 				Name:      "private",
-				StaticIPs: consulInstanceGroupStaticIPs(networks),
+				StaticIPs: consulInstanceGroupStaticIPs(azs),
 			},
 		},
 		VMType:             "default",
 		Stemcell:           "default",
 		PersistentDiskType: "default",
-		Update: core.Update{
-			MaxInFlight: 1,
-		},
 		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "consul_agent",
 				Release: "consul",
+			},
+		},
+		MigratedFrom: []core.InstanceGroupMigratedFrom{
+			{
+				Name: "consul_z1",
+				AZ:   "z1",
+			},
+			{
+				Name: "consul_z2",
+				AZ:   "z2",
 			},
 		},
 		Properties: core.InstanceGroupProperties{
@@ -78,17 +102,21 @@ func consulInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
 	}
 }
 
-func consulTestConsumerInstanceGroup(networks []ConfigNetwork) core.InstanceGroup {
-	ipRange := network.IPRange(networks[0].IPRange)
+func consulTestConsumerInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
+	ipRange := network.IPRange(azs[0].IPRange)
+	totalNodesInFirstAZ := azs[0].Nodes
+
 	return core.InstanceGroup{
-		Instances: 1,
+		Instances: 3,
 		Name:      "consul_test_consumer",
-		AZs:       []string{"z1"},
+		AZs:       []string{azs[0].Name},
 		Networks: []core.InstanceGroupNetwork{
 			{
 				Name: "private",
 				StaticIPs: []string{
-					ipRange.IP(9),
+					ipRange.IP(totalNodesInFirstAZ + 8),
+					ipRange.IP(totalNodesInFirstAZ + 9),
+					ipRange.IP(totalNodesInFirstAZ + 10),
 				},
 			},
 		},
@@ -105,17 +133,23 @@ func consulTestConsumerInstanceGroup(networks []ConfigNetwork) core.InstanceGrou
 				Release: "consul",
 			},
 		},
+		MigratedFrom: []core.InstanceGroupMigratedFrom{
+			{
+				Name: "consul_test_consumer",
+				AZ:   "z1",
+			},
+		},
 	}
 }
 
-func properties(networks []ConfigNetwork) Properties {
+func properties(azs []ConfigAZ) Properties {
 	return Properties{
 		Consul: &PropertiesConsul{
 			Agent: PropertiesConsulAgent{
 				Domain:     "cf.internal",
 				Datacenter: "dc1",
 				Servers: PropertiesConsulAgentServers{
-					Lan: consulInstanceGroupStaticIPs(networks),
+					Lan: consulInstanceGroupStaticIPs(azs),
 				},
 			},
 			AgentCert: DC1AgentCert,
@@ -130,11 +164,11 @@ func properties(networks []ConfigNetwork) Properties {
 	}
 }
 
-func consulInstanceGroupStaticIPs(networks []ConfigNetwork) []string {
+func consulInstanceGroupStaticIPs(azs []ConfigAZ) []string {
 	staticIPs := []string{}
-	for _, cfgNetwork := range networks {
-		ipRange := network.IPRange(cfgNetwork.IPRange)
-		for n := 0; n < cfgNetwork.Nodes; n++ {
+	for _, cfgAZs := range azs {
+		ipRange := network.IPRange(cfgAZs.IPRange)
+		for n := 0; n < cfgAZs.Nodes; n++ {
 			staticIPs = append(staticIPs, ipRange.IP(n+4))
 		}
 	}

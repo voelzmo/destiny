@@ -1,16 +1,22 @@
 package core
 
 type InstanceGroup struct {
-	Instances          int                     `yaml:"instances"`
-	Name               string                  `yaml:"name"`
-	AZs                []string                `yaml:"azs"`
-	Networks           []InstanceGroupNetwork  `yaml:"networks"`
-	VMType             string                  `yaml:"vm_type"`
-	Stemcell           string                  `yaml:"stemcell"`
-	PersistentDiskType string                  `yaml:"persistent_disk_type"`
-	Update             Update                  `yaml:"update,omitempty"`
-	Jobs               []InstanceGroupJob      `yaml:"jobs"`
-	Properties         InstanceGroupProperties `yaml:"properties,omitempty"`
+	Instances          int                         `yaml:"instances"`
+	Name               string                      `yaml:"name"`
+	AZs                []string                    `yaml:"azs"`
+	Networks           []InstanceGroupNetwork      `yaml:"networks"`
+	VMType             string                      `yaml:"vm_type"`
+	Stemcell           string                      `yaml:"stemcell"`
+	PersistentDiskType string                      `yaml:"persistent_disk_type"`
+	Update             Update                      `yaml:"update,omitempty"`
+	Jobs               []InstanceGroupJob          `yaml:"jobs"`
+	MigratedFrom       []InstanceGroupMigratedFrom `yaml:"migrated_from"`
+	Properties         InstanceGroupProperties     `yaml:"properties,omitempty"`
+}
+
+type InstanceGroupMigratedFrom struct {
+	Name string `yaml:"name"`
+	AZ   string `yaml:"az"`
 }
 
 type InstanceGroupProperties struct {

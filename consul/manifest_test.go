@@ -47,7 +47,7 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.Update).To(Equal(core.Update{
 				Canaries:        1,
 				CanaryWatchTime: "1000-180000",
-				MaxInFlight:     50,
+				MaxInFlight:     1,
 				Serial:          true,
 				UpdateWatchTime: "1000-180000",
 			}))
@@ -150,10 +150,14 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Jobs[2]).To(Equal(core.Job{
 				Name:      "consul_test_consumer",
-				Instances: 1,
+				Instances: 3,
 				Networks: []core.JobNetwork{{
-					Name:      "consul1",
-					StaticIPs: []string{"10.244.4.9"},
+					Name: "consul1",
+					StaticIPs: []string{
+						"10.244.4.10",
+						"10.244.4.11",
+						"10.244.4.12",
+					},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "consul_z1",
@@ -179,7 +183,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.13-10.244.4.254",
+							"10.244.4.20-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -188,6 +192,11 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.7",
 							"10.244.4.8",
 							"10.244.4.9",
+							"10.244.4.10",
+							"10.244.4.11",
+							"10.244.4.12",
+							"10.244.4.13",
+							"10.244.4.14",
 						},
 					},
 				},
@@ -202,7 +211,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.5.0/24",
 						Reserved: []string{
 							"10.244.5.2-10.244.5.3",
-							"10.244.5.13-10.244.5.254",
+							"10.244.5.20-10.244.5.254",
 						},
 						Static: []string{
 							"10.244.5.4",
@@ -268,7 +277,7 @@ var _ = Describe("Manifest", func() {
 				Update: core.Update{
 					Canaries:        1,
 					CanaryWatchTime: "1000-180000",
-					MaxInFlight:     50,
+					MaxInFlight:     1,
 					Serial:          true,
 					UpdateWatchTime: "1000-180000",
 				},
@@ -330,10 +339,14 @@ var _ = Describe("Manifest", func() {
 					},
 					{
 						Name:      "consul_test_consumer",
-						Instances: 1,
+						Instances: 3,
 						Networks: []core.JobNetwork{{
-							Name:      "consul1",
-							StaticIPs: []string{"10.0.4.9"},
+							Name: "consul1",
+							StaticIPs: []string{
+								"10.0.4.10",
+								"10.0.4.11",
+								"10.0.4.12",
+							},
 						}},
 						PersistentDisk: 1024,
 						ResourcePool:   "consul_z1",
@@ -359,7 +372,7 @@ var _ = Describe("Manifest", func() {
 								Range:           "10.0.4.0/24",
 								Reserved: []string{
 									"10.0.4.2-10.0.4.3",
-									"10.0.4.13-10.0.4.254",
+									"10.0.4.20-10.0.4.254",
 								},
 								Static: []string{
 									"10.0.4.4",
@@ -368,6 +381,11 @@ var _ = Describe("Manifest", func() {
 									"10.0.4.7",
 									"10.0.4.8",
 									"10.0.4.9",
+									"10.0.4.10",
+									"10.0.4.11",
+									"10.0.4.12",
+									"10.0.4.13",
+									"10.0.4.14",
 								},
 							},
 						},
@@ -562,7 +580,7 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.Update).To(Equal(core.Update{
 				Canaries:        1,
 				CanaryWatchTime: "1000-180000",
-				MaxInFlight:     50,
+				MaxInFlight:     1,
 				Serial:          true,
 				UpdateWatchTime: "1000-180000",
 			}))
@@ -617,10 +635,14 @@ var _ = Describe("Manifest", func() {
 			}))
 			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "consul_test_consumer",
-				Instances: 1,
+				Instances: 3,
 				Networks: []core.JobNetwork{{
-					Name:      "consul1",
-					StaticIPs: []string{"10.244.4.9"},
+					Name: "consul1",
+					StaticIPs: []string{
+						"10.244.4.10",
+						"10.244.4.11",
+						"10.244.4.12",
+					},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "consul_z1",
@@ -635,6 +657,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
 			Expect(manifest.Networks).To(HaveLen(1))
 			Expect(manifest.Networks).To(ContainElement(core.Network{
 				Name: "consul1",
@@ -645,7 +668,7 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.13-10.244.4.254",
+							"10.244.4.20-10.244.4.254",
 						},
 						Static: []string{
 							"10.244.4.4",
@@ -654,6 +677,11 @@ var _ = Describe("Manifest", func() {
 							"10.244.4.7",
 							"10.244.4.8",
 							"10.244.4.9",
+							"10.244.4.10",
+							"10.244.4.11",
+							"10.244.4.12",
+							"10.244.4.13",
+							"10.244.4.14",
 						},
 					},
 				},
@@ -687,7 +715,7 @@ var _ = Describe("Manifest", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
-			Expect(manifest.Name).To(Equal("consul"))
+			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
 			Expect(manifest.Releases).To(HaveLen(1))
 			Expect(manifest.Releases).To(ContainElement(core.Release{
 				Name:    "consul",
@@ -696,30 +724,35 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.Update).To(Equal(core.Update{
 				Canaries:        1,
 				CanaryWatchTime: "1000-180000",
-				MaxInFlight:     50,
+				MaxInFlight:     1,
 				Serial:          true,
 				UpdateWatchTime: "1000-180000",
 			}))
 			Expect(manifest.InstanceGroups).To(HaveLen(2))
 			Expect(manifest.InstanceGroups[0]).To(Equal(core.InstanceGroup{
 				Name:      "consul",
-				Instances: 1,
-				AZs:       []string{"z1"},
+				Instances: 3,
+				AZs:       []string{"z1", "z2"},
 				Networks: []core.InstanceGroupNetwork{{
-					Name:      "private",
-					StaticIPs: []string{"10.244.4.4"},
+					Name: "private",
+					StaticIPs: []string{
+						"10.244.4.4",
+						"10.244.4.5",
+						"10.244.5.4",
+					},
 				}},
 				VMType:             "default",
 				Stemcell:           "default",
 				PersistentDiskType: "default",
-				Update: core.Update{
-					MaxInFlight: 1,
-				},
 				Jobs: []core.InstanceGroupJob{
 					{
 						Name:    "consul_agent",
 						Release: "consul",
 					},
+				},
+				MigratedFrom: []core.InstanceGroupMigratedFrom{
+					{Name: "consul_z1", AZ: "z1"},
+					{Name: "consul_z2", AZ: "z2"},
 				},
 				Properties: core.InstanceGroupProperties{
 					Consul: core.InstanceGroupPropertiesConsul{
@@ -745,10 +778,14 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.InstanceGroups[1]).To(Equal(core.InstanceGroup{
 				Name:      "consul_test_consumer",
 				AZs:       []string{"z1"},
-				Instances: 1,
+				Instances: 3,
 				Networks: []core.InstanceGroupNetwork{{
-					Name:      "private",
-					StaticIPs: []string{"10.244.4.9"},
+					Name: "private",
+					StaticIPs: []string{
+						"10.244.4.10",
+						"10.244.4.11",
+						"10.244.4.12",
+					},
 				}},
 				VMType:             "default",
 				Stemcell:           "default",
@@ -763,6 +800,12 @@ var _ = Describe("Manifest", func() {
 						Release: "consul",
 					},
 				},
+				MigratedFrom: []core.InstanceGroupMigratedFrom{
+					{
+						Name: "consul_test_consumer",
+						AZ:   "z1",
+					},
+				},
 			}))
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{
@@ -770,7 +813,11 @@ var _ = Describe("Manifest", func() {
 						Domain:     "cf.internal",
 						Datacenter: "dc1",
 						Servers: consul.PropertiesConsulAgentServers{
-							Lan: []string{"10.244.4.4"},
+							Lan: []string{
+								"10.244.4.4",
+								"10.244.4.5",
+								"10.244.5.4",
+							},
 						},
 					},
 					CACert:      consul.CACert,
