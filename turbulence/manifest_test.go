@@ -96,7 +96,7 @@ var _ = Describe("Manifest", func() {
 						Networks: []core.JobNetwork{
 							{
 								Name:      "turbulence",
-								StaticIPs: []string{"10.0.16.12"},
+								StaticIPs: []string{"10.0.16.30"},
 							},
 						},
 						PersistentDisk: 1024,
@@ -124,12 +124,12 @@ var _ = Describe("Manifest", func() {
 								Gateway: "10.0.16.1",
 								Range:   "10.0.16.0/24",
 								Reserved: []string{
-									"10.0.16.2-10.0.16.11",
-									"10.0.16.17-10.0.16.254",
+									"10.0.16.2-10.0.16.29",
+									"10.0.16.39-10.0.16.254",
 								},
 								Static: []string{
-									"10.0.16.12",
-									"10.0.16.13",
+									"10.0.16.30",
+									"10.0.16.31",
 								},
 							},
 						},
@@ -163,7 +163,7 @@ var _ = Describe("Manifest", func() {
 						Username: "some-registry-username",
 					},
 					Blobstore: &core.PropertiesBlobstore{
-						Address: "10.0.16.12",
+						Address: "10.0.16.30",
 						Port:    2520,
 						Agent: core.PropertiesBlobstoreAgent{
 							User:     "agent",
@@ -171,7 +171,7 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 					Agent: &core.PropertiesAgent{
-						Mbus: "nats://nats:password@10.0.16.12:4222",
+						Mbus: "nats://nats:password@10.0.16.30:4222",
 					},
 				},
 			}))
@@ -231,7 +231,7 @@ var _ = Describe("Manifest", func() {
 						Networks: []core.JobNetwork{
 							{
 								Name:      "turbulence",
-								StaticIPs: []string{"10.244.4.12"},
+								StaticIPs: []string{"10.244.4.30"},
 							},
 						},
 						PersistentDisk: 1024,
@@ -259,12 +259,12 @@ var _ = Describe("Manifest", func() {
 								Gateway: "10.244.4.1",
 								Range:   "10.244.4.0/24",
 								Reserved: []string{
-									"10.244.4.2-10.244.4.11",
-									"10.244.4.17-10.244.4.254",
+									"10.244.4.2-10.244.4.29",
+									"10.244.4.39-10.244.4.254",
 								},
 								Static: []string{
-									"10.244.4.12",
-									"10.244.4.13",
+									"10.244.4.30",
+									"10.244.4.31",
 								},
 							},
 						},
@@ -357,7 +357,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "turbulence",
-					StaticIPs: []string{"10.244.4.12"},
+					StaticIPs: []string{"10.244.4.30"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "turbulence",
@@ -382,12 +382,12 @@ var _ = Describe("Manifest", func() {
 						Gateway:         "10.244.4.1",
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
-							"10.244.4.2-10.244.4.11",
-							"10.244.4.17-10.244.4.254",
+							"10.244.4.2-10.244.4.29",
+							"10.244.4.39-10.244.4.254",
 						},
 						Static: []string{
-							"10.244.4.12",
-							"10.244.4.13",
+							"10.244.4.30",
+							"10.244.4.31",
 						},
 					},
 				},

@@ -35,7 +35,7 @@ jobs:
   networks:
   - name: turbulence
     static_ips:
-    - 10.244.4.12
+    - 10.244.4.30
   persistent_disk: 1024
   resource_pool: turbulence
   templates:
@@ -52,11 +52,11 @@ networks:
     gateway: 10.244.4.1
     range: 10.244.4.0/24
     reserved:
-    - 10.244.4.2-10.244.4.11
-    - 10.244.4.17-10.244.4.254
+    - 10.244.4.2-10.244.4.29
+    - 10.244.4.39-10.244.4.254
     static:
-    - 10.244.4.12
-    - 10.244.4.13
+    - 10.244.4.30
+    - 10.244.4.31
   type: manual
 
 properties:

@@ -41,10 +41,10 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			CloudProperties: cloudProperties,
 			Gateway:         ipRange.IP(1),
 			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 11), ipRange.Range(17, 254)},
+			Reserved:        []string{ipRange.Range(2, 29), ipRange.Range(39, 254)},
 			Static: []string{
-				ipRange.IP(12),
-				ipRange.IP(13),
+				ipRange.IP(30),
+				ipRange.IP(31),
 			},
 		}},
 		Type: "manual",
