@@ -19,7 +19,7 @@ var _ = Describe("Warden Config", func() {
 
 	Describe("NetworkSubnet", func() {
 		It("returns a network subnet specific to Warden", func() {
-			subnetCloudProperties := wardenConfig.NetworkSubnet()
+			subnetCloudProperties := wardenConfig.NetworkSubnet("")
 			Expect(subnetCloudProperties).To(Equal(core.NetworkSubnetCloudProperties{
 				Name: "random",
 			}))
@@ -35,7 +35,7 @@ var _ = Describe("Warden Config", func() {
 
 	Describe("ResourcePool", func() {
 		It("returns an empty resource pool cloud properties for Warden", func() {
-			resourcePoolCloudProperties := wardenConfig.ResourcePool()
+			resourcePoolCloudProperties := wardenConfig.ResourcePool("")
 			Expect(resourcePoolCloudProperties).To(Equal(core.ResourcePoolCloudProperties{}))
 		})
 	})

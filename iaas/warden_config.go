@@ -9,7 +9,7 @@ func NewWardenConfig() WardenConfig {
 	return WardenConfig{}
 }
 
-func (WardenConfig) NetworkSubnet() core.NetworkSubnetCloudProperties {
+func (WardenConfig) NetworkSubnet(string) core.NetworkSubnetCloudProperties {
 	return core.NetworkSubnetCloudProperties{Name: "random"}
 }
 
@@ -17,7 +17,7 @@ func (WardenConfig) Compilation() core.CompilationCloudProperties {
 	return core.CompilationCloudProperties{}
 }
 
-func (WardenConfig) ResourcePool() core.ResourcePoolCloudProperties {
+func (WardenConfig) ResourcePool(string) core.ResourcePoolCloudProperties {
 	return core.ResourcePoolCloudProperties{}
 }
 
@@ -28,7 +28,7 @@ func (WardenConfig) CPI() CPI {
 	}
 }
 
-func (WardenConfig) Properties(_ string) Properties {
+func (WardenConfig) Properties(string) Properties {
 	return Properties{
 		WardenCPI: &PropertiesWardenCPI{
 			Agent: PropertiesWardenCPIAgent{

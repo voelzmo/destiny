@@ -12,7 +12,7 @@ type AWSConfig struct {
 	DefaultKeyName        string
 	DefaultSecurityGroups []string
 	Region                string
-	Subnet                string
+	Subnets               []AWSConfigSubnet
 	RegistryHost          string
 	RegistryPassword      string
 	RegistryPort          int
@@ -20,10 +20,22 @@ type AWSConfig struct {
 	StaticIP              string
 }
 
-func (a AWSConfig) NetworkSubnet() core.NetworkSubnetCloudProperties {
-	return core.NetworkSubnetCloudProperties{
-		Subnet: a.Subnet,
+type AWSConfigSubnet struct {
+	ID    string
+	Range string
+	AZ    string
+}
+
+func (a AWSConfig) NetworkSubnet(ipRange string) core.NetworkSubnetCloudProperties {
+	for _, subnet := range a.Subnets {
+		if subnet.Range == ipRange {
+			return core.NetworkSubnetCloudProperties{
+				Subnet: subnet.ID,
+			}
+		}
 	}
+
+	return core.NetworkSubnetCloudProperties{}
 }
 
 func (a AWSConfig) Compilation() core.CompilationCloudProperties {
@@ -37,10 +49,18 @@ func (a AWSConfig) Compilation() core.CompilationCloudProperties {
 	}
 }
 
-func (a AWSConfig) ResourcePool() core.ResourcePoolCloudProperties {
+func (a AWSConfig) ResourcePool(ipRange string) core.ResourcePoolCloudProperties {
+	az := ""
+
+	for _, subnet := range a.Subnets {
+		if subnet.Range == ipRange {
+			az = subnet.AZ
+		}
+	}
+
 	return core.ResourcePoolCloudProperties{
 		InstanceType:     "m3.medium",
-		AvailabilityZone: "us-east-1a",
+		AvailabilityZone: az,
 		EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
 			Size: 10240,
 			Type: "gp2",

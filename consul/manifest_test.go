@@ -215,6 +215,16 @@ var _ = Describe("Manifest", func() {
 						},
 						Static: []string{
 							"10.244.5.4",
+							"10.244.5.5",
+							"10.244.5.6",
+							"10.244.5.7",
+							"10.244.5.8",
+							"10.244.5.9",
+							"10.244.5.10",
+							"10.244.5.11",
+							"10.244.5.12",
+							"10.244.5.13",
+							"10.244.5.14",
 						},
 					},
 				},
@@ -249,9 +259,16 @@ var _ = Describe("Manifest", func() {
 						IPRange: "10.0.4.0/24",
 						Nodes:   1,
 					},
+					{
+						IPRange: "10.0.5.0/24",
+						Nodes:   1,
+					},
 				},
 			}, iaas.AWSConfig{
-				Subnet: "subnet-1234",
+				Subnets: []iaas.AWSConfigSubnet{
+					{ID: "subnet-1", Range: "10.0.4.0/24", AZ: "some-az-1a"},
+					{ID: "subnet-2", Range: "10.0.5.0/24", AZ: "some-az-1d"},
+				},
 			})
 
 			Expect(manifest).To(Equal(consul.Manifest{
@@ -291,7 +308,23 @@ var _ = Describe("Manifest", func() {
 						},
 						CloudProperties: core.ResourcePoolCloudProperties{
 							InstanceType:     "m3.medium",
-							AvailabilityZone: "us-east-1a",
+							AvailabilityZone: "some-az-1a",
+							EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
+								Size: 10240,
+								Type: "gp2",
+							},
+						},
+					},
+					{
+						Name:    "consul_z2",
+						Network: "consul2",
+						Stemcell: core.ResourcePoolStemcell{
+							Name:    "bosh-aws-xen-hvm-ubuntu-trusty-go_agent",
+							Version: "latest",
+						},
+						CloudProperties: core.ResourcePoolCloudProperties{
+							InstanceType:     "m3.medium",
+							AvailabilityZone: "some-az-1d",
 							EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
 								Size: 10240,
 								Type: "gp2",
@@ -338,6 +371,43 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 					{
+						Name:      "consul_z2",
+						Instances: 1,
+						Networks: []core.JobNetwork{{
+							Name:      "consul2",
+							StaticIPs: []string{"10.0.5.4"},
+						}},
+						PersistentDisk: 1024,
+						Properties: &core.JobProperties{
+							Consul: &core.JobPropertiesConsul{
+								Agent: core.JobPropertiesConsulAgent{
+									Mode:     "server",
+									LogLevel: "info",
+									Services: core.JobPropertiesConsulAgentServices{
+										"router": core.JobPropertiesConsulAgentService{
+											Name: "gorouter",
+											Check: &core.JobPropertiesConsulAgentServiceCheck{
+												Name:     "router-check",
+												Script:   "/var/vcap/jobs/router/bin/script",
+												Interval: "1m",
+											},
+											Tags: []string{"routing"},
+										},
+										"cloud_controller": core.JobPropertiesConsulAgentService{},
+									},
+								},
+							},
+						},
+						ResourcePool: "consul_z2",
+						Templates: []core.JobTemplate{{
+							Name:    "consul_agent",
+							Release: "consul",
+						}},
+						Update: &core.JobUpdate{
+							MaxInFlight: 1,
+						},
+					},
+					{
 						Name:      "consul_test_consumer",
 						Instances: 3,
 						Networks: []core.JobNetwork{{
@@ -367,7 +437,7 @@ var _ = Describe("Manifest", func() {
 						Name: "consul1",
 						Subnets: []core.NetworkSubnet{
 							{
-								CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-1234"},
+								CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-1"},
 								Gateway:         "10.0.4.1",
 								Range:           "10.0.4.0/24",
 								Reserved: []string{
@@ -391,6 +461,34 @@ var _ = Describe("Manifest", func() {
 						},
 						Type: "manual",
 					},
+					{
+						Name: "consul2",
+						Subnets: []core.NetworkSubnet{
+							{
+								CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-2"},
+								Gateway:         "10.0.5.1",
+								Range:           "10.0.5.0/24",
+								Reserved: []string{
+									"10.0.5.2-10.0.5.3",
+									"10.0.5.20-10.0.5.254",
+								},
+								Static: []string{
+									"10.0.5.4",
+									"10.0.5.5",
+									"10.0.5.6",
+									"10.0.5.7",
+									"10.0.5.8",
+									"10.0.5.9",
+									"10.0.5.10",
+									"10.0.5.11",
+									"10.0.5.12",
+									"10.0.5.13",
+									"10.0.5.14",
+								},
+							},
+						},
+						Type: "manual",
+					},
 				},
 				Properties: consul.Properties{
 					Consul: &consul.PropertiesConsul{
@@ -399,7 +497,7 @@ var _ = Describe("Manifest", func() {
 							Datacenter: "dc1",
 							LogLevel:   "",
 							Servers: consul.PropertiesConsulAgentServers{
-								Lan: []string{"10.0.4.4"},
+								Lan: []string{"10.0.4.4", "10.0.5.4"},
 							},
 						},
 						CACert:      consul.CACert,
@@ -424,7 +522,9 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 				}, iaas.AWSConfig{
-					Subnet: "subnet-1234",
+					Subnets: []iaas.AWSConfigSubnet{
+						{ID: "subnet-1234", Range: "10.0.4.0/24", AZ: "some-az-1"},
+					},
 				})
 
 				Expect(manifest.Jobs[0].Instances).To(Equal(1))

@@ -34,40 +34,29 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		ipRanges = append(ipRanges, network.IPRange(cfgNetwork.IPRange))
 	}
 
-	cloudProperties := iaasConfig.NetworkSubnet()
-
 	consulNetworks := []core.Network{}
 	for i, ipRange := range ipRanges {
-		var staticIPs []string
-
-		if i == 0 {
-			staticIPs = []string{
-				ipRange.IP(4),
-				ipRange.IP(5),
-				ipRange.IP(6),
-				ipRange.IP(7),
-				ipRange.IP(8),
-				ipRange.IP(9),
-				ipRange.IP(10),
-				ipRange.IP(11),
-				ipRange.IP(12),
-				ipRange.IP(13),
-				ipRange.IP(14),
-			}
-		} else {
-			staticIPs = []string{
-				ipRange.IP(4),
-			}
-		}
 
 		consulNetwork := core.Network{
 			Name: fmt.Sprintf("consul%d", i+1),
 			Subnets: []core.NetworkSubnet{{
-				CloudProperties: cloudProperties,
+				CloudProperties: iaasConfig.NetworkSubnet(ipRange.String()),
 				Gateway:         ipRange.IP(1),
 				Range:           string(ipRange),
 				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(20, 254)},
-				Static:          staticIPs,
+				Static: []string{
+					ipRange.IP(4),
+					ipRange.IP(5),
+					ipRange.IP(6),
+					ipRange.IP(7),
+					ipRange.IP(8),
+					ipRange.IP(9),
+					ipRange.IP(10),
+					ipRange.IP(11),
+					ipRange.IP(12),
+					ipRange.IP(13),
+					ipRange.IP(14),
+				},
 			}},
 			Type: "manual",
 		}
@@ -87,12 +76,12 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	resourcePools := []core.ResourcePool{}
-	for i := range consulNetworks {
+	for i, network := range consulNetworks {
 		resourcePool := core.ResourcePool{
 			Name:            fmt.Sprintf("consul_z%d", i+1),
-			Network:         consulNetworks[i].Name,
+			Network:         network.Name,
 			Stemcell:        stemcell,
-			CloudProperties: iaasConfig.ResourcePool(),
+			CloudProperties: iaasConfig.ResourcePool(network.Subnets[0].Range),
 		}
 		resourcePools = append(resourcePools, resourcePool)
 	}

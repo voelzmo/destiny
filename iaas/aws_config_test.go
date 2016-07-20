@@ -21,19 +21,22 @@ var _ = Describe("AWS Config", func() {
 			DefaultKeyName:        "some-default-key-name",
 			DefaultSecurityGroups: []string{"some-default-security-group"},
 			Region:                "some-region",
-			Subnet:                "some-subnet",
-			RegistryHost:          "some-host",
-			RegistryPassword:      "some-password",
-			RegistryPort:          1234,
-			RegistryUsername:      "some-username",
+			Subnets: []iaas.AWSConfigSubnet{
+				{ID: "some-subnet-1", Range: "127.0.0.1/24", AZ: "some-az-1a"},
+				{ID: "some-subnet-2", Range: "127.0.0.2/24", AZ: "some-az-1c"},
+			},
+			RegistryHost:     "some-host",
+			RegistryPassword: "some-password",
+			RegistryPort:     1234,
+			RegistryUsername: "some-username",
 		}
 	})
 
 	Describe("NetworkSubnet", func() {
-		It("returns a network subnet specific to AWS", func() {
-			subnetCloudProperties := awsConfig.NetworkSubnet()
+		It("returns network subnet cloud properties given a range", func() {
+			subnetCloudProperties := awsConfig.NetworkSubnet("127.0.0.2/24")
 			Expect(subnetCloudProperties).To(Equal(core.NetworkSubnetCloudProperties{
-				Subnet: "some-subnet",
+				Subnet: "some-subnet-2",
 			}))
 		})
 	})
@@ -53,11 +56,11 @@ var _ = Describe("AWS Config", func() {
 	})
 
 	Describe("ResourcePool", func() {
-		It("returns a resource pool specific to AWS", func() {
-			resourcePoolCloudProperties := awsConfig.ResourcePool()
+		It("returns a resource pool given a range", func() {
+			resourcePoolCloudProperties := awsConfig.ResourcePool("127.0.0.2/24")
 			Expect(resourcePoolCloudProperties).To(Equal(core.ResourcePoolCloudProperties{
 				InstanceType:     "m3.medium",
-				AvailabilityZone: "us-east-1a",
+				AvailabilityZone: "some-az-1c",
 				EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
 					Size: 10240,
 					Type: "gp2",

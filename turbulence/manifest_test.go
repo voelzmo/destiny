@@ -31,11 +31,13 @@ var _ = Describe("Manifest", func() {
 				DefaultKeyName:        "some-default-key-name",
 				DefaultSecurityGroups: []string{"some-default-security-group1"},
 				Region:                "some-region",
-				Subnet:                "subnet-1234",
-				RegistryHost:          "some-registry-host",
-				RegistryPassword:      "some-registry-password",
-				RegistryPort:          25777,
-				RegistryUsername:      "some-registry-username",
+				Subnets: []iaas.AWSConfigSubnet{
+					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
+				},
+				RegistryHost:     "some-registry-host",
+				RegistryPassword: "some-registry-password",
+				RegistryPort:     25777,
+				RegistryUsername: "some-registry-username",
 			})
 
 			Expect(manifest).To(Equal(turbulence.Manifest{
@@ -61,7 +63,7 @@ var _ = Describe("Manifest", func() {
 						},
 						CloudProperties: core.ResourcePoolCloudProperties{
 							InstanceType:     "m3.medium",
-							AvailabilityZone: "us-east-1a",
+							AvailabilityZone: "some-az-1a",
 							EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
 								Size: 10240,
 								Type: "gp2",

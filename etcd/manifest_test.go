@@ -253,7 +253,9 @@ var _ = Describe("Manifest", func() {
 				Name:         "etcd-some-random-guid",
 				IPRange:      "10.0.16.0/24",
 			}, iaas.AWSConfig{
-				Subnet: "subnet-1234",
+				Subnets: []iaas.AWSConfigSubnet{
+					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
+				},
 			})
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
@@ -301,7 +303,7 @@ var _ = Describe("Manifest", func() {
 				},
 				CloudProperties: core.ResourcePoolCloudProperties{
 					InstanceType:     "m3.medium",
-					AvailabilityZone: "us-east-1a",
+					AvailabilityZone: "some-az-1a",
 					EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
 						Size: 10240,
 						Type: "gp2",
@@ -668,7 +670,9 @@ var _ = Describe("Manifest", func() {
 				Name:         "etcd-some-random-guid",
 				IPRange:      "10.0.16.0/24",
 			}, iaas.AWSConfig{
-				Subnet: "subnet-1234",
+				Subnets: []iaas.AWSConfigSubnet{
+					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
+				},
 			})
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
@@ -712,7 +716,7 @@ var _ = Describe("Manifest", func() {
 				},
 				CloudProperties: core.ResourcePoolCloudProperties{
 					InstanceType:     "m3.medium",
-					AvailabilityZone: "us-east-1a",
+					AvailabilityZone: "some-az-1a",
 					EphemeralDisk: &core.ResourcePoolCloudPropertiesEphemeralDisk{
 						Size: 10240,
 						Type: "gp2",

@@ -38,7 +38,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	ipRange := network.IPRange(config.IPRange)
-	cloudProperties := iaasConfig.NetworkSubnet()
+	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
 
 	etcdNetwork1 := core.Network{
 		Name: "etcd1",
@@ -114,7 +114,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Name:            "etcd_z1",
 		Network:         etcdNetwork1.Name,
 		Stemcell:        stemcell,
-		CloudProperties: iaasConfig.ResourcePool(),
+		CloudProperties: iaasConfig.ResourcePool(etcdNetwork1.Subnets[0].Range),
 	}
 
 	consulZ1Job := core.Job{
@@ -268,7 +268,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 	}
 
 	ipRange := network.IPRange(config.IPRange)
-	cloudProperties := iaasConfig.NetworkSubnet()
+	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
 
 	etcdNetwork1 := core.Network{
 		Name: "etcd1",
@@ -344,7 +344,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Name:            "etcd_z1",
 		Network:         etcdNetwork1.Name,
 		Stemcell:        stemcell,
-		CloudProperties: iaasConfig.ResourcePool(),
+		CloudProperties: iaasConfig.ResourcePool(etcdNetwork1.Subnets[0].Range),
 	}
 
 	consulZ1Job := core.Job{

@@ -11,7 +11,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 	config = NewConfigWithDefaults(config)
 
 	ipRange := network.IPRange(config.IPRange)
-	cloudProperties := iaasConfig.NetworkSubnet()
+	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
 
 	releases := []core.Release{
 		{
@@ -48,7 +48,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		{
 			Name:            "etcd_z1",
 			Network:         "etcd1",
-			CloudProperties: iaasConfig.ResourcePool(),
+			CloudProperties: iaasConfig.ResourcePool(config.IPRange),
 			Stemcell:        stemcell,
 		},
 	}

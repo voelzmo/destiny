@@ -27,7 +27,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 
 	ipRange := network.IPRange(config.IPRange)
 
-	cloudProperties := iaasConfig.NetworkSubnet()
+	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
 	cpi := iaasConfig.CPI()
 
 	cpiRelease := core.Release{
@@ -64,7 +64,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			Name:    iaasConfig.Stemcell(),
 			Version: "latest",
 		},
-		CloudProperties: iaasConfig.ResourcePool(),
+		CloudProperties: iaasConfig.ResourcePool(config.IPRange),
 	}
 
 	update := core.Update{
