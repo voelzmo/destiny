@@ -160,7 +160,15 @@ var _ = Describe("Manifest", func() {
 					},
 				}},
 				PersistentDisk: 1024,
-				ResourcePool:   "consul_z1",
+				Properties: &core.JobProperties{
+					Consul: &core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Mode:     "client",
+							LogLevel: "info",
+						},
+					},
+				},
+				ResourcePool: "consul_z1",
 				Templates: []core.JobTemplate{
 					{
 						Name:    "consul_agent",
@@ -419,7 +427,15 @@ var _ = Describe("Manifest", func() {
 							},
 						}},
 						PersistentDisk: 1024,
-						ResourcePool:   "consul_z1",
+						Properties: &core.JobProperties{
+							Consul: &core.JobPropertiesConsul{
+								Agent: core.JobPropertiesConsulAgent{
+									Mode:     "client",
+									LogLevel: "info",
+								},
+							},
+						},
+						ResourcePool: "consul_z1",
 						Templates: []core.JobTemplate{
 							{
 								Name:    "consul_agent",
@@ -745,7 +761,15 @@ var _ = Describe("Manifest", func() {
 					},
 				}},
 				PersistentDisk: 1024,
-				ResourcePool:   "consul_z1",
+				Properties: &core.JobProperties{
+					Consul: &core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
+							Mode:     "client",
+							LogLevel: "info",
+						},
+					},
+				},
+				ResourcePool: "consul_z1",
 				Templates: []core.JobTemplate{
 					{
 						Name:    "consul_agent",

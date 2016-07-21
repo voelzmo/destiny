@@ -146,7 +146,15 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			},
 		}},
 		PersistentDisk: 1024,
-		ResourcePool:   resourcePools[0].Name,
+		Properties: &core.JobProperties{
+			Consul: &core.JobPropertiesConsul{
+				Agent: core.JobPropertiesConsulAgent{
+					Mode:     "client",
+					LogLevel: "info",
+				},
+			},
+		},
+		ResourcePool: resourcePools[0].Name,
 		Templates: []core.JobTemplate{
 			{
 				Name:    "consul_agent",

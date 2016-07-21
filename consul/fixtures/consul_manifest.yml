@@ -64,6 +64,11 @@ jobs:
     - 10.244.4.11
     - 10.244.4.12
   persistent_disk: 1024
+  properties:
+    consul:
+      agent:
+        mode: client
+        log_level: info
   resource_pool: consul_z1
   templates:
   - name: consul_agent

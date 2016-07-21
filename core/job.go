@@ -33,7 +33,13 @@ type JobProperties struct {
 }
 
 type JobPropertiesConsul struct {
-	Agent JobPropertiesConsulAgent `yaml:"agent"`
+	Agent       JobPropertiesConsulAgent `yaml:"agent"`
+	CACert      string                   `yaml:"ca_cert,omitempty"`
+	ServerCert  string                   `yaml:"server_cert,omitempty"`
+	ServerKey   string                   `yaml:"server_key,omitempty"`
+	AgentCert   string                   `yaml:"agent_cert,omitempty"`
+	AgentKey    string                   `yaml:"agent_key,omitempty"`
+	EncryptKeys []string                 `yaml:"encrypt_keys,omitempty"`
 }
 
 type JobPropertiesEtcd struct {
@@ -71,9 +77,16 @@ type JobPropertiesEtcdCluster struct {
 }
 
 type JobPropertiesConsulAgent struct {
-	Mode     string                           `yaml:"mode,omitempty"`
-	LogLevel string                           `yaml:"log_level,omitempty"`
-	Services JobPropertiesConsulAgentServices `yaml:"services,omitempty"`
+	Domain     string                           `yaml:"domain,omitempty"`
+	Datacenter string                           `yaml:"datacenter,omitempty"`
+	Servers    JobPropertiesConsulAgentServers  `yaml:"servers,omitempty"`
+	Mode       string                           `yaml:"mode,omitempty"`
+	LogLevel   string                           `yaml:"log_level,omitempty"`
+	Services   JobPropertiesConsulAgentServices `yaml:"services,omitempty"`
+}
+
+type JobPropertiesConsulAgentServers struct {
+	Lan []string `yaml:"lan"`
 }
 
 type JobPropertiesConsulAgentServices map[string]JobPropertiesConsulAgentService
