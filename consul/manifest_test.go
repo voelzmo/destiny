@@ -16,20 +16,21 @@ import (
 var _ = Describe("Manifest", func() {
 	Describe("NewManifest", func() {
 		It("generates a valid Consul BOSH-Lite manifest", func() {
-			manifest := consul.NewManifest(consul.Config{
+			manifest, err := consul.NewManifest(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
 				Networks: []consul.ConfigNetwork{
 					{
-						IPRange: "10.244.4.0/24",
+						IPRange: "10.244.4.0/26",
 						Nodes:   2,
 					},
 					{
-						IPRange: "10.244.5.0/24",
+						IPRange: "10.244.5.0/26",
 						Nodes:   1,
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
@@ -188,24 +189,12 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
 						Gateway:         "10.244.4.1",
-						Range:           "10.244.4.0/24",
+						Range:           "10.244.4.0/26",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.20-10.244.4.254",
+							"10.244.4.63",
 						},
-						Static: []string{
-							"10.244.4.4",
-							"10.244.4.5",
-							"10.244.4.6",
-							"10.244.4.7",
-							"10.244.4.8",
-							"10.244.4.9",
-							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
-							"10.244.4.13",
-							"10.244.4.14",
-						},
+						Static: []string{"10.244.4.4-10.244.4.59"},
 					},
 				},
 				Type: "manual",
@@ -216,24 +205,12 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
 						Gateway:         "10.244.5.1",
-						Range:           "10.244.5.0/24",
+						Range:           "10.244.5.0/26",
 						Reserved: []string{
 							"10.244.5.2-10.244.5.3",
-							"10.244.5.20-10.244.5.254",
+							"10.244.5.63",
 						},
-						Static: []string{
-							"10.244.5.4",
-							"10.244.5.5",
-							"10.244.5.6",
-							"10.244.5.7",
-							"10.244.5.8",
-							"10.244.5.9",
-							"10.244.5.10",
-							"10.244.5.11",
-							"10.244.5.12",
-							"10.244.5.13",
-							"10.244.5.14",
-						},
+						Static: []string{"10.244.5.4-10.244.5.59"},
 					},
 				},
 				Type: "manual",
@@ -259,7 +236,7 @@ var _ = Describe("Manifest", func() {
 		})
 
 		It("generates a valid Consul AWS manifest", func() {
-			manifest := consul.NewManifest(consul.Config{
+			manifest, err := consul.NewManifest(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
 				Networks: []consul.ConfigNetwork{
@@ -278,6 +255,7 @@ var _ = Describe("Manifest", func() {
 					{ID: "subnet-2", Range: "10.0.5.0/24", AZ: "some-az-1d"},
 				},
 			})
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest).To(Equal(consul.Manifest{
 				DirectorUUID: "some-director-uuid",
@@ -458,21 +436,9 @@ var _ = Describe("Manifest", func() {
 								Range:           "10.0.4.0/24",
 								Reserved: []string{
 									"10.0.4.2-10.0.4.3",
-									"10.0.4.20-10.0.4.254",
+									"10.0.4.255",
 								},
-								Static: []string{
-									"10.0.4.4",
-									"10.0.4.5",
-									"10.0.4.6",
-									"10.0.4.7",
-									"10.0.4.8",
-									"10.0.4.9",
-									"10.0.4.10",
-									"10.0.4.11",
-									"10.0.4.12",
-									"10.0.4.13",
-									"10.0.4.14",
-								},
+								Static: []string{"10.0.4.4-10.0.4.251"},
 							},
 						},
 						Type: "manual",
@@ -486,21 +452,9 @@ var _ = Describe("Manifest", func() {
 								Range:           "10.0.5.0/24",
 								Reserved: []string{
 									"10.0.5.2-10.0.5.3",
-									"10.0.5.20-10.0.5.254",
+									"10.0.5.255",
 								},
-								Static: []string{
-									"10.0.5.4",
-									"10.0.5.5",
-									"10.0.5.6",
-									"10.0.5.7",
-									"10.0.5.8",
-									"10.0.5.9",
-									"10.0.5.10",
-									"10.0.5.11",
-									"10.0.5.12",
-									"10.0.5.13",
-									"10.0.5.14",
-								},
+								Static: []string{"10.0.5.4-10.0.5.251"},
 							},
 						},
 						Type: "manual",
@@ -529,7 +483,7 @@ var _ = Describe("Manifest", func() {
 
 		Context("when config nodes is not specified", func() {
 			It("sets job instances to 1 and assigns a static IP", func() {
-				manifest := consul.NewManifest(consul.Config{
+				manifest, err := consul.NewManifest(consul.Config{
 					DirectorUUID: "some-director-uuid",
 					Name:         "consul-some-random-guid",
 					Networks: []consul.ConfigNetwork{
@@ -542,6 +496,7 @@ var _ = Describe("Manifest", func() {
 						{ID: "subnet-1234", Range: "10.0.4.0/24", AZ: "some-az-1"},
 					},
 				})
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(manifest.Jobs[0].Instances).To(Equal(1))
 			})
@@ -549,7 +504,7 @@ var _ = Describe("Manifest", func() {
 
 		DescribeTable("TLS configuration",
 			func(dcName, agentCert, agentKey, serverCert, serverKey string) {
-				manifest := consul.NewManifest(consul.Config{
+				manifest, err := consul.NewManifest(consul.Config{
 					DirectorUUID: "some-director-uuid",
 					Name:         "consul-some-random-guid",
 					Networks: []consul.ConfigNetwork{
@@ -560,6 +515,7 @@ var _ = Describe("Manifest", func() {
 					},
 					DC: dcName,
 				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(manifest.Properties.Consul.Agent.Datacenter).To(Equal(dcName))
 				Expect(manifest.Properties.Consul.AgentCert).To(Equal(agentCert))
@@ -573,6 +529,49 @@ var _ = Describe("Manifest", func() {
 			Entry("generates a manifest with dc3.cf.internal signed certs", "dc3", consul.DC3AgentCert, consul.DC3AgentKey, consul.DC3ServerCert, consul.DC3ServerKey),
 		)
 
+		Context("failure cases", func() {
+			It("returns an error when it cannot parse the cidr block provided in config", func() {
+				_, err := consul.NewManifest(consul.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					Networks: []consul.ConfigNetwork{
+						{
+							IPRange: "fake-cidr-block",
+							Nodes:   1,
+						},
+					},
+				}, iaas.NewWardenConfig())
+				Expect(err).To(MatchError(`"fake-cidr-block" cannot parse CIDR block`))
+			})
+
+			It("returns an error when nodes is less than zero ", func() {
+				_, err := consul.NewManifest(consul.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					Networks: []consul.ConfigNetwork{
+						{
+							IPRange: "10.244.4.0/24",
+							Nodes:   -1,
+						},
+					},
+				}, iaas.NewWardenConfig())
+				Expect(err).To(MatchError("count must be greater than or equal to zero"))
+			})
+
+			It("returns an error when not enough ips for test consumers", func() {
+				_, err := consul.NewManifest(consul.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					Networks: []consul.ConfigNetwork{
+						{
+							IPRange: "10.244.4.0/28",
+							Nodes:   1,
+						},
+					},
+				}, iaas.NewWardenConfig())
+				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+			})
+		})
 	})
 
 	Describe("ConsulMembers", func() {
@@ -792,21 +791,9 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.20-10.244.4.254",
+							"10.244.4.255",
 						},
-						Static: []string{
-							"10.244.4.4",
-							"10.244.4.5",
-							"10.244.4.6",
-							"10.244.4.7",
-							"10.244.4.8",
-							"10.244.4.9",
-							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
-							"10.244.4.13",
-							"10.244.4.14",
-						},
+						Static: []string{"10.244.4.4-10.244.4.251"},
 					},
 				},
 				Type: "manual",
@@ -960,7 +947,7 @@ var _ = Describe("Manifest", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest := consul.NewManifest(consul.Config{
+			manifest, err := consul.NewManifest(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul",
 				Networks: []consul.ConfigNetwork{
@@ -970,6 +957,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			yaml, err := manifest.ToYAML()
 			Expect(err).NotTo(HaveOccurred())

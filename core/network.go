@@ -1,5 +1,10 @@
 package core
 
+import (
+	"errors"
+	"strings"
+)
+
 type Network struct {
 	Name    string          `yaml:"name"`
 	Subnets []NetworkSubnet `yaml:"subnets"`
@@ -30,4 +35,48 @@ func (n Network) StaticIPs(count int) []string {
 	}
 
 	return []string{}
+}
+
+func (n Network) StaticIPsFromRange(count int) ([]string, error) {
+	if count < 0 {
+		return []string{}, errors.New("count must be greater than or equal to zero")
+	}
+
+	var ips []string
+	for _, subnet := range n.Subnets {
+		subnetIPs, err := n.rangeToList(subnet.Static[0])
+		if err != nil {
+			return nil, err
+		}
+
+		ips = append(ips, subnetIPs...)
+	}
+
+	if len(ips) >= count {
+		return ips[:count], nil
+	}
+
+	return []string{}, errors.New("count is greater than the number of ips in range")
+}
+
+func (n Network) rangeToList(ipRange string) ([]string, error) {
+	ipRange = strings.Replace(ipRange, " ", "", -1)
+
+	ips := strings.Split(ipRange, "-")
+
+	if len(ips) != 2 {
+		return nil, errors.New("static ip's must be a range in the form of x.x.x.x-x.x.x.x")
+	}
+
+	firstIP, err := ParseIP(ips[0])
+	if err != nil {
+		return nil, err
+	}
+
+	secondIP, err := ParseIP(ips[1])
+	if err != nil {
+		return nil, err
+	}
+
+	return firstIP.To(secondIP), nil
 }

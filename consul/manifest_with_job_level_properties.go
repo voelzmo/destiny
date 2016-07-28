@@ -5,8 +5,11 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/iaas"
 )
 
-func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) Manifest {
-	manifest := NewManifest(config, iaasConfig)
+func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) (Manifest, error) {
+	manifest, err := NewManifest(config, iaasConfig)
+	if err != nil {
+		return Manifest{}, err
+	}
 
 	for _, consulJob := range manifest.Jobs {
 		consulJob.Properties.Consul = &core.JobPropertiesConsul{
@@ -48,7 +51,7 @@ func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) Ma
 
 	manifest.Properties.Consul = nil
 
-	return manifest
+	return manifest, nil
 }
 
 func findJob(manifest Manifest, name string) core.Job {

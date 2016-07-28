@@ -15,7 +15,7 @@ import (
 var _ = Describe("Manifest", func() {
 	Describe("NewManifestWithJobLevelProperties", func() {
 		It("generates a valid Consul BOSH-Lite manifest with proper job level consul properties", func() {
-			manifest := consul.NewManifestWithJobLevelProperties(consul.Config{
+			manifest, err := consul.NewManifestWithJobLevelProperties(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
 				Networks: []consul.ConfigNetwork{
@@ -29,6 +29,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
@@ -107,6 +108,22 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Properties.Consul).To(BeNil())
 		})
+
+		Context("failure cases", func() {
+			It("returns an error when it fails to build base manifest", func() {
+				_, err := consul.NewManifestWithJobLevelProperties(consul.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					Networks: []consul.ConfigNetwork{
+						{
+							IPRange: "fake-cidr-block",
+							Nodes:   1,
+						},
+					},
+				}, iaas.NewWardenConfig())
+				Expect(err).To(MatchError(`"fake-cidr-block" cannot parse CIDR block`))
+			})
+		})
 	})
 
 	Describe("ToYAML", func() {
@@ -114,7 +131,7 @@ var _ = Describe("Manifest", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest_with_job_level_properties.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest := consul.NewManifestWithJobLevelProperties(consul.Config{
+			manifest, err := consul.NewManifestWithJobLevelProperties(consul.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul",
 				Networks: []consul.ConfigNetwork{
@@ -124,6 +141,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			yaml, err := manifest.ToYAML()
 			Expect(err).NotTo(HaveOccurred())

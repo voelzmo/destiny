@@ -5,7 +5,6 @@ import (
 
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
-	"github.com/pivotal-cf-experimental/destiny/network"
 	"gopkg.in/yaml.v2"
 )
 
@@ -25,38 +24,29 @@ type ConsulMember struct {
 	Address string
 }
 
-func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
+func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 	config = populateDefaultConfigNodes(config)
 
-	ipRanges := []network.IPRange{}
-
+	cidrBlocks := []core.CIDRBlock{}
 	for _, cfgNetwork := range config.Networks {
-		ipRanges = append(ipRanges, network.IPRange(cfgNetwork.IPRange))
+		cidr, err := core.ParseCIDRBlock(cfgNetwork.IPRange)
+		if err != nil {
+			return Manifest{}, err
+		}
+		cidrBlocks = append(cidrBlocks, cidr)
 	}
 
 	consulNetworks := []core.Network{}
-	for i, ipRange := range ipRanges {
+	for i, cidrBlock := range cidrBlocks {
 
 		consulNetwork := core.Network{
 			Name: fmt.Sprintf("consul%d", i+1),
 			Subnets: []core.NetworkSubnet{{
-				CloudProperties: iaasConfig.NetworkSubnet(ipRange.String()),
-				Gateway:         ipRange.IP(1),
-				Range:           string(ipRange),
-				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(20, 254)},
-				Static: []string{
-					ipRange.IP(4),
-					ipRange.IP(5),
-					ipRange.IP(6),
-					ipRange.IP(7),
-					ipRange.IP(8),
-					ipRange.IP(9),
-					ipRange.IP(10),
-					ipRange.IP(11),
-					ipRange.IP(12),
-					ipRange.IP(13),
-					ipRange.IP(14),
-				},
+				CloudProperties: iaasConfig.NetworkSubnet(cidrBlock.String()),
+				Gateway:         cidrBlock.GetFirstIP().Add(1).String(),
+				Range:           cidrBlock.String(),
+				Reserved:        []string{cidrBlock.Range(2, 3), cidrBlock.GetLastIP().String()},
+				Static:          []string{cidrBlock.Range(4, cidrBlock.CIDRSize-5)},
 			}},
 			Type: "manual",
 		}
@@ -92,12 +82,17 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 	for i := range consulNetworks {
 		instances := config.Networks[i].Nodes
 
+		staticIps, err := consulNetworks[i].StaticIPsFromRange(instances)
+		if err != nil {
+			return Manifest{}, err
+		}
+
 		job := core.Job{
 			Name:      fmt.Sprintf("consul_z%d", i+1),
 			Instances: instances,
 			Networks: []core.JobNetwork{{
 				Name:      consulNetworks[i].Name,
-				StaticIPs: consulNetworks[i].StaticIPs(instances),
+				StaticIPs: staticIps,
 			}},
 			PersistentDisk: 1024,
 			Properties: &core.JobProperties{
@@ -131,7 +126,12 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		}
 
 		jobs = append(jobs, job)
-		consulClusterStaticIPs = append(consulClusterStaticIPs, consulNetworks[i].StaticIPs(instances)...)
+		consulClusterStaticIPs = append(consulClusterStaticIPs, staticIps...)
+	}
+
+	staticIps, err := consulNetworks[0].StaticIPsFromRange(9)
+	if err != nil {
+		return Manifest{}, err
 	}
 
 	jobs = append(jobs, core.Job{
@@ -140,9 +140,9 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: consulNetworks[0].Name,
 			StaticIPs: []string{
-				consulNetworks[0].StaticIPs(9)[6],
-				consulNetworks[0].StaticIPs(9)[7],
-				consulNetworks[0].StaticIPs(9)[8],
+				staticIps[6],
+				staticIps[7],
+				staticIps[8],
 			},
 		}},
 		PersistentDisk: 1024,
@@ -191,7 +191,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Jobs:          jobs,
 		Networks:      consulNetworks,
 		Properties:    properties,
-	}
+	}, nil
 }
 
 func (m Manifest) ConsulMembers() []ConsulMember {
