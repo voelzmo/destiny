@@ -15,7 +15,7 @@ import (
 var _ = Describe("Manifest", func() {
 	Describe("NewManifest", func() {
 		It("generates a valid Turbulence AWS manifest", func() {
-			manifest := turbulence.NewManifest(turbulence.Config{
+			manifest, err := turbulence.NewManifest(turbulence.Config{
 				Name:         "turbulence",
 				DirectorUUID: "some-director-uuid",
 				IPRange:      "10.0.16.0/24",
@@ -39,6 +39,7 @@ var _ = Describe("Manifest", func() {
 				RegistryPort:     25777,
 				RegistryUsername: "some-registry-username",
 			})
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest).To(Equal(turbulence.Manifest{
 				DirectorUUID: "some-director-uuid",
@@ -126,12 +127,11 @@ var _ = Describe("Manifest", func() {
 								Gateway: "10.0.16.1",
 								Range:   "10.0.16.0/24",
 								Reserved: []string{
-									"10.0.16.2-10.0.16.29",
-									"10.0.16.39-10.0.16.254",
+									"10.0.16.2-10.0.16.3",
+									"10.0.16.255",
 								},
 								Static: []string{
-									"10.0.16.30",
-									"10.0.16.31",
+									"10.0.16.4-10.0.16.251",
 								},
 							},
 						},
@@ -180,7 +180,7 @@ var _ = Describe("Manifest", func() {
 		})
 
 		It("generates a valid Turbulence BOSH-Lite manifest", func() {
-			manifest := turbulence.NewManifest(turbulence.Config{
+			manifest, err := turbulence.NewManifest(turbulence.Config{
 				DirectorUUID: "some-director-uuid",
 				IPRange:      "10.244.4.0/24",
 				BOSH: turbulence.ConfigBOSH{
@@ -190,6 +190,7 @@ var _ = Describe("Manifest", func() {
 				},
 				Name: "turbulence",
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest).To(Equal(turbulence.Manifest{
 				DirectorUUID: "some-director-uuid",
@@ -261,13 +262,10 @@ var _ = Describe("Manifest", func() {
 								Gateway: "10.244.4.1",
 								Range:   "10.244.4.0/24",
 								Reserved: []string{
-									"10.244.4.2-10.244.4.29",
-									"10.244.4.39-10.244.4.254",
+									"10.244.4.2-10.244.4.3",
+									"10.244.4.255",
 								},
-								Static: []string{
-									"10.244.4.30",
-									"10.244.4.31",
-								},
+								Static: []string{"10.244.4.4-10.244.4.251"},
 							},
 						},
 						Type: "manual",
@@ -384,12 +382,11 @@ var _ = Describe("Manifest", func() {
 						Gateway:         "10.244.4.1",
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
-							"10.244.4.2-10.244.4.29",
-							"10.244.4.39-10.244.4.254",
+							"10.244.4.2-10.244.4.3",
+							"10.244.4.255",
 						},
 						Static: []string{
-							"10.244.4.30",
-							"10.244.4.31",
+							"10.244.4.4-10.244.4.251",
 						},
 					},
 				},
@@ -435,7 +432,7 @@ var _ = Describe("Manifest", func() {
 			turbulenceManifest, err := ioutil.ReadFile("fixtures/turbulence_manifest.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest := turbulence.NewManifest(turbulence.Config{
+			manifest, err := turbulence.NewManifest(turbulence.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "turbulence",
 				IPRange:      "10.244.4.0/24",
@@ -445,6 +442,7 @@ var _ = Describe("Manifest", func() {
 					Password: "some-bosh-password",
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			yaml, err := manifest.ToYAML()
 			Expect(err).NotTo(HaveOccurred())

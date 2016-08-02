@@ -3,7 +3,6 @@ package turbulence
 import (
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
-	"github.com/pivotal-cf-experimental/destiny/network"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,13 +18,16 @@ type Manifest struct {
 	ResourcePools []core.ResourcePool `yaml:"resource_pools"`
 }
 
-func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
+func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 	turbulenceRelease := core.Release{
 		Name:    "turbulence",
 		Version: "latest",
 	}
 
-	ipRange := network.IPRange(config.IPRange)
+	cidrBlock, err := core.ParseCIDRBlock(config.IPRange)
+	if err != nil {
+		panic(err)
+	}
 
 	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
 	cpi := iaasConfig.CPI()
@@ -39,13 +41,10 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Name: "turbulence",
 		Subnets: []core.NetworkSubnet{{
 			CloudProperties: cloudProperties,
-			Gateway:         ipRange.IP(1),
-			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 29), ipRange.Range(39, 254)},
-			Static: []string{
-				ipRange.IP(30),
-				ipRange.IP(31),
-			},
+			Gateway:         cidrBlock.GetFirstIP().Add(1).String(),
+			Range:           cidrBlock.String(),
+			Reserved:        []string{cidrBlock.Range(2, 3), cidrBlock.GetLastIP().String()},
+			Static:          []string{cidrBlock.Range(4, cidrBlock.CIDRSize-5)},
 		}},
 		Type: "manual",
 	}
@@ -75,12 +74,17 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		UpdateWatchTime: "1000-180000",
 	}
 
+	staticIps, err := turbulenceNetwork.StaticIPsFromRange(27)
+	if err != nil {
+		panic(err)
+	}
+
 	apiJob := core.Job{
 		Instances: 1,
 		Name:      "api",
 		Networks: []core.JobNetwork{{
 			Name:      turbulenceNetwork.Name,
-			StaticIPs: turbulenceNetwork.StaticIPs(1),
+			StaticIPs: []string{staticIps[26]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   turbulenceResourcePool.Name,
@@ -101,7 +105,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		directorCACert = config.BOSH.DirectorCACert
 	}
 
-	iaasProperties := iaasConfig.Properties(turbulenceNetwork.Subnets[0].Static[0])
+	iaasProperties := iaasConfig.Properties(staticIps[26])
 	turbulenceProperties := Properties{
 		WardenCPI: iaasProperties.WardenCPI,
 		AWS:       iaasProperties.AWS,
@@ -132,7 +136,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Jobs:          []core.Job{apiJob},
 		Networks:      []core.Network{turbulenceNetwork},
 		Properties:    turbulenceProperties,
-	}
+	}, nil
 }
 
 func (m Manifest) ToYAML() ([]byte, error) {
