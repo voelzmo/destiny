@@ -3,9 +3,9 @@ package cloudconfig
 import (
 	"fmt"
 
-	"gopkg.in/yaml.v2"
+	"github.com/pivotal-cf-experimental/destiny/core"
 
-	"github.com/pivotal-cf-experimental/destiny/network"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -66,13 +66,10 @@ type SubnetCloudProperties struct {
 }
 
 const (
-	gatewayIPRangeIndex         = 1
-	loReservedIPRangeStartIndex = 2
-	loReservedIPRangeEndIndex   = 3
-	hiReservedIPRangeEndIndex   = 254
+	gatewayIPRangeIndex = 1
 )
 
-func NewWardenCloudConfig(config Config) CloudConfig {
+func NewWardenCloudConfig(config Config) (CloudConfig, error) {
 	vmTypes := []VMType{
 		{
 			Name: "default",
@@ -103,30 +100,20 @@ func NewWardenCloudConfig(config Config) CloudConfig {
 			Name: azName,
 		})
 
-		ipRange := network.IPRange(cfgAZ.IPRange)
-
-		hiReservedIPRangeStartIndex := loReservedIPRangeEndIndex + 1 + cfgAZ.StaticIPs
-		if i == 0 {
-			hiReservedIPRangeStartIndex += compilation.Workers
-		}
-
-		staticIPs := []string{}
-		for j := 0; j < cfgAZ.StaticIPs; j++ {
-			staticIPs = append(staticIPs, ipRange.IP(loReservedIPRangeEndIndex+1+j))
+		cidrBlock, err := core.ParseCIDRBlock(cfgAZ.IPRange)
+		if err != nil {
+			return CloudConfig{}, err
 		}
 
 		subnets = append(subnets, Subnet{
 			CloudProperties: SubnetCloudProperties{
 				Name: "random",
 			},
-			Range:   string(ipRange),
-			Gateway: ipRange.IP(gatewayIPRangeIndex),
-			AZ:      azName,
-			Reserved: []string{
-				ipRange.Range(loReservedIPRangeStartIndex, loReservedIPRangeEndIndex),
-				ipRange.Range(hiReservedIPRangeStartIndex, hiReservedIPRangeEndIndex),
-			},
-			Static: staticIPs,
+			Range:    cidrBlock.String(),
+			Gateway:  cidrBlock.GetFirstIP().Add(gatewayIPRangeIndex).String(),
+			AZ:       azName,
+			Reserved: []string{cidrBlock.Range(2, 3), cidrBlock.GetLastIP().String()},
+			Static:   []string{cidrBlock.Range(4, cidrBlock.CIDRSize-5)},
 		})
 	}
 
@@ -144,7 +131,7 @@ func NewWardenCloudConfig(config Config) CloudConfig {
 		DiskTypes:   diskTypes,
 		Compilation: compilation,
 		Networks:    networks,
-	}
+	}, nil
 }
 
 func (c CloudConfig) ToYAML() ([]byte, error) {
