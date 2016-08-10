@@ -99,7 +99,7 @@ var _ = Describe("Manifest", func() {
 						Networks: []core.JobNetwork{
 							{
 								Name:      "turbulence",
-								StaticIPs: []string{"10.0.16.30"},
+								StaticIPs: []string{"10.0.16.20"},
 							},
 						},
 						PersistentDisk: 1024,
@@ -165,7 +165,7 @@ var _ = Describe("Manifest", func() {
 						Username: "some-registry-username",
 					},
 					Blobstore: &core.PropertiesBlobstore{
-						Address: "10.0.16.30",
+						Address: "10.0.16.20",
 						Port:    2520,
 						Agent: core.PropertiesBlobstoreAgent{
 							User:     "agent",
@@ -173,7 +173,7 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 					Agent: &core.PropertiesAgent{
-						Mbus: "nats://nats:password@10.0.16.30:4222",
+						Mbus: "nats://nats:password@10.0.16.20:4222",
 					},
 				},
 			}))
@@ -234,7 +234,7 @@ var _ = Describe("Manifest", func() {
 						Networks: []core.JobNetwork{
 							{
 								Name:      "turbulence",
-								StaticIPs: []string{"10.244.4.30"},
+								StaticIPs: []string{"10.244.4.20"},
 							},
 						},
 						PersistentDisk: 1024,
@@ -357,7 +357,7 @@ var _ = Describe("Manifest", func() {
 				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name:      "turbulence",
-					StaticIPs: []string{"10.244.4.30"},
+					StaticIPs: []string{"10.244.4.20"},
 				}},
 				PersistentDisk: 1024,
 				ResourcePool:   "turbulence",

@@ -74,7 +74,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		UpdateWatchTime: "1000-180000",
 	}
 
-	staticIps, err := turbulenceNetwork.StaticIPsFromRange(27)
+	staticIps, err := turbulenceNetwork.StaticIPsFromRange(17)
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +84,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Name:      "api",
 		Networks: []core.JobNetwork{{
 			Name:      turbulenceNetwork.Name,
-			StaticIPs: []string{staticIps[26]},
+			StaticIPs: []string{staticIps[16]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   turbulenceResourcePool.Name,
@@ -105,7 +105,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		directorCACert = config.BOSH.DirectorCACert
 	}
 
-	iaasProperties := iaasConfig.Properties(staticIps[26])
+	iaasProperties := iaasConfig.Properties(staticIps[16])
 	turbulenceProperties := Properties{
 		WardenCPI: iaasProperties.WardenCPI,
 		AWS:       iaasProperties.AWS,

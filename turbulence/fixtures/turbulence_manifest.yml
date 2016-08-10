@@ -35,7 +35,7 @@ jobs:
   networks:
   - name: turbulence
     static_ips:
-    - 10.244.4.30
+    - 10.244.4.20
   persistent_disk: 1024
   resource_pool: turbulence
   templates:
