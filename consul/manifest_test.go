@@ -160,7 +160,6 @@ var _ = Describe("Manifest", func() {
 						"10.244.4.12",
 					},
 				}},
-				PersistentDisk: 1024,
 				Properties: &core.JobProperties{
 					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
@@ -404,7 +403,6 @@ var _ = Describe("Manifest", func() {
 								"10.0.4.12",
 							},
 						}},
-						PersistentDisk: 1024,
 						Properties: &core.JobProperties{
 							Consul: &core.JobPropertiesConsul{
 								Agent: core.JobPropertiesConsulAgent{
@@ -759,7 +757,6 @@ var _ = Describe("Manifest", func() {
 						"10.244.4.12",
 					},
 				}},
-				PersistentDisk: 1024,
 				Properties: &core.JobProperties{
 					Consul: &core.JobPropertiesConsul{
 						Agent: core.JobPropertiesConsulAgent{
@@ -887,7 +884,7 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 			Expect(manifest.InstanceGroups[1]).To(Equal(core.InstanceGroup{
-				Name:      "consul_test_consumer",
+				Name:      "test_consumer",
 				AZs:       []string{"z1"},
 				Instances: 3,
 				Networks: []core.InstanceGroupNetwork{{
@@ -898,9 +895,8 @@ var _ = Describe("Manifest", func() {
 						"10.244.4.12",
 					},
 				}},
-				VMType:             "default",
-				Stemcell:           "default",
-				PersistentDiskType: "default",
+				VMType:   "default",
+				Stemcell: "default",
 				Jobs: []core.InstanceGroupJob{
 					{
 						Name:    "consul_agent",

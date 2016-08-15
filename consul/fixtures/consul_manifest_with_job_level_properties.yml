@@ -154,7 +154,6 @@ jobs:
     - 10.244.4.10
     - 10.244.4.11
     - 10.244.4.12
-  persistent_disk: 1024
   properties:
     consul:
       agent:

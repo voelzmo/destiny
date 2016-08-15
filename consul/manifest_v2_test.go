@@ -116,7 +116,7 @@ var _ = Describe("ManifestV2", func() {
 
 			Expect(manifest.InstanceGroups[1]).To(Equal(core.InstanceGroup{
 				Instances: 3,
-				Name:      "consul_test_consumer",
+				Name:      "test_consumer",
 				AZs:       []string{"z1"},
 				Networks: []core.InstanceGroupNetwork{
 					{
@@ -128,9 +128,8 @@ var _ = Describe("ManifestV2", func() {
 						},
 					},
 				},
-				VMType:             "default",
-				Stemcell:           "default",
-				PersistentDiskType: "default",
+				VMType:   "default",
+				Stemcell: "default",
 				Jobs: []core.InstanceGroupJob{
 					{
 						Name:    "consul_agent",

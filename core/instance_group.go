@@ -7,7 +7,7 @@ type InstanceGroup struct {
 	Networks           []InstanceGroupNetwork      `yaml:"networks"`
 	VMType             string                      `yaml:"vm_type"`
 	Stemcell           string                      `yaml:"stemcell"`
-	PersistentDiskType string                      `yaml:"persistent_disk_type"`
+	PersistentDiskType string                      `yaml:"persistent_disk_type,omitempty"`
 	Update             Update                      `yaml:"update,omitempty"`
 	Jobs               []InstanceGroupJob          `yaml:"jobs"`
 	MigratedFrom       []InstanceGroupMigratedFrom `yaml:"migrated_from"`

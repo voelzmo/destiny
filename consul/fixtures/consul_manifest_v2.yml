@@ -43,7 +43,7 @@ instance_groups:
             tags: [routing]
           cloud_controller: {}
 
-- name: consul_test_consumer
+- name: test_consumer
   instances: 3
   azs: [z1]
   networks:
@@ -60,7 +60,6 @@ instance_groups:
     release: consul
   - name: consul-test-consumer
     release: consul
-  persistent_disk_type: default
   vm_type: default
   stemcell: default
 

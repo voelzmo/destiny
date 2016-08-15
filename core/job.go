@@ -7,7 +7,7 @@ type Job struct {
 	Networks       []JobNetwork   `yaml:"networks"`
 	ResourcePool   string         `yaml:"resource_pool"`
 	Templates      []JobTemplate  `yaml:"templates"`
-	PersistentDisk int            `yaml:"persistent_disk"`
+	PersistentDisk int            `yaml:"persistent_disk,omitempty"`
 	Properties     *JobProperties `yaml:"properties,omitempty"`
 	Update         *JobUpdate     `yaml:"update,omitempty"`
 }

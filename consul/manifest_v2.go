@@ -108,7 +108,7 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
 
 	return core.InstanceGroup{
 		Instances: 3,
-		Name:      "consul_test_consumer",
+		Name:      "test_consumer",
 		AZs:       []string{azs[0].Name},
 		Networks: []core.InstanceGroupNetwork{
 			{
@@ -120,9 +120,8 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
 				},
 			},
 		},
-		VMType:             "default",
-		Stemcell:           "default",
-		PersistentDiskType: "default",
+		VMType:   "default",
+		Stemcell: "default",
 		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "consul_agent",

@@ -145,7 +145,6 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				staticIps[8],
 			},
 		}},
-		PersistentDisk: 1024,
 		Properties: &core.JobProperties{
 			Consul: &core.JobPropertiesConsul{
 				Agent: core.JobPropertiesConsulAgent{
