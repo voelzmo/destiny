@@ -31,7 +31,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		return Manifest{}, err
 	}
 
-	consulStaticIP, err := manifest.Networks[0].StaticIPsFromRange(40)
+	consulStaticIP, err := manifest.Networks[0].StaticIPsFromRange(24)
 	if err != nil {
 		return Manifest{}, err
 	}
@@ -196,7 +196,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		CloudProperties: iaasConfig.ResourcePool(etcdNetwork1.Subnets[0].Range),
 	}
 
-	staticIPs, err := etcdNetwork1.StaticIPsFromRange(40)
+	staticIPs, err := etcdNetwork1.StaticIPsFromRange(24)
 	if err != nil {
 		return Manifest{}, err
 	}

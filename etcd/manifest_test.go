@@ -19,7 +19,7 @@ var _ = Describe("Manifest", func() {
 			manifest, err := etcd.NewTLSManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
-				IPRange:      "10.244.4.0/24",
+				IPRange:      "10.244.4.0/27",
 			}, iaas.NewWardenConfig())
 			Expect(err).NotTo(HaveOccurred())
 
@@ -149,13 +149,13 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
 						Gateway:         "10.244.4.1",
-						Range:           "10.244.4.0/24",
+						Range:           "10.244.4.0/27",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.255",
+							"10.244.4.31",
 						},
 						Static: []string{
-							"10.244.4.4-10.244.4.251",
+							"10.244.4.4-10.244.4.27",
 						},
 					},
 				},
@@ -216,10 +216,10 @@ var _ = Describe("Manifest", func() {
 			manifest, err := etcd.NewTLSManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
-				IPRange:      "10.0.16.0/24",
+				IPRange:      "10.0.16.0/27",
 			}, iaas.AWSConfig{
 				Subnets: []iaas.AWSConfigSubnet{
-					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
+					{ID: "subnet-1234", Range: "10.0.16.0/27", AZ: "some-az-1a"},
 				},
 			})
 
@@ -360,13 +360,13 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-1234"},
 						Gateway:         "10.0.16.1",
-						Range:           "10.0.16.0/24",
+						Range:           "10.0.16.0/27",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.255",
+							"10.0.16.31",
 						},
 						Static: []string{
-							"10.0.16.4-10.0.16.251",
+							"10.0.16.4-10.0.16.27",
 						},
 					},
 				},
@@ -451,7 +451,7 @@ var _ = Describe("Manifest", func() {
 			manifest, err := etcd.NewManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
-				IPRange:      "10.244.4.0/24",
+				IPRange:      "10.244.4.0/27",
 			}, iaas.NewWardenConfig())
 			Expect(err).NotTo(HaveOccurred())
 
@@ -546,13 +546,13 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
 						Gateway:         "10.244.4.1",
-						Range:           "10.244.4.0/24",
+						Range:           "10.244.4.0/27",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.255",
+							"10.244.4.31",
 						},
 						Static: []string{
-							"10.244.4.4-10.244.4.251",
+							"10.244.4.4-10.244.4.27",
 						},
 					},
 				},
@@ -586,10 +586,10 @@ var _ = Describe("Manifest", func() {
 			manifest, err := etcd.NewManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
-				IPRange:      "10.0.16.0/24",
+				IPRange:      "10.0.16.0/27",
 			}, iaas.AWSConfig{
 				Subnets: []iaas.AWSConfigSubnet{
-					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
+					{ID: "subnet-1234", Range: "10.0.16.0/27", AZ: "some-az-1a"},
 				},
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -697,13 +697,13 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-1234"},
 						Gateway:         "10.0.16.1",
-						Range:           "10.0.16.0/24",
+						Range:           "10.0.16.0/27",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.255",
+							"10.0.16.31",
 						},
 						Static: []string{
-							"10.0.16.4-10.0.16.251",
+							"10.0.16.4-10.0.16.27",
 						},
 					},
 				},
@@ -900,7 +900,7 @@ var _ = Describe("Manifest", func() {
 			manifest, err := etcd.NewTLSManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd",
-				IPRange:      "10.244.4.0/24",
+				IPRange:      "10.244.4.0/27",
 				Secrets: etcd.ConfigSecrets{
 					Consul: consul.ConfigSecretsConsul{
 						EncryptKey: "consul-encrypt-key",
@@ -1055,13 +1055,13 @@ var _ = Describe("Manifest", func() {
 					{
 						CloudProperties: core.NetworkSubnetCloudProperties{Name: "random"},
 						Gateway:         "10.244.4.1",
-						Range:           "10.244.4.0/24",
+						Range:           "10.244.4.0/27",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.255",
+							"10.244.4.31",
 						},
 						Static: []string{
-							"10.244.4.4-10.244.4.251",
+							"10.244.4.4-10.244.4.27",
 						},
 					},
 				},
