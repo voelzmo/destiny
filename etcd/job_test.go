@@ -13,9 +13,11 @@ var _ = Describe("Manifest", func() {
 	Describe("Job", func() {
 		Describe("SetEtcdProperties", func() {
 			It("updates the etcd and testconsumer properties to match the current job configuration", func() {
-				manifest := etcd.NewManifest(etcd.Config{
+				manifest, err := etcd.NewManifest(etcd.Config{
 					IPRange: "10.244.4.0/24",
 				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
 				job := manifest.Jobs[1]
 				properties := manifest.Properties
 
@@ -33,9 +35,11 @@ var _ = Describe("Manifest", func() {
 			})
 
 			It("does not override the machines property if ssl is enabled", func() {
-				manifest := etcd.NewTLSManifest(etcd.Config{
+				manifest, err := etcd.NewTLSManifest(etcd.Config{
 					IPRange: "10.244.4.0/24",
 				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
 				job := manifest.Jobs[1]
 				properties := manifest.Properties
 
@@ -55,9 +59,11 @@ var _ = Describe("Manifest", func() {
 
 		Describe("SetJobInstanceCount", func() {
 			It("sets the correct values for instances and static_ips given a count", func() {
-				manifest := etcd.NewManifest(etcd.Config{
+				manifest, err := etcd.NewManifest(etcd.Config{
 					IPRange: "10.244.4.0/24",
 				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
 				job := manifest.Jobs[1]
 				network := manifest.Networks[0]
 
@@ -65,15 +71,19 @@ var _ = Describe("Manifest", func() {
 				Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
 				Expect(job.Networks[0].Name).To(Equal(network.Name))
 
-				job = etcd.SetJobInstanceCount(job, network, 3, 0)
+				job, err = etcd.SetJobInstanceCount(job, network, 3, 0)
+
+				Expect(err).NotTo(HaveOccurred())
 				Expect(job.Instances).To(Equal(3))
 				Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
 			})
 
 			It("returns a job with an offsetted static ip list", func() {
-				manifest := etcd.NewManifest(etcd.Config{
+				manifest, err := etcd.NewManifest(etcd.Config{
 					IPRange: "10.244.4.0/24",
 				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
 				job := manifest.Jobs[1]
 				network := manifest.Networks[0]
 
@@ -81,7 +91,9 @@ var _ = Describe("Manifest", func() {
 				Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
 				Expect(job.Networks[0].Name).To(Equal(network.Name))
 
-				job = etcd.SetJobInstanceCount(job, network, 3, 3)
+				job, err = etcd.SetJobInstanceCount(job, network, 3, 3)
+
+				Expect(err).NotTo(HaveOccurred())
 				Expect(job.Instances).To(Equal(3))
 				Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
 				Expect(job.Networks[0].StaticIPs).To(ConsistOf([]string{
@@ -89,6 +101,21 @@ var _ = Describe("Manifest", func() {
 					"10.244.4.8",
 					"10.244.4.9",
 				}))
+			})
+
+			Context("failure cases", func() {
+				It("returns an error when there aren't enough static ips", func() {
+					manifest, err := etcd.NewManifest(etcd.Config{
+						IPRange: "10.244.4.0/24",
+					}, iaas.NewWardenConfig())
+					Expect(err).NotTo(HaveOccurred())
+
+					job := manifest.Jobs[1]
+					network := manifest.Networks[0]
+
+					job, err = etcd.SetJobInstanceCount(job, network, 1000, 0)
+					Expect(err).To(MatchError("count is greater than the number of ips in range"))
+				})
 			})
 		})
 	})

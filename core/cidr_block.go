@@ -19,7 +19,7 @@ func ParseCIDRBlock(cidrBlock string) (CIDRBlock, error) {
 	cidrParts := strings.Split(cidrBlock, "/")
 
 	if len(cidrParts) != CIDR_PARTS {
-		return CIDRBlock{}, fmt.Errorf(`"%s" cannot parse CIDR block`, cidrBlock)
+		return CIDRBlock{}, fmt.Errorf("%q cannot parse CIDR block", cidrBlock)
 	}
 
 	ip, err := ParseIP(cidrParts[0])

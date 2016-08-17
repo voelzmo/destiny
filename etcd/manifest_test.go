@@ -16,11 +16,12 @@ import (
 var _ = Describe("Manifest", func() {
 	Describe("NewTLSManifest", func() {
 		It("generates a valid Etcd BOSH-Lite manifest", func() {
-			manifest := etcd.NewTLSManifest(etcd.Config{
+			manifest, err := etcd.NewTLSManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
 				IPRange:      "10.244.4.0/24",
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 
@@ -151,46 +152,10 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.50-10.244.4.254",
+							"10.244.4.255",
 						},
 						Static: []string{
-							"10.244.4.4",
-							"10.244.4.5",
-							"10.244.4.6",
-							"10.244.4.7",
-							"10.244.4.8",
-							"10.244.4.9",
-							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
-							"10.244.4.13",
-							"10.244.4.14",
-							"10.244.4.15",
-							"10.244.4.16",
-							"10.244.4.17",
-							"10.244.4.18",
-							"10.244.4.19",
-							"10.244.4.20",
-							"10.244.4.21",
-							"10.244.4.22",
-							"10.244.4.23",
-							"10.244.4.24",
-							"10.244.4.25",
-							"10.244.4.26",
-							"10.244.4.27",
-							"10.244.4.28",
-							"10.244.4.29",
-							"10.244.4.30",
-							"10.244.4.31",
-							"10.244.4.32",
-							"10.244.4.33",
-							"10.244.4.34",
-							"10.244.4.35",
-							"10.244.4.36",
-							"10.244.4.37",
-							"10.244.4.38",
-							"10.244.4.39",
-							"10.244.4.40",
+							"10.244.4.4-10.244.4.251",
 						},
 					},
 				},
@@ -248,7 +213,7 @@ var _ = Describe("Manifest", func() {
 		})
 
 		It("generates a valid Etcd AWS manifest", func() {
-			manifest := etcd.NewTLSManifest(etcd.Config{
+			manifest, err := etcd.NewTLSManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
 				IPRange:      "10.0.16.0/24",
@@ -257,6 +222,8 @@ var _ = Describe("Manifest", func() {
 					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
 				},
 			})
+
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("etcd-some-random-guid"))
@@ -396,46 +363,10 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.0.16.0/24",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.50-10.0.16.254",
+							"10.0.16.255",
 						},
 						Static: []string{
-							"10.0.16.4",
-							"10.0.16.5",
-							"10.0.16.6",
-							"10.0.16.7",
-							"10.0.16.8",
-							"10.0.16.9",
-							"10.0.16.10",
-							"10.0.16.11",
-							"10.0.16.12",
-							"10.0.16.13",
-							"10.0.16.14",
-							"10.0.16.15",
-							"10.0.16.16",
-							"10.0.16.17",
-							"10.0.16.18",
-							"10.0.16.19",
-							"10.0.16.20",
-							"10.0.16.21",
-							"10.0.16.22",
-							"10.0.16.23",
-							"10.0.16.24",
-							"10.0.16.25",
-							"10.0.16.26",
-							"10.0.16.27",
-							"10.0.16.28",
-							"10.0.16.29",
-							"10.0.16.30",
-							"10.0.16.31",
-							"10.0.16.32",
-							"10.0.16.33",
-							"10.0.16.34",
-							"10.0.16.35",
-							"10.0.16.36",
-							"10.0.16.37",
-							"10.0.16.38",
-							"10.0.16.39",
-							"10.0.16.40",
+							"10.0.16.4-10.0.16.251",
 						},
 					},
 				},
@@ -491,15 +422,38 @@ var _ = Describe("Manifest", func() {
 				EncryptKeys: []string{consul.EncryptKey},
 			}))
 		})
+
+		Context("failure cases", func() {
+			It("returns an error when the iprange is not a valid iprange", func() {
+				_, err := etcd.NewTLSManifest(etcd.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "etcd-some-random-guid",
+					IPRange:      "%%%%%%%%%",
+				}, iaas.NewWardenConfig())
+
+				Expect(err).To(MatchError(`"%%%%%%%%%" cannot parse CIDR block`))
+			})
+
+			It("returns an error when the iprange is not sufficiently large enough", func() {
+				_, err := etcd.NewTLSManifest(etcd.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "etcd-some-random-guid",
+					IPRange:      "10.244.4.0/32",
+				}, iaas.NewWardenConfig())
+
+				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+			})
+		})
 	})
 
 	Describe("NewManifest", func() {
 		It("generates a valid Etcd BOSH-Lite manifest", func() {
-			manifest := etcd.NewManifest(etcd.Config{
+			manifest, err := etcd.NewManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
 				IPRange:      "10.244.4.0/24",
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 
@@ -595,46 +549,10 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.50-10.244.4.254",
+							"10.244.4.255",
 						},
 						Static: []string{
-							"10.244.4.4",
-							"10.244.4.5",
-							"10.244.4.6",
-							"10.244.4.7",
-							"10.244.4.8",
-							"10.244.4.9",
-							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
-							"10.244.4.13",
-							"10.244.4.14",
-							"10.244.4.15",
-							"10.244.4.16",
-							"10.244.4.17",
-							"10.244.4.18",
-							"10.244.4.19",
-							"10.244.4.20",
-							"10.244.4.21",
-							"10.244.4.22",
-							"10.244.4.23",
-							"10.244.4.24",
-							"10.244.4.25",
-							"10.244.4.26",
-							"10.244.4.27",
-							"10.244.4.28",
-							"10.244.4.29",
-							"10.244.4.30",
-							"10.244.4.31",
-							"10.244.4.32",
-							"10.244.4.33",
-							"10.244.4.34",
-							"10.244.4.35",
-							"10.244.4.36",
-							"10.244.4.37",
-							"10.244.4.38",
-							"10.244.4.39",
-							"10.244.4.40",
+							"10.244.4.4-10.244.4.251",
 						},
 					},
 				},
@@ -665,7 +583,7 @@ var _ = Describe("Manifest", func() {
 		})
 
 		It("generates a valid Etcd AWS manifest", func() {
-			manifest := etcd.NewManifest(etcd.Config{
+			manifest, err := etcd.NewManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd-some-random-guid",
 				IPRange:      "10.0.16.0/24",
@@ -674,6 +592,7 @@ var _ = Describe("Manifest", func() {
 					{ID: "subnet-1234", Range: "10.0.16.0/24", AZ: "some-az-1a"},
 				},
 			})
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("etcd-some-random-guid"))
@@ -781,46 +700,10 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.0.16.0/24",
 						Reserved: []string{
 							"10.0.16.2-10.0.16.3",
-							"10.0.16.50-10.0.16.254",
+							"10.0.16.255",
 						},
 						Static: []string{
-							"10.0.16.4",
-							"10.0.16.5",
-							"10.0.16.6",
-							"10.0.16.7",
-							"10.0.16.8",
-							"10.0.16.9",
-							"10.0.16.10",
-							"10.0.16.11",
-							"10.0.16.12",
-							"10.0.16.13",
-							"10.0.16.14",
-							"10.0.16.15",
-							"10.0.16.16",
-							"10.0.16.17",
-							"10.0.16.18",
-							"10.0.16.19",
-							"10.0.16.20",
-							"10.0.16.21",
-							"10.0.16.22",
-							"10.0.16.23",
-							"10.0.16.24",
-							"10.0.16.25",
-							"10.0.16.26",
-							"10.0.16.27",
-							"10.0.16.28",
-							"10.0.16.29",
-							"10.0.16.30",
-							"10.0.16.31",
-							"10.0.16.32",
-							"10.0.16.33",
-							"10.0.16.34",
-							"10.0.16.35",
-							"10.0.16.36",
-							"10.0.16.37",
-							"10.0.16.38",
-							"10.0.16.39",
-							"10.0.16.40",
+							"10.0.16.4-10.0.16.251",
 						},
 					},
 				},
@@ -848,6 +731,28 @@ var _ = Describe("Manifest", func() {
 					RequireSSL: false,
 				},
 			}))
+		})
+
+		Context("failure cases", func() {
+			It("returns an error when the iprange is not a valid iprange", func() {
+				_, err := etcd.NewManifest(etcd.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "etcd-some-random-guid",
+					IPRange:      "%%%%%%%%%",
+				}, iaas.NewWardenConfig())
+
+				Expect(err).To(MatchError(`"%%%%%%%%%" cannot parse CIDR block`))
+			})
+
+			It("returns an error when the iprange is not sufficiently large enough", func() {
+				_, err := etcd.NewManifest(etcd.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "etcd-some-random-guid",
+					IPRange:      "10.244.4.0/32",
+				}, iaas.NewWardenConfig())
+
+				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+			})
 		})
 	})
 
@@ -992,7 +897,7 @@ var _ = Describe("Manifest", func() {
 			etcdManifest, err := ioutil.ReadFile("fixtures/tls.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest := etcd.NewTLSManifest(etcd.Config{
+			manifest, err := etcd.NewTLSManifest(etcd.Config{
 				DirectorUUID: "some-director-uuid",
 				Name:         "etcd",
 				IPRange:      "10.244.4.0/24",
@@ -1017,6 +922,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			yaml, err := manifest.ToYAML()
 			Expect(err).NotTo(HaveOccurred())
@@ -1152,46 +1058,10 @@ var _ = Describe("Manifest", func() {
 						Range:           "10.244.4.0/24",
 						Reserved: []string{
 							"10.244.4.2-10.244.4.3",
-							"10.244.4.50-10.244.4.254",
+							"10.244.4.255",
 						},
 						Static: []string{
-							"10.244.4.4",
-							"10.244.4.5",
-							"10.244.4.6",
-							"10.244.4.7",
-							"10.244.4.8",
-							"10.244.4.9",
-							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
-							"10.244.4.13",
-							"10.244.4.14",
-							"10.244.4.15",
-							"10.244.4.16",
-							"10.244.4.17",
-							"10.244.4.18",
-							"10.244.4.19",
-							"10.244.4.20",
-							"10.244.4.21",
-							"10.244.4.22",
-							"10.244.4.23",
-							"10.244.4.24",
-							"10.244.4.25",
-							"10.244.4.26",
-							"10.244.4.27",
-							"10.244.4.28",
-							"10.244.4.29",
-							"10.244.4.30",
-							"10.244.4.31",
-							"10.244.4.32",
-							"10.244.4.33",
-							"10.244.4.34",
-							"10.244.4.35",
-							"10.244.4.36",
-							"10.244.4.37",
-							"10.244.4.38",
-							"10.244.4.39",
-							"10.244.4.40",
+							"10.244.4.4-10.244.4.251",
 						},
 					},
 				},

@@ -4,7 +4,6 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/consul"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
-	"github.com/pivotal-cf-experimental/destiny/network"
 	"gopkg.in/yaml.v2"
 )
 
@@ -24,7 +23,7 @@ type EtcdMember struct {
 	Address string
 }
 
-func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
+func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 	config = NewConfigWithDefaults(config)
 
 	etcdRelease := core.Release{
@@ -37,55 +36,19 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Version: "latest",
 	}
 
-	ipRange := network.IPRange(config.IPRange)
-	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
+	cidr, err := core.ParseCIDRBlock(config.IPRange)
+	if err != nil {
+		return Manifest{}, err
+	}
 
 	etcdNetwork1 := core.Network{
 		Name: "etcd1",
 		Subnets: []core.NetworkSubnet{{
-			CloudProperties: cloudProperties,
-			Gateway:         ipRange.IP(1),
-			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(50, 254)},
-			Static: []string{
-				ipRange.IP(4),
-				ipRange.IP(5),
-				ipRange.IP(6),
-				ipRange.IP(7),
-				ipRange.IP(8),
-				ipRange.IP(9),
-				ipRange.IP(10),
-				ipRange.IP(11),
-				ipRange.IP(12),
-				ipRange.IP(13),
-				ipRange.IP(14),
-				ipRange.IP(15),
-				ipRange.IP(16),
-				ipRange.IP(17),
-				ipRange.IP(18),
-				ipRange.IP(19),
-				ipRange.IP(20),
-				ipRange.IP(21),
-				ipRange.IP(22),
-				ipRange.IP(23),
-				ipRange.IP(24),
-				ipRange.IP(25),
-				ipRange.IP(26),
-				ipRange.IP(27),
-				ipRange.IP(28),
-				ipRange.IP(29),
-				ipRange.IP(30),
-				ipRange.IP(31),
-				ipRange.IP(32),
-				ipRange.IP(33),
-				ipRange.IP(34),
-				ipRange.IP(35),
-				ipRange.IP(36),
-				ipRange.IP(37),
-				ipRange.IP(38),
-				ipRange.IP(39),
-				ipRange.IP(40),
-			},
+			CloudProperties: iaasConfig.NetworkSubnet(cidr.String()),
+			Gateway:         cidr.GetFirstIP().Add(1).String(),
+			Range:           cidr.String(),
+			Reserved:        []string{cidr.Range(2, 3), cidr.GetLastIP().String()},
+			Static:          []string{cidr.Range(4, cidr.CIDRSize-5)},
 		}},
 		Type: "manual",
 	}
@@ -117,12 +80,17 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 		CloudProperties: iaasConfig.ResourcePool(etcdNetwork1.Subnets[0].Range),
 	}
 
+	staticIPs, err := etcdNetwork1.StaticIPsFromRange(20)
+	if err != nil {
+		return Manifest{}, err
+	}
+
 	consulZ1Job := core.Job{
 		Name:      "consul_z1",
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: []string{etcdNetwork1.StaticIPs(6)[5]},
+			StaticIPs: []string{staticIPs[5]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -146,7 +114,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: etcdNetwork1.StaticIPs(1),
+			StaticIPs: []string{staticIPs[0]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -176,7 +144,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: []string{etcdNetwork1.StaticIPs(9)[8]},
+			StaticIPs: []string{staticIPs[8]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -237,7 +205,7 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 				Agent: consul.PropertiesConsulAgent{
 					Domain: "cf.internal",
 					Servers: consul.PropertiesConsulAgentServers{
-						Lan: []string{etcdNetwork1.StaticIPs(6)[5]},
+						Lan: []string{staticIPs[5]},
 					},
 				},
 				CACert:      config.Secrets.Consul.CACert,
@@ -256,10 +224,10 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) Manifest {
 			z1ResourcePool,
 		},
 		Update: update,
-	}
+	}, nil
 }
 
-func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
+func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 	config = NewConfigWithDefaults(config)
 
 	etcdRelease := core.Release{
@@ -267,55 +235,19 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Version: "latest",
 	}
 
-	ipRange := network.IPRange(config.IPRange)
-	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
+	cidr, err := core.ParseCIDRBlock(config.IPRange)
+	if err != nil {
+		return Manifest{}, err
+	}
 
 	etcdNetwork1 := core.Network{
 		Name: "etcd1",
 		Subnets: []core.NetworkSubnet{{
-			CloudProperties: cloudProperties,
-			Gateway:         ipRange.IP(1),
-			Range:           string(ipRange),
-			Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(50, 254)},
-			Static: []string{
-				ipRange.IP(4),
-				ipRange.IP(5),
-				ipRange.IP(6),
-				ipRange.IP(7),
-				ipRange.IP(8),
-				ipRange.IP(9),
-				ipRange.IP(10),
-				ipRange.IP(11),
-				ipRange.IP(12),
-				ipRange.IP(13),
-				ipRange.IP(14),
-				ipRange.IP(15),
-				ipRange.IP(16),
-				ipRange.IP(17),
-				ipRange.IP(18),
-				ipRange.IP(19),
-				ipRange.IP(20),
-				ipRange.IP(21),
-				ipRange.IP(22),
-				ipRange.IP(23),
-				ipRange.IP(24),
-				ipRange.IP(25),
-				ipRange.IP(26),
-				ipRange.IP(27),
-				ipRange.IP(28),
-				ipRange.IP(29),
-				ipRange.IP(30),
-				ipRange.IP(31),
-				ipRange.IP(32),
-				ipRange.IP(33),
-				ipRange.IP(34),
-				ipRange.IP(35),
-				ipRange.IP(36),
-				ipRange.IP(37),
-				ipRange.IP(38),
-				ipRange.IP(39),
-				ipRange.IP(40),
-			},
+			CloudProperties: iaasConfig.NetworkSubnet(cidr.String()),
+			Gateway:         cidr.GetFirstIP().Add(1).String(),
+			Range:           cidr.String(),
+			Reserved:        []string{cidr.Range(2, 3), cidr.GetLastIP().String()},
+			Static:          []string{cidr.Range(4, cidr.CIDRSize-5)},
 		}},
 		Type: "manual",
 	}
@@ -347,6 +279,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		CloudProperties: iaasConfig.ResourcePool(etcdNetwork1.Subnets[0].Range),
 	}
 
+	staticIPs, err := etcdNetwork1.StaticIPsFromRange(40)
+	if err != nil {
+		return Manifest{}, err
+	}
+
 	consulZ1Job := core.Job{
 		Name:      "consul_z1",
 		Instances: 0,
@@ -363,7 +300,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: etcdNetwork1.StaticIPs(1),
+			StaticIPs: []string{staticIPs[0]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -380,7 +317,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name:      etcdNetwork1.Name,
-			StaticIPs: []string{etcdNetwork1.StaticIPs(9)[8]},
+			StaticIPs: []string{staticIPs[8]},
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
@@ -410,14 +347,14 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 					Instances: 1,
 					Name:      "etcd_z1",
 				}},
-				Machines:                        etcdNetwork1.StaticIPs(1),
+				Machines:                        etcdZ1Job.Networks[0].StaticIPs,
 				PeerRequireSSL:                  false,
 				RequireSSL:                      false,
 				HeartbeatIntervalInMilliseconds: 50,
 			},
 			EtcdTestConsumer: &PropertiesEtcdTestConsumer{
 				Etcd: PropertiesEtcdTestConsumerEtcd{
-					Machines: etcdNetwork1.StaticIPs(1),
+					Machines: etcdZ1Job.Networks[0].StaticIPs,
 				},
 			},
 		},
@@ -428,7 +365,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) Manifest {
 			z1ResourcePool,
 		},
 		Update: update,
-	}
+	}, nil
 }
 
 func (m Manifest) EtcdMembers() []EtcdMember {
