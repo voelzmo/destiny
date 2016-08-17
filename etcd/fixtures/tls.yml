@@ -33,10 +33,10 @@ jobs:
   persistent_disk: 1024
   resource_pool: etcd_z1
   templates:
-  - name: etcd
-    release: etcd
   - name: consul_agent
     release: consul
+  - name: etcd
+    release: etcd
   properties:
     consul:
       agent:
@@ -112,9 +112,9 @@ properties:
     server_key: consul-server-key
 
 releases:
-- name: consul
-  version: latest
 - name: etcd
+  version: latest
+- name: consul
   version: latest
 
 resource_pools:

@@ -101,12 +101,12 @@ var _ = Describe("Manifest", func() {
 				ResourcePool:   "etcd_z1",
 				Templates: []core.JobTemplate{
 					{
-						Name:    "etcd",
-						Release: "etcd",
-					},
-					{
 						Name:    "consul_agent",
 						Release: "consul",
+					},
+					{
+						Name:    "etcd",
+						Release: "etcd",
 					},
 				},
 				Properties: &core.JobProperties{
@@ -313,12 +313,12 @@ var _ = Describe("Manifest", func() {
 				ResourcePool:   "etcd_z1",
 				Templates: []core.JobTemplate{
 					{
-						Name:    "etcd",
-						Release: "etcd",
-					},
-					{
 						Name:    "consul_agent",
 						Release: "consul",
+					},
+					{
+						Name:    "etcd",
+						Release: "etcd",
 					},
 				},
 				Properties: &core.JobProperties{
@@ -1008,12 +1008,12 @@ var _ = Describe("Manifest", func() {
 				ResourcePool:   "etcd_z1",
 				Templates: []core.JobTemplate{
 					{
-						Name:    "etcd",
-						Release: "etcd",
-					},
-					{
 						Name:    "consul_agent",
 						Release: "consul",
+					},
+					{
+						Name:    "etcd",
+						Release: "etcd",
 					},
 				},
 				Properties: &core.JobProperties{
