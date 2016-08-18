@@ -4,14 +4,10 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/consul"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
-	"github.com/pivotal-cf-experimental/destiny/network"
 )
 
 func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 	config = NewConfigWithDefaults(config)
-
-	ipRange := network.IPRange(config.IPRange)
-	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
 
 	releases := []core.Release{
 		{
@@ -53,56 +49,28 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		},
 	}
 
+	cidr, err := core.ParseCIDRBlock(config.IPRange)
+	if err != nil {
+		return Manifest{}
+	}
+
 	networks := []core.Network{
 		{
 			Name: "etcd1",
 			Subnets: []core.NetworkSubnet{{
-				CloudProperties: cloudProperties,
-				Gateway:         ipRange.IP(1),
-				Range:           string(ipRange),
-				Reserved:        []string{ipRange.Range(2, 3), ipRange.Range(50, 254)},
-				Static: []string{
-					ipRange.IP(4),
-					ipRange.IP(5),
-					ipRange.IP(6),
-					ipRange.IP(7),
-					ipRange.IP(8),
-					ipRange.IP(9),
-					ipRange.IP(10),
-					ipRange.IP(11),
-					ipRange.IP(12),
-					ipRange.IP(13),
-					ipRange.IP(14),
-					ipRange.IP(15),
-					ipRange.IP(16),
-					ipRange.IP(17),
-					ipRange.IP(18),
-					ipRange.IP(19),
-					ipRange.IP(20),
-					ipRange.IP(21),
-					ipRange.IP(22),
-					ipRange.IP(23),
-					ipRange.IP(24),
-					ipRange.IP(25),
-					ipRange.IP(26),
-					ipRange.IP(27),
-					ipRange.IP(28),
-					ipRange.IP(29),
-					ipRange.IP(30),
-					ipRange.IP(31),
-					ipRange.IP(32),
-					ipRange.IP(33),
-					ipRange.IP(34),
-					ipRange.IP(35),
-					ipRange.IP(36),
-					ipRange.IP(37),
-					ipRange.IP(38),
-					ipRange.IP(39),
-					ipRange.IP(40),
-				},
+				CloudProperties: iaasConfig.NetworkSubnet(cidr.String()),
+				Gateway:         cidr.GetFirstIP().Add(1).String(),
+				Range:           cidr.String(),
+				Reserved:        []string{cidr.Range(2, 3), cidr.GetLastIP().String()},
+				Static:          []string{cidr.Range(4, cidr.CIDRSize-5)},
 			}},
 			Type: "manual",
 		},
+	}
+
+	staticIPs, err := networks[0].StaticIPsFromRange(24)
+	if err != nil {
+		return Manifest{}
 	}
 
 	consulJob := core.Job{
@@ -111,9 +79,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(9),
-				ipRange.IP(10),
-				ipRange.IP(11),
+				staticIPs[5],
+				staticIPs[6],
+				staticIPs[7],
 			},
 		}},
 		PersistentDisk: 1024,
@@ -139,9 +107,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(30),
-				ipRange.IP(31),
-				ipRange.IP(32),
+				staticIPs[13],
+				staticIPs[14],
+				staticIPs[15],
 			},
 		}},
 		PersistentDisk: 1024,
@@ -194,7 +162,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(4),
+				staticIPs[0],
 			},
 		}},
 		PersistentDisk: 1024,
@@ -217,11 +185,11 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Networks: []core.JobNetwork{{
 			Name: "etcd1",
 			StaticIPs: []string{
-				ipRange.IP(12),
-				ipRange.IP(13),
-				ipRange.IP(14),
-				ipRange.IP(15),
-				ipRange.IP(16),
+				staticIPs[8],
+				staticIPs[9],
+				staticIPs[10],
+				staticIPs[11],
+				staticIPs[12],
 			},
 		}},
 		PersistentDisk: 1024,
@@ -257,9 +225,9 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 				Domain: "cf.internal",
 				Servers: consul.PropertiesConsulAgentServers{
 					Lan: []string{
-						ipRange.IP(9),
-						ipRange.IP(10),
-						ipRange.IP(11),
+						staticIPs[5],
+						staticIPs[6],
+						staticIPs[7],
 					},
 				},
 			},
