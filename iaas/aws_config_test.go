@@ -22,8 +22,8 @@ var _ = Describe("AWS Config", func() {
 			DefaultSecurityGroups: []string{"some-default-security-group"},
 			Region:                "some-region",
 			Subnets: []iaas.AWSConfigSubnet{
-				{ID: "some-subnet-1", Range: "127.0.0.1/24", AZ: "some-az-1a"},
-				{ID: "some-subnet-2", Range: "127.0.0.2/24", AZ: "some-az-1c"},
+				{ID: "some-subnet-1", Range: "127.0.0.1/24", AZ: "some-az-1a", SecurityGroup: "some-security-group-1"},
+				{ID: "some-subnet-2", Range: "127.0.0.2/24", AZ: "some-az-1c", SecurityGroup: "some-security-group-2"},
 			},
 			RegistryHost:     "some-host",
 			RegistryPassword: "some-password",
@@ -36,8 +36,19 @@ var _ = Describe("AWS Config", func() {
 		It("returns network subnet cloud properties given a range", func() {
 			subnetCloudProperties := awsConfig.NetworkSubnet("127.0.0.2/24")
 			Expect(subnetCloudProperties).To(Equal(core.NetworkSubnetCloudProperties{
-				Subnet: "some-subnet-2",
+				Subnet:         "some-subnet-2",
+				SecurityGroups: []string{"some-security-group-2"},
 			}))
+		})
+
+		Context("when security group is not provided", func() {
+			It("returns network subnet cloud properties given a range", func() {
+				awsConfig.Subnets[1].SecurityGroup = ""
+				subnetCloudProperties := awsConfig.NetworkSubnet("127.0.0.2/24")
+				Expect(subnetCloudProperties).To(Equal(core.NetworkSubnetCloudProperties{
+					Subnet: "some-subnet-2",
+				}))
+			})
 		})
 	})
 

@@ -21,16 +21,26 @@ type AWSConfig struct {
 }
 
 type AWSConfigSubnet struct {
-	ID    string
-	Range string
-	AZ    string
+	ID            string
+	Range         string
+	AZ            string
+	SecurityGroup string
 }
 
 func (a AWSConfig) NetworkSubnet(ipRange string) core.NetworkSubnetCloudProperties {
 	for _, subnet := range a.Subnets {
 		if subnet.Range == ipRange {
+
+			var securityGroups []string
+			if subnet.SecurityGroup != "" {
+				securityGroups = []string{
+					subnet.SecurityGroup,
+				}
+			}
+
 			return core.NetworkSubnetCloudProperties{
-				Subnet: subnet.ID,
+				Subnet:         subnet.ID,
+				SecurityGroups: securityGroups,
 			}
 		}
 	}

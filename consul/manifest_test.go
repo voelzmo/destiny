@@ -250,8 +250,8 @@ var _ = Describe("Manifest", func() {
 				},
 			}, iaas.AWSConfig{
 				Subnets: []iaas.AWSConfigSubnet{
-					{ID: "subnet-1", Range: "10.0.4.0/24", AZ: "some-az-1a"},
-					{ID: "subnet-2", Range: "10.0.5.0/24", AZ: "some-az-1d"},
+					{ID: "subnet-1", Range: "10.0.4.0/24", AZ: "some-az-1a", SecurityGroup: "some-security-group-1"},
+					{ID: "subnet-2", Range: "10.0.5.0/24", AZ: "some-az-1d", SecurityGroup: "some-security-group-2"},
 				},
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -429,9 +429,12 @@ var _ = Describe("Manifest", func() {
 						Name: "consul1",
 						Subnets: []core.NetworkSubnet{
 							{
-								CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-1"},
-								Gateway:         "10.0.4.1",
-								Range:           "10.0.4.0/24",
+								CloudProperties: core.NetworkSubnetCloudProperties{
+									Subnet:         "subnet-1",
+									SecurityGroups: []string{"some-security-group-1"},
+								},
+								Gateway: "10.0.4.1",
+								Range:   "10.0.4.0/24",
 								Reserved: []string{
 									"10.0.4.2-10.0.4.3",
 									"10.0.4.255",
@@ -445,9 +448,12 @@ var _ = Describe("Manifest", func() {
 						Name: "consul2",
 						Subnets: []core.NetworkSubnet{
 							{
-								CloudProperties: core.NetworkSubnetCloudProperties{Subnet: "subnet-2"},
-								Gateway:         "10.0.5.1",
-								Range:           "10.0.5.0/24",
+								CloudProperties: core.NetworkSubnetCloudProperties{
+									Subnet:         "subnet-2",
+									SecurityGroups: []string{"some-security-group-2"},
+								},
+								Gateway: "10.0.5.1",
+								Range:   "10.0.5.0/24",
 								Reserved: []string{
 									"10.0.5.2-10.0.5.3",
 									"10.0.5.255",
