@@ -37,17 +37,25 @@ func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) ManifestV2 {
 		},
 		Update: update(),
 		InstanceGroups: []core.InstanceGroup{
-			consulInstanceGroup(config.AZs),
-			consulTestConsumerInstanceGroup(config.AZs),
+			consulInstanceGroup(config.AZs, config.PersistentDiskType, config.VMType),
+			consulTestConsumerInstanceGroup(config.AZs, config.VMType),
 		},
 		Properties: properties(config.AZs),
 	}
 }
 
-func consulInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
+func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType string) core.InstanceGroup {
 	totalNodes := 0
 	for _, az := range azs {
 		totalNodes += az.Nodes
+	}
+
+	if persistentDiskType == "" {
+		persistentDiskType = "default"
+	}
+
+	if vmType == "" {
+		vmType = "default"
 	}
 
 	return core.InstanceGroup{
@@ -60,9 +68,9 @@ func consulInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
 				StaticIPs: consulInstanceGroupStaticIPs(azs),
 			},
 		},
-		VMType:             "default",
+		VMType:             vmType,
 		Stemcell:           "default",
-		PersistentDiskType: "default",
+		PersistentDiskType: persistentDiskType,
 		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "consul_agent",
@@ -102,9 +110,13 @@ func consulInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
 	}
 }
 
-func consulTestConsumerInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
+func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) core.InstanceGroup {
 	ipRange := network.IPRange(azs[0].IPRange)
 	totalNodesInFirstAZ := azs[0].Nodes
+
+	if vmType == "" {
+		vmType = "default"
+	}
 
 	return core.InstanceGroup{
 		Instances: 3,
@@ -120,7 +132,7 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ) core.InstanceGroup {
 				},
 			},
 		},
-		VMType:   "default",
+		VMType:   vmType,
 		Stemcell: "default",
 		Jobs: []core.InstanceGroupJob{
 			{

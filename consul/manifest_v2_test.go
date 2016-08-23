@@ -175,8 +175,10 @@ var _ = Describe("ManifestV2", func() {
 
 		It("returns a bosh 2.0 consul manifest for aws", func() {
 			manifest := consul.NewManifestV2(consul.ConfigV2{
-				DirectorUUID: "some-director-uuid",
-				Name:         "consul-some-random-guid",
+				DirectorUUID:       "some-director-uuid",
+				Name:               "consul-some-random-guid",
+				PersistentDiskType: "1GB",
+				VMType:             "m3.medium",
 				AZs: []consul.ConfigAZ{
 					{
 						Name:    "us-east-1",
@@ -194,6 +196,10 @@ var _ = Describe("ManifestV2", func() {
 				},
 			}))
 
+			Expect(manifest.InstanceGroups[0].PersistentDiskType).To(Equal("1GB"))
+			Expect(manifest.InstanceGroups[0].VMType).To(Equal("m3.medium"))
+
+			Expect(manifest.InstanceGroups[1].VMType).To(Equal("m3.medium"))
 		})
 	})
 
