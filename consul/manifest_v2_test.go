@@ -15,7 +15,7 @@ import (
 var _ = Describe("ManifestV2", func() {
 	Describe("NewManifestV2", func() {
 		It("returns a BOSH 2.0 manifest for bosh-lite", func() {
-			manifest := consul.NewManifestV2(consul.ConfigV2{
+			manifest, err := consul.NewManifestV2(consul.ConfigV2{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
 				AZs: []consul.ConfigAZ{
@@ -32,6 +32,7 @@ var _ = Describe("ManifestV2", func() {
 				},
 			}, iaas.NewWardenConfig())
 
+			Expect(err).NotTo(HaveOccurred())
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
 
@@ -174,7 +175,7 @@ var _ = Describe("ManifestV2", func() {
 		})
 
 		It("returns a bosh 2.0 consul manifest for aws", func() {
-			manifest := consul.NewManifestV2(consul.ConfigV2{
+			manifest, err := consul.NewManifestV2(consul.ConfigV2{
 				DirectorUUID:       "some-director-uuid",
 				Name:               "consul-some-random-guid",
 				PersistentDiskType: "1GB",
@@ -182,12 +183,18 @@ var _ = Describe("ManifestV2", func() {
 				AZs: []consul.ConfigAZ{
 					{
 						Name:    "us-east-1",
-						IPRange: "10.0.4.0/24",
-						Nodes:   1,
+						IPRange: "10.0.4.192/27",
+						Nodes:   3,
+					},
+					{
+						Name:    "us-east-1",
+						IPRange: "10.0.5.192/27",
+						Nodes:   3,
 					},
 				},
 			}, iaas.AWSConfig{})
 
+			Expect(err).NotTo(HaveOccurred())
 			Expect(manifest.Stemcells).To(Equal([]consul.Stemcell{
 				{
 					Alias:   "default",
@@ -196,10 +203,58 @@ var _ = Describe("ManifestV2", func() {
 				},
 			}))
 
+			Expect(manifest.InstanceGroups[0].Networks).To(Equal([]core.InstanceGroupNetwork{
+				{
+					Name: "private",
+					StaticIPs: []string{
+						"10.0.4.196",
+						"10.0.4.197",
+						"10.0.4.198",
+						"10.0.5.196",
+						"10.0.5.197",
+						"10.0.5.198",
+					},
+				},
+			}))
+
+			Expect(manifest.InstanceGroups[1].Networks).To(Equal([]core.InstanceGroupNetwork{
+				{
+					Name: "private",
+					StaticIPs: []string{
+						"10.0.4.202",
+						"10.0.4.203",
+						"10.0.4.204",
+					},
+				},
+			}))
+
 			Expect(manifest.InstanceGroups[0].PersistentDiskType).To(Equal("1GB"))
 			Expect(manifest.InstanceGroups[0].VMType).To(Equal("m3.medium"))
 
 			Expect(manifest.InstanceGroups[1].VMType).To(Equal("m3.medium"))
+		})
+
+		Context("failure cases", func() {
+			It("returns an error when the az ip range is not a valid cidrblock", func() {
+				_, err := consul.NewManifestV2(consul.ConfigV2{
+					DirectorUUID: "some-director-uuid",
+					Name:         "consul-some-random-guid",
+					AZs: []consul.ConfigAZ{
+						{
+							Name:    "z1",
+							IPRange: "%%%%%%%%",
+							Nodes:   2,
+						},
+						{
+							Name:    "z2",
+							IPRange: "%%%%%%%%",
+							Nodes:   2,
+						},
+					},
+				}, iaas.NewWardenConfig())
+
+				Expect(err).To(MatchError("\"%%%%%%%%\" cannot parse CIDR block"))
+			})
 		})
 	})
 
@@ -208,7 +263,7 @@ var _ = Describe("ManifestV2", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest_v2.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest := consul.NewManifestV2(consul.ConfigV2{
+			manifest, err := consul.NewManifestV2(consul.ConfigV2{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
 				AZs: []consul.ConfigAZ{
@@ -224,6 +279,7 @@ var _ = Describe("ManifestV2", func() {
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
 
 			yaml, err := manifest.ToYAML()
 			Expect(err).NotTo(HaveOccurred())

@@ -3,7 +3,6 @@ package consul
 import (
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
-	"github.com/pivotal-cf-experimental/destiny/network"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,7 +22,22 @@ type Stemcell struct {
 	Version string
 }
 
-func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) ManifestV2 {
+func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) {
+	consulInstanceGroup, err := consulInstanceGroup(config.AZs, config.PersistentDiskType, config.VMType)
+	if err != nil {
+		return ManifestV2{}, err
+	}
+
+	consulTestConsumerInstanceGroup, err := consulTestConsumerInstanceGroup(config.AZs, config.VMType)
+	if err != nil {
+		return ManifestV2{}, err
+	}
+
+	properties, err := properties(config.AZs)
+	if err != nil {
+		return ManifestV2{}, err
+	}
+
 	return ManifestV2{
 		DirectorUUID: config.DirectorUUID,
 		Name:         config.Name,
@@ -37,14 +51,14 @@ func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) ManifestV2 {
 		},
 		Update: update(),
 		InstanceGroups: []core.InstanceGroup{
-			consulInstanceGroup(config.AZs, config.PersistentDiskType, config.VMType),
-			consulTestConsumerInstanceGroup(config.AZs, config.VMType),
+			consulInstanceGroup,
+			consulTestConsumerInstanceGroup,
 		},
-		Properties: properties(config.AZs),
-	}
+		Properties: properties,
+	}, nil
 }
 
-func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType string) core.InstanceGroup {
+func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType string) (core.InstanceGroup, error) {
 	totalNodes := 0
 	for _, az := range azs {
 		totalNodes += az.Nodes
@@ -58,6 +72,11 @@ func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType strin
 		vmType = "default"
 	}
 
+	consulInstanceGroupStaticIPs, err := consulInstanceGroupStaticIPs(azs)
+	if err != nil {
+		return core.InstanceGroup{}, err
+	}
+
 	return core.InstanceGroup{
 		Instances: totalNodes,
 		Name:      "consul",
@@ -65,7 +84,7 @@ func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType strin
 		Networks: []core.InstanceGroupNetwork{
 			{
 				Name:      "private",
-				StaticIPs: consulInstanceGroupStaticIPs(azs),
+				StaticIPs: consulInstanceGroupStaticIPs,
 			},
 		},
 		VMType:             vmType,
@@ -107,12 +126,14 @@ func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType strin
 				},
 			},
 		},
-	}
+	}, nil
 }
 
-func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) core.InstanceGroup {
-	ipRange := network.IPRange(azs[0].IPRange)
-	totalNodesInFirstAZ := azs[0].Nodes
+func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) (core.InstanceGroup, error) {
+	cidr, err := core.ParseCIDRBlock(azs[0].IPRange)
+	if err != nil {
+		return core.InstanceGroup{}, err
+	}
 
 	if vmType == "" {
 		vmType = "default"
@@ -126,9 +147,9 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) core.Instanc
 			{
 				Name: "private",
 				StaticIPs: []string{
-					ipRange.IP(totalNodesInFirstAZ + 8),
-					ipRange.IP(totalNodesInFirstAZ + 9),
-					ipRange.IP(totalNodesInFirstAZ + 10),
+					cidr.GetFirstIP().Add(10).String(),
+					cidr.GetFirstIP().Add(11).String(),
+					cidr.GetFirstIP().Add(12).String(),
 				},
 			},
 		},
@@ -150,17 +171,22 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) core.Instanc
 				AZ:   "z1",
 			},
 		},
-	}
+	}, nil
 }
 
-func properties(azs []ConfigAZ) Properties {
+func properties(azs []ConfigAZ) (Properties, error) {
+	consulInstanceGroupStaticIPs, err := consulInstanceGroupStaticIPs(azs)
+	if err != nil {
+		return Properties{}, err
+	}
+
 	return Properties{
 		Consul: &PropertiesConsul{
 			Agent: PropertiesConsulAgent{
 				Domain:     "cf.internal",
 				Datacenter: "dc1",
 				Servers: PropertiesConsulAgentServers{
-					Lan: consulInstanceGroupStaticIPs(azs),
+					Lan: consulInstanceGroupStaticIPs,
 				},
 			},
 			AgentCert: DC1AgentCert,
@@ -172,19 +198,22 @@ func properties(azs []ConfigAZ) Properties {
 			ServerCert: DC1ServerCert,
 			ServerKey:  DC1ServerKey,
 		},
-	}
+	}, nil
 }
 
-func consulInstanceGroupStaticIPs(azs []ConfigAZ) []string {
+func consulInstanceGroupStaticIPs(azs []ConfigAZ) ([]string, error) {
 	staticIPs := []string{}
 	for _, cfgAZs := range azs {
-		ipRange := network.IPRange(cfgAZs.IPRange)
+		cidr, err := core.ParseCIDRBlock(cfgAZs.IPRange)
+		if err != nil {
+			return []string{}, err
+		}
 		for n := 0; n < cfgAZs.Nodes; n++ {
-			staticIPs = append(staticIPs, ipRange.IP(n+4))
+			staticIPs = append(staticIPs, cidr.GetFirstIP().Add(4+n).String())
 		}
 	}
 
-	return staticIPs
+	return staticIPs, nil
 }
 
 func (m ManifestV2) ToYAML() ([]byte, error) {
