@@ -27,6 +27,8 @@ func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) (M
 			ServerCert:  manifest.Properties.Consul.ServerCert,
 			ServerKey:   manifest.Properties.Consul.ServerKey,
 			EncryptKeys: manifest.Properties.Consul.EncryptKeys,
+			AgentCert:   manifest.Properties.Consul.AgentCert,
+			AgentKey:    manifest.Properties.Consul.AgentKey,
 		}
 	}
 

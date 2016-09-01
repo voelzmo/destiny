@@ -140,6 +140,60 @@ jobs:
           6ggEWjuROs3+FUrjALcLF4Di5WyMK8uKLM7/vNaPvYuoriem66yVE00XUTPfvyP5
           tEruMUT1TBpwT9QzGTTjvvgH6m47OL5Zq/o9LFuShvoI5Zceft8gzA==
           -----END RSA PRIVATE KEY-----
+      agent_cert: |-
+          -----BEGIN CERTIFICATE-----
+          MIIEJjCCAg6gAwIBAgIRAN78Qi+2Bin8G8I9ywz++gMwDQYJKoZIhvcNAQELBQAw
+          EzERMA8GA1UEAxMIY29uc3VsQ0EwHhcNMTYwNTE5MjMyMjE2WhcNMTgwNTE5MjMy
+          MjE2WjAXMRUwEwYDVQQDEwxjb25zdWwgYWdlbnQwggEiMA0GCSqGSIb3DQEBAQUA
+          A4IBDwAwggEKAoIBAQDJeOEEeYNps5BZE5LRc1ml2fA9yXYxjR1y8mJI60Xwhysf
+          J1pUUE/LMvYrMlILowSLZFx1vHuIQntmudV/Uu2bUlyb/StUPIT9KbTSs9y+mD3Z
+          HCcy72IAeP446RiT88vXFNvN+CUCC6T6tk7qlC6XgktNDyP0d8OUbsYxUR+QthbW
+          PRlqa5g+VpOIytFAp+RixrP1hjr2XcyOfDNzHBM9xE+Q0oCS9L1YW/POJCTsv96a
+          Q2bmrifeOd0YNDSDBIqxd+MMg6h/jVIXGfrJqnZJLd2M/O/2f972Z3YJHnEl0Gny
+          MUqjLSloM3TpVn9x/Vt1t8yea+JrDW1vzkqcglcZAgMBAAGjcTBvMA4GA1UdDwEB
+          /wQEAwIDuDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwHQYDVR0OBBYE
+          FMOZKx4Q0UIc28voIx45AGgPxUOZMB8GA1UdIwQYMBaAFCVfhs3cUPAFrdnh+EgI
+          hzs1m2UNMA0GCSqGSIb3DQEBCwUAA4ICAQCowAFMbtaLfzFbcWC6HCNz9xvkhqjn
+          07sgxQULseCFYkvbWQrdbpc8y5VFh1y4p8bwbpX00ygPX+1xTA6fUMy1mtJBucqa
+          5xtpVyxDI4z4M9MrUK43+j6TbCj0fdqtombx/iOrnfMmiL1WpFpdUQ0LxQ77gv5/
+          s40AJQC6CsWH6HudJbSG5iKyPC0tqgI6ZigDbMRPwdnMPCUf8eG3F87qDt/hS4b2
+          nxBGzdYYUtsmB+czg5Um1b0/yIUSAQzqYOVrbBy8ocU6sv9yqOv4CobpqXC2lTfa
+          Kn1sykYVzVaH32CfG13/VmSGFk8Mz8oFxBmji6UmwtV5IoLYUvXCKtLWH+KnvCCw
+          /BsUwvNn77J99z5SHtEsjwjfsAcZ3i86FpzSmViovQloKqdCQiTPCObrGjIH6prr
+          PJNYP6vHFyMF6vxG2out3jaBnW1+NrnpSi2bL2DUQwtqMlp2e2xhN0ytdeJxPWCJ
+          lKSE7qVkRDnXei7mr4kit3q4DbLKg8DcSDdZY04ZNOZtCtJKnxIbtv5Qo+Q6wzKg
+          Yk2POBc3mp6H1bYojhciRZPHcNCM280EtV6YAUZo4WPQzB5RkDSrC3+oXxeze3D4
+          L9jX3eCZSbGodNgl/QiExYx/Bhlj4CEj4J2ifZNB9DJ+f1+srzL/tXkORp6o1fkC
+          6CCaINfC/kU6cw==
+          -----END CERTIFICATE-----
+      agent_key: |-
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpQIBAAKCAQEAyXjhBHmDabOQWROS0XNZpdnwPcl2MY0dcvJiSOtF8IcrHyda
+          VFBPyzL2KzJSC6MEi2Rcdbx7iEJ7ZrnVf1Ltm1Jcm/0rVDyE/Sm00rPcvpg92Rwn
+          Mu9iAHj+OOkYk/PL1xTbzfglAguk+rZO6pQul4JLTQ8j9HfDlG7GMVEfkLYW1j0Z
+          amuYPlaTiMrRQKfkYsaz9YY69l3MjnwzcxwTPcRPkNKAkvS9WFvzziQk7L/emkNm
+          5q4n3jndGDQ0gwSKsXfjDIOof41SFxn6yap2SS3djPzv9n/e9md2CR5xJdBp8jFK
+          oy0paDN06VZ/cf1bdbfMnmviaw1tb85KnIJXGQIDAQABAoIBAAXRxQYhEGesNR4t
+          j48XOt6sheDzAcP6pIAeejJLAXEqJle3BkfrLfLbnPqwcGg/pDD2jCkmcZcE/JWC
+          BqWv2ocjAOPMk0TSnrDFVKDFazniId80jflNqtICrK0uJnSXlSq4QoUXhtIhTfmj
+          7HGgKBxeOhiWuF4mW3LdJEJmanf+jVmVawRJmSUwuVTdXyDMZsvM7lLHgxfGAmIE
+          RnMT5ngElWuv4Tx6+g4FBl3uGE6/gr+FznP7AaKPgb7IXu8y0aCAls+u2qoK5RKh
+          floPzX615cbpH0XHmXYF3+ajqZ84Dxis9My1HlK839GZdCNjv6OEH+/MePS5wnwQ
+          AkXjPYECgYEA4c1FNxHZj71+KBTQYMYW3fc7HW0g9B/4khjM0KEW3+C0v21G7zgE
+          xNe5l99vGFDtiTW63DOUt/flOCyYpAdjiN3ILwkcoMQvyYNU9ikCZFmJHf/s7nCA
+          3MeXH8KMV1nLlDm9tBNFnxn0XgWf0EcuzxBuEHNWRluKq15rCwnw5OkCgYEA5Gqj
+          r87RZmKSBuTN8q/pqKzD9tv+Pq9MdY3NnZmUedUB2FFZZ+yxJjZhH5+q39354+0L
+          uR0yX1MKW9qwBezapBDIi0VOpBPeZZ2QrzgZUl+zSabn85uEDBsoyoIiFz5V7uj+
+          aQiLk4VlSSIFJ/QNSy0yjHDPdK4uEo6McxxwQrECgYEAoOk2TPNEdkGUmJ2UjZI8
+          k3tuvh6ZoD70VbCkrHxPn8UzKUOHjEwAYgJVeRw5wDtTuzb17Zw4fA2FZM2rDSFS
+          1iMuWA6HPy3v3AviTPWWhcqkgyNxRc4Ylr0JPhHXDxynjf7D6ILfV20YjrQ1WiiP
+          +/F6bfCzZ7oujMbhQ2GXMJkCgYEA45SAjH0i08EoP2ge7ktpIh8ojL/6HFiqdIGZ
+          uQm5Dn41fWLoEoyYoDsUH98E8FIJVZfr0z+M3b8uFgDY2r53xXnXZjPiu8X0Ewif
+          jIT3bcReLOb4OhbbxPgWd1abQs9f7U8FlH7oGk6RcQFNY9ZcnGdm8ti/SkD1NJYE
+          x/gwvbECgYEAqU5sEn3vK20pVda4FSE1s3DHpZ0g3VFXuCQmX6qxK04Cdt78Rdw0
+          2IsBL3Pnl4NBxEbWjd3wliHil2SPH7NRSm8wiCn+zPfpauKp5iLaD1pNNEdZpXGt
+          puYKU5AIas6dozRCZobWn9uGYSxXkO2hdLZzI1veEKmimzkrDQ4Nqgk=
+          -----END RSA PRIVATE KEY-----
   resource_pool: consul_z1
   templates:
   - name: consul_agent

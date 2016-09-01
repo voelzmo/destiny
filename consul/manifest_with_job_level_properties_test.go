@@ -59,6 +59,8 @@ var _ = Describe("Manifest", func() {
 				CACert:      consul.CACert,
 				ServerCert:  consul.DC1ServerCert,
 				ServerKey:   consul.DC1ServerKey,
+				AgentCert:   consul.DC1AgentCert,
+				AgentKey:    consul.DC1AgentKey,
 				EncryptKeys: []string{consul.EncryptKey},
 			}))
 
@@ -87,6 +89,8 @@ var _ = Describe("Manifest", func() {
 				CACert:      consul.CACert,
 				ServerCert:  consul.DC1ServerCert,
 				ServerKey:   consul.DC1ServerKey,
+				AgentCert:   consul.DC1AgentCert,
+				AgentKey:    consul.DC1AgentKey,
 				EncryptKeys: []string{consul.EncryptKey},
 			}))
 
