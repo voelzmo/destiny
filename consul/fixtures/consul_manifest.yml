@@ -91,6 +91,7 @@ networks:
 
 properties:
   consul:
+    dns_timeout_in_seconds: 5
     agent:
       domain: "cf.internal"
       datacenter: "dc1"

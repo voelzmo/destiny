@@ -56,12 +56,11 @@ func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) (M
 	return manifest, nil
 }
 
-func findJob(manifest Manifest, name string) core.Job {
-	for _, job := range manifest.Jobs {
-		if job.Name == name {
-			return job
+func findJob(manifest Manifest, name string) *core.Job {
+	for index := range manifest.Jobs {
+		if manifest.Jobs[index].Name == name {
+			return &manifest.Jobs[index]
 		}
 	}
-
-	return core.Job{}
+	return &core.Job{}
 }

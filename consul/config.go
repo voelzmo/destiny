@@ -1,11 +1,12 @@
 package consul
 
 type Config struct {
-	DirectorUUID  string
-	Name          string
-	ConsulSecrets ConfigSecretsConsul
-	DC            string
-	Networks      []ConfigNetwork
+	DirectorUUID   string
+	Name           string
+	ConsulSecrets  ConfigSecretsConsul
+	DC             string
+	Networks       []ConfigNetwork
+	TurbulenceHost string
 }
 
 type ConfigNetwork struct {

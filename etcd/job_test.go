@@ -114,7 +114,7 @@ var _ = Describe("Manifest", func() {
 					network := manifest.Networks[0]
 
 					job, err = etcd.SetJobInstanceCount(job, network, 1000, 0)
-					Expect(err).To(MatchError("count is greater than the number of ips in range"))
+					Expect(err).To(MatchError("can't allocate 1000 ips from 248 available ips"))
 				})
 			})
 		})

@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -57,7 +58,7 @@ func (n Network) StaticIPsFromRange(count int) ([]string, error) {
 		return ips[:count], nil
 	}
 
-	return []string{}, errors.New("count is greater than the number of ips in range")
+	return []string{}, fmt.Errorf("can't allocate %d ips from %d available ips", count, len(ips))
 }
 
 func (n Network) rangeToList(ipRange string) ([]string, error) {

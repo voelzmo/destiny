@@ -100,7 +100,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		},
 	}
 
-	directorCACert := APIDirectorCACert
+	directorCACert := BOSHDirectorCACert
 	if config.BOSH.DirectorCACert != "" {
 		directorCACert = config.BOSH.DirectorCACert
 	}
@@ -121,7 +121,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				Password: config.BOSH.Password,
 				Username: config.BOSH.Username,
 			},
-			Password:   "turbulence-password",
+			Password:   DEFAULT_PASSWORD,
 			PrivateKey: APIPrivateKey,
 		},
 	}

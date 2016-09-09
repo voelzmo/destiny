@@ -53,7 +53,7 @@ var _ = Describe("Network", func() {
 		Context("failure cases", func() {
 			It("returns an error when the count is greater than the number of ips in range", func() {
 				_, err := network.StaticIPsFromRange(5)
-				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+				Expect(err).To(MatchError("can't allocate 5 ips from 4 available ips"))
 			})
 
 			It("returns an error when the count is less than zero", func() {

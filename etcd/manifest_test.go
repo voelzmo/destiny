@@ -441,7 +441,7 @@ var _ = Describe("Manifest", func() {
 					IPRange:      "10.244.4.0/32",
 				}, iaas.NewWardenConfig())
 
-				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+				Expect(err).To(MatchError("can't allocate 24 ips from 9 available ips"))
 			})
 		})
 	})
@@ -751,7 +751,7 @@ var _ = Describe("Manifest", func() {
 					IPRange:      "10.244.4.0/32",
 				}, iaas.NewWardenConfig())
 
-				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+				Expect(err).To(MatchError("can't allocate 24 ips from 9 available ips"))
 			})
 		})
 	})

@@ -81,3 +81,13 @@ type PropertiesRegistry struct {
 	Password string `yaml:"password"`
 	Port     int    `yaml:"port"`
 }
+
+type PropertiesTurbulenceAgent struct {
+	API PropertiesTurbulenceAgentAPI
+}
+
+type PropertiesTurbulenceAgentAPI struct {
+	Host     string
+	Password string
+	CACert   string `yaml:"ca_cert"`
+}

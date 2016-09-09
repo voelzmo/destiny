@@ -217,6 +217,7 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{
+					DNSTimeoutInSeconds: 5,
 					Agent: consul.PropertiesConsulAgent{
 						Domain:     "cf.internal",
 						Datacenter: "dc1",
@@ -466,6 +467,7 @@ var _ = Describe("Manifest", func() {
 				},
 				Properties: consul.Properties{
 					Consul: &consul.PropertiesConsul{
+						DNSTimeoutInSeconds: 5,
 						Agent: consul.PropertiesConsulAgent{
 							Domain:     "cf.internal",
 							Datacenter: "dc1",
@@ -573,7 +575,7 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 				}, iaas.NewWardenConfig())
-				Expect(err).To(MatchError("count is greater than the number of ips in range"))
+				Expect(err).To(MatchError("can't allocate 9 ips from 8 available ips"))
 			})
 		})
 	})
@@ -803,6 +805,7 @@ var _ = Describe("Manifest", func() {
 			}))
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{
+					DNSTimeoutInSeconds: 5,
 					Agent: consul.PropertiesConsulAgent{
 						Domain:     "cf.internal",
 						Datacenter: "dc1",

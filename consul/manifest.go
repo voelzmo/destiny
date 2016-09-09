@@ -168,6 +168,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 
 	properties := Properties{
 		Consul: &PropertiesConsul{
+			DNSTimeoutInSeconds: 5,
 			Agent: PropertiesConsulAgent{
 				Domain: "cf.internal",
 				Servers: PropertiesConsulAgentServers{

@@ -276,12 +276,12 @@ var _ = Describe("Manifest", func() {
 						Certificate: turbulence.APICertificate,
 						CPIJobName:  "warden_cpi",
 						Director: turbulence.PropertiesTurbulenceAPIDirector{
-							CACert:   turbulence.APIDirectorCACert,
+							CACert:   turbulence.BOSHDirectorCACert,
 							Host:     "some-bosh-target",
 							Password: "some-bosh-password",
 							Username: "some-bosh-username",
 						},
-						Password:   "turbulence-password",
+						Password:   turbulence.DEFAULT_PASSWORD,
 						PrivateKey: turbulence.APIPrivateKey,
 					},
 					WardenCPI: &iaas.PropertiesWardenCPI{
@@ -415,12 +415,12 @@ var _ = Describe("Manifest", func() {
 					Certificate: turbulence.APICertificate,
 					CPIJobName:  "warden_cpi",
 					Director: turbulence.PropertiesTurbulenceAPIDirector{
-						CACert:   turbulence.APIDirectorCACert,
+						CACert:   turbulence.BOSHDirectorCACert,
 						Host:     "some-bosh-target",
 						Password: "some-bosh-password",
 						Username: "some-bosh-username",
 					},
-					Password:   "turbulence-password",
+					Password:   turbulence.DEFAULT_PASSWORD,
 					PrivateKey: turbulence.APIPrivateKey,
 				},
 			}))
