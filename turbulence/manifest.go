@@ -26,7 +26,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 
 	cidrBlock, err := core.ParseCIDRBlock(config.IPRange)
 	if err != nil {
-		panic(err)
+		return Manifest{}, err
 	}
 
 	cloudProperties := iaasConfig.NetworkSubnet(config.IPRange)
@@ -76,7 +76,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 
 	staticIps, err := turbulenceNetwork.StaticIPsFromRange(17)
 	if err != nil {
-		panic(err)
+		return Manifest{}, err
 	}
 
 	apiJob := core.Job{

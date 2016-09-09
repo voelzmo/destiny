@@ -304,6 +304,24 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 		})
+
+		Context("failure cases", func() {
+			It("returns an error when the codr block is invalid", func() {
+				_, err := turbulence.NewManifest(turbulence.Config{
+					DirectorUUID: "some-director-uuid",
+					IPRange:      "%%%%%%",
+				}, iaas.NewWardenConfig())
+				Expect(err).To(MatchError(`"%%%%%%" cannot parse CIDR block`))
+			})
+
+			It("returns an error when the codr block is small", func() {
+				_, err := turbulence.NewManifest(turbulence.Config{
+					DirectorUUID: "some-director-uuid",
+					IPRange:      "10.244.4.0/31",
+				}, iaas.NewWardenConfig())
+				Expect(err).To(MatchError("can't allocate 17 ips from 8 available ips"))
+			})
+		})
 	})
 
 	Describe("FromYAML", func() {
