@@ -55,14 +55,12 @@ jobs:
     release: consul
   update:
     max_in_flight: 1
-- instances: 3
+- instances: 1
   name: consul_test_consumer
   networks:
   - name: consul1
     static_ips:
     - 10.244.4.10
-    - 10.244.4.11
-    - 10.244.4.12
   properties:
     consul:
       agent:
@@ -91,13 +89,14 @@ networks:
 
 properties:
   consul:
-    dns_timeout_in_seconds: 5
     agent:
       domain: "cf.internal"
       datacenter: "dc1"
       servers:
         lan:
         - 10.244.4.4
+      dns_config:
+        recursor_timeout: 5s
     agent_cert: |-
         -----BEGIN CERTIFICATE-----
         MIIEJjCCAg6gAwIBAgIRAN78Qi+2Bin8G8I9ywz++gMwDQYJKoZIhvcNAQELBQAw

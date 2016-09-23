@@ -151,13 +151,11 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Jobs[2]).To(Equal(core.Job{
 				Name:      "consul_test_consumer",
-				Instances: 3,
+				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name: "consul1",
 					StaticIPs: []string{
 						"10.244.4.10",
-						"10.244.4.11",
-						"10.244.4.12",
 					},
 				}},
 				Properties: &core.JobProperties{
@@ -217,12 +215,14 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{
-					DNSTimeoutInSeconds: 5,
 					Agent: consul.PropertiesConsulAgent{
 						Domain:     "cf.internal",
 						Datacenter: "dc1",
 						Servers: consul.PropertiesConsulAgentServers{
 							Lan: []string{"10.244.4.4", "10.244.4.5", "10.244.5.4"},
+						},
+						DNSConfig: consul.PropertiesConsulAgentDNSConfig{
+							RecursorTimeout: "5s",
 						},
 					},
 					CACert:      consul.CACert,
@@ -395,13 +395,11 @@ var _ = Describe("Manifest", func() {
 					},
 					{
 						Name:      "consul_test_consumer",
-						Instances: 3,
+						Instances: 1,
 						Networks: []core.JobNetwork{{
 							Name: "consul1",
 							StaticIPs: []string{
 								"10.0.4.10",
-								"10.0.4.11",
-								"10.0.4.12",
 							},
 						}},
 						Properties: &core.JobProperties{
@@ -467,13 +465,15 @@ var _ = Describe("Manifest", func() {
 				},
 				Properties: consul.Properties{
 					Consul: &consul.PropertiesConsul{
-						DNSTimeoutInSeconds: 5,
 						Agent: consul.PropertiesConsulAgent{
 							Domain:     "cf.internal",
 							Datacenter: "dc1",
 							LogLevel:   "",
 							Servers: consul.PropertiesConsulAgentServers{
 								Lan: []string{"10.0.4.4", "10.0.5.4"},
+							},
+							DNSConfig: consul.PropertiesConsulAgentDNSConfig{
+								RecursorTimeout: "5s",
 							},
 						},
 						CACert:      consul.CACert,
@@ -756,13 +756,11 @@ var _ = Describe("Manifest", func() {
 			}))
 			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "consul_test_consumer",
-				Instances: 3,
+				Instances: 1,
 				Networks: []core.JobNetwork{{
 					Name: "consul1",
 					StaticIPs: []string{
 						"10.244.4.10",
-						"10.244.4.11",
-						"10.244.4.12",
 					},
 				}},
 				Properties: &core.JobProperties{
@@ -805,12 +803,14 @@ var _ = Describe("Manifest", func() {
 			}))
 			Expect(manifest.Properties).To(Equal(consul.Properties{
 				Consul: &consul.PropertiesConsul{
-					DNSTimeoutInSeconds: 5,
 					Agent: consul.PropertiesConsulAgent{
 						Domain:     "cf.internal",
 						Datacenter: "dc1",
 						Servers: consul.PropertiesConsulAgentServers{
 							Lan: []string{"10.244.4.4"},
+						},
+						DNSConfig: consul.PropertiesConsulAgentDNSConfig{
+							RecursorTimeout: "5s",
 						},
 					},
 					CACert:      consul.CACert,

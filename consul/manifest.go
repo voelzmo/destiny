@@ -38,7 +38,6 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 
 	consulNetworks := []core.Network{}
 	for i, cidrBlock := range cidrBlocks {
-
 		consulNetwork := core.Network{
 			Name: fmt.Sprintf("consul%d", i+1),
 			Subnets: []core.NetworkSubnet{{
@@ -136,13 +135,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 
 	jobs = append(jobs, core.Job{
 		Name:      "consul_test_consumer",
-		Instances: 3,
+		Instances: 1,
 		Networks: []core.JobNetwork{{
 			Name: consulNetworks[0].Name,
 			StaticIPs: []string{
 				staticIps[6],
-				staticIps[7],
-				staticIps[8],
 			},
 		}},
 		Properties: &core.JobProperties{
@@ -168,11 +165,13 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 
 	properties := Properties{
 		Consul: &PropertiesConsul{
-			DNSTimeoutInSeconds: 5,
 			Agent: PropertiesConsulAgent{
 				Domain: "cf.internal",
 				Servers: PropertiesConsulAgentServers{
 					Lan: consulClusterStaticIPs,
+				},
+				DNSConfig: PropertiesConsulAgentDNSConfig{
+					RecursorTimeout: "5s",
 				},
 			},
 			EncryptKeys: []string{EncryptKey},

@@ -4,6 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf-experimental/destiny/core"
+	. "github.com/pivotal-cf-experimental/gomegamatchers"
 	"gopkg.in/yaml.v2"
 )
 

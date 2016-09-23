@@ -86,6 +86,10 @@ type PropertiesTurbulenceAgent struct {
 	API PropertiesTurbulenceAgentAPI
 }
 
+type ConsulTestConsumer struct {
+	NameServer string `yaml:"nameserver"`
+}
+
 type PropertiesTurbulenceAgentAPI struct {
 	Host     string
 	Password string

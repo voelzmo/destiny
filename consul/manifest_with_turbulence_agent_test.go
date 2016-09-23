@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/pivotal-cf-experimental/gomegamatchers"
 )
 
 var _ = Describe("Manifest", func() {
@@ -33,22 +34,37 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
 
-			consulTestConsumerJob := findJob(manifest, "consul_test_consumer")
-			Expect(consulTestConsumerJob.Templates).To(ContainElement(core.JobTemplate{
-				Name:    "turbulence_agent",
-				Release: "turbulence",
-			}))
-
-			Expect(manifest.Releases).To(ContainElement(core.Release{
-				Name:    "turbulence",
-				Version: "latest",
-			}))
-
 			Expect(manifest.Properties.TurbulenceAgent.API).To(Equal(core.PropertiesTurbulenceAgentAPI{
 				Host:     "10.244.4.32",
 				Password: turbulence.DEFAULT_PASSWORD,
 				CACert:   turbulence.APICACert,
 			}))
+			Expect(manifest.Jobs[3].ResourcePool).To(Equal("consul_z1"))
+			Expect(manifest.Jobs[3].Networks[0]).To(Equal(core.JobNetwork{
+				Name:      "consul1",
+				StaticIPs: []string{"10.244.4.13"},
+			}))
+			Expect(manifest.Jobs[3].Name).To(Equal("fake-dns-server"))
+			Expect(manifest.Jobs[3].Instances).To(Equal(1))
+			Expect(manifest.Jobs[3].Templates).To(gomegamatchers.ContainSequence([]core.JobTemplate{
+				{
+					Name:    "turbulence_agent",
+					Release: "turbulence",
+				},
+				{
+					Name:    "fake-dns-server",
+					Release: "consul",
+				},
+			}))
+			Expect(manifest.Releases).To(ContainElement(core.Release{
+				Name:    "turbulence",
+				Version: "latest",
+			}))
+			Expect(manifest.Releases).To(ContainElement(core.Release{
+				Name:    "consul",
+				Version: "latest",
+			}))
+			Expect(manifest.Properties.ConsulTestConsumer.NameServer).To(Equal("10.244.4.13"))
 		})
 	})
 

@@ -200,14 +200,12 @@ jobs:
     release: consul
   update:
     max_in_flight: 1
-- instances: 3
+- instances: 1
   name: consul_test_consumer
   networks:
   - name: consul1
     static_ips:
     - 10.244.4.10
-    - 10.244.4.11
-    - 10.244.4.12
   properties:
     consul:
       agent:

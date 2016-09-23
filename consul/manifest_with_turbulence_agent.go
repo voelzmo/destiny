@@ -22,6 +22,39 @@ func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Mani
 		Version: "latest",
 	})
 
+	staticIpForAddTestHost, err := manifest.Networks[0].StaticIPsFromRange(10)
+	if err != nil {
+		panic(err)
+	}
+
+	manifest.Jobs = append(manifest.Jobs, core.Job{
+		Name:         "fake-dns-server",
+		Instances:    1,
+		ResourcePool: manifest.Jobs[0].ResourcePool,
+		Networks: []core.JobNetwork{
+			{
+				Name: manifest.Networks[0].Name,
+				StaticIPs: []string{
+					staticIpForAddTestHost[9],
+				},
+			},
+		},
+		Templates: []core.JobTemplate{
+			{
+				Name:    "turbulence_agent",
+				Release: "turbulence",
+			},
+			{
+				Name:    "fake-dns-server",
+				Release: "consul",
+			},
+		},
+	})
+
+	manifest.Properties.ConsulTestConsumer = &core.ConsulTestConsumer{
+		NameServer: staticIpForAddTestHost[9],
+	}
+
 	manifest.Properties.TurbulenceAgent = &core.PropertiesTurbulenceAgent{
 		API: core.PropertiesTurbulenceAgentAPI{
 			Host:     config.TurbulenceHost,
