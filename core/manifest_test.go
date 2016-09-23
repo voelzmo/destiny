@@ -1,11 +1,13 @@
 package core_test
 
 import (
+	"github.com/pivotal-cf-experimental/destiny/core"
+	"github.com/pivotal-cf-experimental/gomegamatchers"
+
+	"gopkg.in/yaml.v2"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf-experimental/destiny/core"
-	. "github.com/pivotal-cf-experimental/gomegamatchers"
-	"gopkg.in/yaml.v2"
 )
 
 var _ = Describe("Manifest", func() {
@@ -21,7 +23,7 @@ ca_cert: some-cert`
 			})
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(actualYAML).To(MatchYAML(expectedYAML))
+			Expect(actualYAML).To(gomegamatchers.MatchYAML(expectedYAML))
 		})
 	})
 
