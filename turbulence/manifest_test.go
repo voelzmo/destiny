@@ -140,7 +140,7 @@ var _ = Describe("Manifest", func() {
 				},
 				Properties: turbulence.Properties{
 					TurbulenceAPI: &turbulence.PropertiesTurbulenceAPI{
-						Certificate: turbulence.AWS_TURBULENCE_API_CERTIFICATE,
+						Certificate: turbulence.APICertificate,
 						CPIJobName:  "aws_cpi",
 						Director: turbulence.PropertiesTurbulenceAPIDirector{
 							CACert:   "some-ca-cert",
