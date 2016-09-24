@@ -100,11 +100,9 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		},
 	}
 
-	apiCertificate := APICertificate
 	directorCACert := BOSHDirectorCACert
 	if config.BOSH.DirectorCACert != "" {
 		directorCACert = config.BOSH.DirectorCACert
-		apiCertificate = AWS_TURBULENCE_API_CERTIFICATE
 	}
 
 	iaasProperties := iaasConfig.Properties(staticIps[16])
@@ -115,7 +113,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Blobstore: iaasProperties.Blobstore,
 		Agent:     iaasProperties.Agent,
 		TurbulenceAPI: &PropertiesTurbulenceAPI{
-			Certificate: apiCertificate,
+			Certificate: APICertificate,
 			CPIJobName:  cpi.JobName,
 			Director: PropertiesTurbulenceAPIDirector{
 				CACert:   directorCACert,
