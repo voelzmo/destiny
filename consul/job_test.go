@@ -10,9 +10,62 @@ import (
 )
 
 var _ = Describe("Job", func() {
-	Describe("SetJobInstanceCount", func() {
+	Describe("SetConsulJobInstanceCount", func() {
+		var (
+			manifest consul.Manifest
+		)
+
+		BeforeEach(func() {
+			var err error
+			manifest, err = consul.NewManifest(consul.Config{
+				Networks: []consul.ConfigNetwork{
+					{
+						IPRange: "10.244.4.0/24",
+						Nodes:   1,
+					},
+				},
+			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
+		})
+
 		It("sets the correct values for instances and static_ips given a count", func() {
-			manifest, err := consul.NewManifest(consul.Config{
+			job := manifest.Jobs[0]
+			properties := manifest.Properties
+
+			Expect(job.Instances).To(Equal(1))
+			Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
+			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.4"}))
+			Expect(properties.Consul.Agent.Servers.Lan).To(Equal([]string{"10.244.4.4"}))
+
+			manifest, err := manifest.SetConsulJobInstanceCount(3)
+			Expect(err).NotTo(HaveOccurred())
+
+			job = manifest.Jobs[0]
+			properties = manifest.Properties
+
+			Expect(job.Instances).To(Equal(3))
+			Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
+			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.4", "10.244.4.5", "10.244.4.6"}))
+			Expect(properties.Consul.Agent.Servers.Lan).To(Equal([]string{"10.244.4.4", "10.244.4.5", "10.244.4.6"}))
+		})
+
+		Context("failure cases", func() {
+			It("returns an error when set job instance count fails", func() {
+				manifest.Jobs[0].Networks = []core.JobNetwork{}
+				_, err := manifest.SetConsulJobInstanceCount(3)
+				Expect(err).To(MatchError(`"consul_z1" job must have an existing network to modify`))
+			})
+		})
+	})
+
+	Describe("SetJobInstanceCount", func() {
+		var (
+			manifest consul.Manifest
+		)
+
+		BeforeEach(func() {
+			var err error
+			manifest, err = consul.NewManifest(consul.Config{
 				Networks: []consul.ConfigNetwork{
 					{
 						IPRange: "10.244.4.0/24",
@@ -22,48 +75,61 @@ var _ = Describe("Job", func() {
 			}, iaas.NewWardenConfig())
 			Expect(err).NotTo(HaveOccurred())
 
-			job := manifest.Jobs[0]
+		})
+
+		It("sets the correct values for instances and static_ips given a count", func() {
+			var err error
+			job := findJob(manifest, "consul_test_consumer")
 			network := manifest.Networks[0]
-			properties := manifest.Properties
 
 			Expect(job.Instances).To(Equal(1))
 			Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
 			Expect(job.Networks[0].Name).To(Equal(network.Name))
-			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.4"}))
-			Expect(properties.Consul.Agent.Servers.Lan).To(Equal([]string{"10.244.4.4"}))
+			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.10"}))
 
-			job, properties, err = consul.SetJobInstanceCount(job, network, properties, 3)
+			manifest, err = manifest.SetJobInstanceCount("consul_test_consumer", 3)
 			Expect(err).NotTo(HaveOccurred())
+
+			job = findJob(manifest, "consul_test_consumer")
+
 			Expect(job.Instances).To(Equal(3))
 			Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
-			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.4", "10.244.4.5", "10.244.4.6"}))
-			Expect(properties.Consul.Agent.Servers.Lan).To(Equal([]string{"10.244.4.4", "10.244.4.5", "10.244.4.6"}))
+			Expect(job.Networks[0].Name).To(Equal(network.Name))
+			Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.10", "10.244.4.11", "10.244.4.12"}))
+		})
+
+		It("sets the correct values given a count of zero", func() {
+			var err error
+			manifest, err = manifest.SetJobInstanceCount("consul_test_consumer", 0)
+			Expect(err).NotTo(HaveOccurred())
+
+			job := findJob(manifest, "consul_test_consumer")
+			Expect(job.Instances).To(Equal(0))
+			Expect(job.Networks[0].StaticIPs).To(HaveLen(0))
 		})
 
 		Context("failure cases", func() {
-			It("returns an error when set job instance count fails to retrieve list of static ips", func() {
-				manifest, err := consul.NewManifest(consul.Config{
-					Networks: []consul.ConfigNetwork{
-						{
-							IPRange: "10.244.4.0/24",
-							Nodes:   1,
-						},
-					},
-				}, iaas.NewWardenConfig())
-				Expect(err).NotTo(HaveOccurred())
+			It("returns an error when the job does not exist", func() {
+				_, err := manifest.SetJobInstanceCount("fake-job", 3)
+				Expect(err).To(MatchError(`"fake-job" job does not exist`))
+			})
 
-				job := manifest.Jobs[0]
-				network := manifest.Networks[0]
-				properties := manifest.Properties
+			It("returns an error when the networks is empty", func() {
+				manifest.Jobs[1].Networks = []core.JobNetwork{}
+				_, err := manifest.SetJobInstanceCount("consul_test_consumer", 3)
+				Expect(err).To(MatchError(`"consul_test_consumer" job must have an existing network to modify`))
+			})
 
-				network.Subnets = []core.NetworkSubnet{
-					{
-						Static: []string{"fake-ip"},
-					},
-				}
+			It("returns an error when the static ips is empty", func() {
+				manifest.Jobs[1].Networks[0].StaticIPs = []string{}
+				_, err := manifest.SetJobInstanceCount("consul_test_consumer", 3)
+				Expect(err).To(MatchError(`"consul_test_consumer" job must have at least one static ip in its network`))
+			})
 
-				_, _, err = consul.SetJobInstanceCount(job, network, properties, 100)
-				Expect(err).To(MatchError("'fake' is not a valid ip address"))
+			It("returns an error when the job does not exist", func() {
+				manifest.Jobs[1].Networks[0].StaticIPs[0] = "%%%%"
+				_, err := manifest.SetJobInstanceCount("consul_test_consumer", 3)
+				Expect(err).To(MatchError(`'%%%%' is not a valid ip address`))
 			})
 		})
 	})

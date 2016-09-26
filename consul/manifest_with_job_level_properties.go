@@ -1,6 +1,8 @@
 package consul
 
 import (
+	"fmt"
+
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
 )
@@ -32,7 +34,11 @@ func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) (M
 		}
 	}
 
-	consulTestConsumerJob := findJob(manifest, "consul_test_consumer")
+	consulTestConsumerJob, err := findJob(manifest, "consul_test_consumer")
+	if err != nil {
+		// not tested
+		return Manifest{}, err
+	}
 
 	consulTestConsumerJob.Properties.Consul = &core.JobPropertiesConsul{
 		Agent: core.JobPropertiesConsulAgent{
@@ -56,11 +62,11 @@ func NewManifestWithJobLevelProperties(config Config, iaasConfig iaas.Config) (M
 	return manifest, nil
 }
 
-func findJob(manifest Manifest, name string) *core.Job {
+func findJob(manifest Manifest, name string) (*core.Job, error) {
 	for index := range manifest.Jobs {
 		if manifest.Jobs[index].Name == name {
-			return &manifest.Jobs[index]
+			return &manifest.Jobs[index], nil
 		}
 	}
-	return &core.Job{}
+	return &core.Job{}, fmt.Errorf("%q job does not exist", name)
 }

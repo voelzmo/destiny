@@ -11,7 +11,12 @@ func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Mani
 	if err != nil {
 		return Manifest{}, err
 	}
-	consulTestConsumerJob := findJob(manifest, "consul_test_consumer")
+	consulTestConsumerJob, err := findJob(manifest, "consul_test_consumer")
+	if err != nil {
+		// not tested
+		return Manifest{}, err
+	}
+
 	consulTestConsumerJob.Templates = append(consulTestConsumerJob.Templates, core.JobTemplate{
 		Name:    "turbulence_agent",
 		Release: "turbulence",
@@ -24,7 +29,8 @@ func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Mani
 
 	staticIpForAddTestHost, err := manifest.Networks[0].StaticIPsFromRange(10)
 	if err != nil {
-		panic(err)
+		// not tested
+		return Manifest{}, err
 	}
 
 	manifest.Jobs = append(manifest.Jobs, core.Job{
