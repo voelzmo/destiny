@@ -42,4 +42,13 @@ var _ = Describe("CIDRPool", func() {
 			})
 		})
 	})
+
+	Describe("Last", func() {
+		It("returns the last cidr block", func() {
+			cidrPool = core.NewCIDRPool("10.244.4.0", 24, 27)
+
+			cidr := cidrPool.Last()
+			Expect(cidr).To(Equal("10.244.4.224/27"))
+		})
+	})
 })

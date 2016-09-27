@@ -29,6 +29,10 @@ func (c *CIDRPool) Get(index int) (string, error) {
 	return c.pool[index], nil
 }
 
+func (c *CIDRPool) Last() string {
+	return c.pool[len(c.pool)-1]
+}
+
 func generateCIDRPool(ipStart string, cidrMask, cidrMaskBlock uint) []string {
 	pool := []string{}
 	fullRange := 1 << (32 - cidrMask)

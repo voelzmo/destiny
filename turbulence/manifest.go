@@ -121,7 +121,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				Password: config.BOSH.Password,
 				Username: config.BOSH.Username,
 			},
-			Password:   DEFAULT_PASSWORD,
+			Password:   DefaultPassword,
 			PrivateKey: APIPrivateKey,
 		},
 	}

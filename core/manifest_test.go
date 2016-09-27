@@ -26,5 +26,4 @@ ca_cert: some-cert`
 			Expect(actualYAML).To(gomegamatchers.MatchYAML(expectedYAML))
 		})
 	})
-
 })

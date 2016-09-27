@@ -7,15 +7,16 @@ import (
 )
 
 type Properties struct {
-	Etcd             *PropertiesEtcd             `yaml:"etcd,omitempty"`
-	EtcdTestConsumer *PropertiesEtcdTestConsumer `yaml:"etcd_testconsumer,omitempty"`
-	EtcdProxy        *PropertiesEtcdProxy        `yaml:"etcd_proxy,omitempty"`
-	Consul           *consul.PropertiesConsul    `yaml:"consul,omitempty"`
-	WardenCPI        *iaas.PropertiesWardenCPI   `yaml:"warden_cpi,omitempty"`
-	AWS              *iaas.PropertiesAWS         `yaml:"aws,omitempty"`
-	Registry         *core.PropertiesRegistry    `yaml:"registry,omitempty"`
-	Blobstore        *core.PropertiesBlobstore   `yaml:"blobstore,omitempty"`
-	Agent            *core.PropertiesAgent       `yaml:"agent,omitempty"`
+	Etcd             *PropertiesEtcd                 `yaml:"etcd,omitempty"`
+	EtcdTestConsumer *PropertiesEtcdTestConsumer     `yaml:"etcd_testconsumer,omitempty"`
+	EtcdProxy        *PropertiesEtcdProxy            `yaml:"etcd_proxy,omitempty"`
+	Consul           *consul.PropertiesConsul        `yaml:"consul,omitempty"`
+	WardenCPI        *iaas.PropertiesWardenCPI       `yaml:"warden_cpi,omitempty"`
+	AWS              *iaas.PropertiesAWS             `yaml:"aws,omitempty"`
+	Registry         *core.PropertiesRegistry        `yaml:"registry,omitempty"`
+	Blobstore        *core.PropertiesBlobstore       `yaml:"blobstore,omitempty"`
+	Agent            *core.PropertiesAgent           `yaml:"agent,omitempty"`
+	TurbulenceAgent  *core.PropertiesTurbulenceAgent `yaml:"turbulence_agent,omitempty"`
 }
 
 type PropertiesEtcd struct {

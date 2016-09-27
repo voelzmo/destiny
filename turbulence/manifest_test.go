@@ -281,7 +281,7 @@ var _ = Describe("Manifest", func() {
 							Password: "some-bosh-password",
 							Username: "some-bosh-username",
 						},
-						Password:   turbulence.DEFAULT_PASSWORD,
+						Password:   turbulence.DefaultPassword,
 						PrivateKey: turbulence.APIPrivateKey,
 					},
 					WardenCPI: &iaas.PropertiesWardenCPI{
@@ -438,7 +438,7 @@ var _ = Describe("Manifest", func() {
 						Password: "some-bosh-password",
 						Username: "some-bosh-username",
 					},
-					Password:   turbulence.DEFAULT_PASSWORD,
+					Password:   turbulence.DefaultPassword,
 					PrivateKey: turbulence.APIPrivateKey,
 				},
 			}))

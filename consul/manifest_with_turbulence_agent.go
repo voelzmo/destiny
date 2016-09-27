@@ -64,7 +64,7 @@ func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Mani
 	manifest.Properties.TurbulenceAgent = &core.PropertiesTurbulenceAgent{
 		API: core.PropertiesTurbulenceAgentAPI{
 			Host:     config.TurbulenceHost,
-			Password: turbulence.DEFAULT_PASSWORD,
+			Password: turbulence.DefaultPassword,
 			CACert:   turbulence.APICACert,
 		},
 	}

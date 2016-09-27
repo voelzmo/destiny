@@ -4,6 +4,7 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/consul"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
+	"github.com/pivotal-cf-experimental/destiny/turbulence"
 	"gopkg.in/yaml.v2"
 )
 
@@ -75,6 +76,12 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 					},
 				},
 			}
+			if config.TurbulenceHost != "" {
+				job.Templates = append(job.Templates, core.JobTemplate{
+					Name:    "turbulence_agent",
+					Release: "turbulence",
+				})
+			}
 		case "testconsumer_z1":
 			job.Templates = []core.JobTemplate{
 				{
@@ -140,6 +147,22 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Name:    "consul",
 		Version: "latest",
 	})
+
+	if config.TurbulenceHost != "" {
+		manifest.Releases = append(manifest.Releases, core.Release{
+			Name:    "turbulence",
+			Version: "latest",
+		})
+
+		manifest.Properties.TurbulenceAgent = &core.PropertiesTurbulenceAgent{
+			API: core.PropertiesTurbulenceAgentAPI{
+				Host:     config.TurbulenceHost,
+				Password: turbulence.DefaultPassword,
+				CACert:   turbulence.APICACert,
+			},
+		}
+
+	}
 
 	return manifest, nil
 }

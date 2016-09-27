@@ -5,10 +5,11 @@ import (
 )
 
 type Config struct {
-	DirectorUUID string
-	Name         string
-	IPRange      string
-	Secrets      ConfigSecrets
+	DirectorUUID   string
+	Name           string
+	IPRange        string
+	Secrets        ConfigSecrets
+	TurbulenceHost string
 }
 
 type ConfigSecrets struct {

@@ -36,7 +36,7 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Properties.TurbulenceAgent.API).To(Equal(core.PropertiesTurbulenceAgentAPI{
 				Host:     "10.244.4.32",
-				Password: turbulence.DEFAULT_PASSWORD,
+				Password: turbulence.DefaultPassword,
 				CACert:   turbulence.APICACert,
 			}))
 			Expect(manifest.Jobs[3].ResourcePool).To(Equal("consul_z1"))
@@ -56,6 +56,7 @@ var _ = Describe("Manifest", func() {
 					Release: "consul",
 				},
 			}))
+
 			Expect(manifest.Releases).To(ContainElement(core.Release{
 				Name:    "turbulence",
 				Version: "latest",
@@ -63,6 +64,12 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.Releases).To(ContainElement(core.Release{
 				Name:    "consul",
 				Version: "latest",
+			}))
+
+			Expect(manifest.Properties.TurbulenceAgent.API).To(Equal(core.PropertiesTurbulenceAgentAPI{
+				Host:     "10.244.4.32",
+				Password: turbulence.DefaultPassword,
+				CACert:   turbulence.APICACert,
 			}))
 			Expect(manifest.Properties.ConsulTestConsumer.NameServer).To(Equal("10.244.4.13"))
 		})

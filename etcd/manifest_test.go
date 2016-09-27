@@ -7,6 +7,7 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/etcd"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
+	"github.com/pivotal-cf-experimental/destiny/turbulence"
 	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
@@ -442,6 +443,33 @@ var _ = Describe("Manifest", func() {
 				}, iaas.NewWardenConfig())
 
 				Expect(err).To(MatchError("can't allocate 24 ips from 9 available ips"))
+			})
+		})
+
+		Context("when turbulence host is specified", func() {
+			It("generates a manifest with turbulence agents colocated on etcd nodes", func() {
+				manifest, err := etcd.NewTLSManifest(etcd.Config{
+					DirectorUUID:   "some-director-uuid",
+					Name:           "etcd-some-random-guid",
+					IPRange:        "10.244.4.0/27",
+					TurbulenceHost: "10.244.244.244",
+				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(manifest.Releases).To(HaveLen(3))
+				Expect(manifest.Releases[2]).To(Equal(core.Release{
+					Name:    "turbulence",
+					Version: "latest",
+				}))
+
+				Expect(manifest.Jobs).To(HaveLen(3))
+				Expect(manifest.Jobs[1].Templates).To(HaveLen(3))
+				Expect(manifest.Jobs[1].Templates[2].Name).To(Equal("turbulence_agent"))
+				Expect(manifest.Jobs[1].Templates[2].Release).To(Equal("turbulence"))
+
+				Expect(manifest.Properties.TurbulenceAgent.API.Host).To(Equal("10.244.244.244"))
+				Expect(manifest.Properties.TurbulenceAgent.API.Password).To(Equal(turbulence.DefaultPassword))
+				Expect(manifest.Properties.TurbulenceAgent.API.CACert).To(Equal(turbulence.APICACert))
 			})
 		})
 	})

@@ -112,5 +112,5 @@ jAnwQ9HXdpFlkdEF2LAj+wr/GLsDNniHI2CpgnvaV7CS+2LvXzBxWczKe/zECZ26
 GJ/5AVq6Rckqoc05vzIQw4UsXFO73EzL0PC3NpBSOI+Rt0cSRO+yDEvL
 -----END RSA PRIVATE KEY-----
 `
-	DEFAULT_PASSWORD = "turbulence-password"
+	DefaultPassword = "turbulence-password"
 )
