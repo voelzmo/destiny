@@ -457,7 +457,7 @@ var _ = Describe("Manifest", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(manifest.Releases).To(HaveLen(3))
-				Expect(manifest.Releases[2]).To(Equal(core.Release{
+				Expect(manifest.Releases[1]).To(Equal(core.Release{
 					Name:    "turbulence",
 					Version: "latest",
 				}))
@@ -467,9 +467,27 @@ var _ = Describe("Manifest", func() {
 				Expect(manifest.Jobs[1].Templates[2].Name).To(Equal("turbulence_agent"))
 				Expect(manifest.Jobs[1].Templates[2].Release).To(Equal("turbulence"))
 
+				Expect(manifest.Properties.Etcd.HeartbeatIntervalInMilliseconds).To(Equal(50))
 				Expect(manifest.Properties.TurbulenceAgent.API.Host).To(Equal("10.244.244.244"))
 				Expect(manifest.Properties.TurbulenceAgent.API.Password).To(Equal(turbulence.DefaultPassword))
 				Expect(manifest.Properties.TurbulenceAgent.API.CACert).To(Equal(turbulence.APICACert))
+			})
+		})
+
+		Context("when iptables agent flag is true", func() {
+			It("generates a manifest with iptables agent colocated", func() {
+				manifest, err := etcd.NewTLSManifest(etcd.Config{
+					DirectorUUID:  "some-director-uuid",
+					Name:          "etcd-some-random-guid",
+					IPRange:       "10.244.4.0/27",
+					IPTablesAgent: true,
+				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(manifest.Jobs).To(HaveLen(3))
+				Expect(manifest.Jobs[1].Templates).To(HaveLen(3))
+				Expect(manifest.Jobs[1].Templates[2].Name).To(Equal("iptables_agent"))
+				Expect(manifest.Jobs[1].Templates[2].Release).To(Equal("etcd"))
 			})
 		})
 	})
@@ -519,20 +537,9 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 
-			Expect(manifest.Jobs).To(HaveLen(3))
+			Expect(manifest.Jobs).To(HaveLen(2))
 
 			Expect(manifest.Jobs[0]).To(Equal(core.Job{
-				Name:      "consul_z1",
-				Instances: 0,
-				Networks: []core.JobNetwork{{
-					Name:      "etcd1",
-					StaticIPs: []string{},
-				}},
-				PersistentDisk: 1024,
-				ResourcePool:   "etcd_z1",
-			}))
-
-			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "etcd_z1",
 				Instances: 1,
 				Networks: []core.JobNetwork{{
@@ -549,7 +556,7 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 
-			Expect(manifest.Jobs[2]).To(Equal(core.Job{
+			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "testconsumer_z1",
 				Instances: 1,
 				Networks: []core.JobNetwork{{
@@ -671,20 +678,9 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 
-			Expect(manifest.Jobs).To(HaveLen(3))
+			Expect(manifest.Jobs).To(HaveLen(2))
 
 			Expect(manifest.Jobs[0]).To(Equal(core.Job{
-				Name:      "consul_z1",
-				Instances: 0,
-				Networks: []core.JobNetwork{{
-					Name:      "etcd1",
-					StaticIPs: []string{},
-				}},
-				PersistentDisk: 1024,
-				ResourcePool:   "etcd_z1",
-			}))
-
-			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "etcd_z1",
 				Instances: 1,
 				Networks: []core.JobNetwork{{
@@ -701,7 +697,7 @@ var _ = Describe("Manifest", func() {
 				},
 			}))
 
-			Expect(manifest.Jobs[2]).To(Equal(core.Job{
+			Expect(manifest.Jobs[1]).To(Equal(core.Job{
 				Name:      "testconsumer_z1",
 				Instances: 1,
 				Networks: []core.JobNetwork{{
@@ -759,6 +755,50 @@ var _ = Describe("Manifest", func() {
 					RequireSSL: false,
 				},
 			}))
+		})
+
+		Context("when turbulence host is specified", func() {
+			It("generates a manifest with turbulence agents colocated on etcd nodes", func() {
+				manifest, err := etcd.NewManifest(etcd.Config{
+					DirectorUUID:   "some-director-uuid",
+					Name:           "etcd-some-random-guid",
+					IPRange:        "10.244.4.0/27",
+					TurbulenceHost: "10.244.244.244",
+				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(manifest.Releases).To(HaveLen(2))
+				Expect(manifest.Releases[1]).To(Equal(core.Release{
+					Name:    "turbulence",
+					Version: "latest",
+				}))
+
+				Expect(manifest.Jobs).To(HaveLen(2))
+				Expect(manifest.Jobs[0].Templates).To(HaveLen(2))
+				Expect(manifest.Jobs[0].Templates[1].Name).To(Equal("turbulence_agent"))
+				Expect(manifest.Jobs[0].Templates[1].Release).To(Equal("turbulence"))
+
+				Expect(manifest.Properties.TurbulenceAgent.API.Host).To(Equal("10.244.244.244"))
+				Expect(manifest.Properties.TurbulenceAgent.API.Password).To(Equal(turbulence.DefaultPassword))
+				Expect(manifest.Properties.TurbulenceAgent.API.CACert).To(Equal(turbulence.APICACert))
+			})
+		})
+
+		Context("when iptables agent flag is true", func() {
+			It("generates a manifest with iptables agent colocated", func() {
+				manifest, err := etcd.NewManifest(etcd.Config{
+					DirectorUUID:  "some-director-uuid",
+					Name:          "etcd-some-random-guid",
+					IPRange:       "10.244.4.0/27",
+					IPTablesAgent: true,
+				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(manifest.Jobs).To(HaveLen(2))
+				Expect(manifest.Jobs[0].Templates).To(HaveLen(2))
+				Expect(manifest.Jobs[0].Templates[1].Name).To(Equal("iptables_agent"))
+				Expect(manifest.Jobs[0].Templates[1].Release).To(Equal("etcd"))
+			})
 		})
 
 		Context("failure cases", func() {

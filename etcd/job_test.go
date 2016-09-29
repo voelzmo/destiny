@@ -18,7 +18,7 @@ var _ = Describe("Manifest", func() {
 				}, iaas.NewWardenConfig())
 				Expect(err).NotTo(HaveOccurred())
 
-				job := manifest.Jobs[1]
+				job := manifest.Jobs[0]
 				properties := manifest.Properties
 
 				Expect(properties.EtcdTestConsumer.Etcd.Machines).To(Equal(job.Networks[0].StaticIPs))
@@ -40,7 +40,7 @@ var _ = Describe("Manifest", func() {
 				}, iaas.NewWardenConfig())
 				Expect(err).NotTo(HaveOccurred())
 
-				job := manifest.Jobs[1]
+				job := manifest.Jobs[0]
 				properties := manifest.Properties
 
 				Expect(properties.EtcdTestConsumer.Etcd.Machines).To(Equal([]string{"etcd.service.cf.internal"}))
@@ -58,63 +58,71 @@ var _ = Describe("Manifest", func() {
 		})
 
 		Describe("SetJobInstanceCount", func() {
-			It("sets the correct values for instances and static_ips given a count", func() {
-				manifest, err := etcd.NewManifest(etcd.Config{
+			var (
+				manifest etcd.Manifest
+			)
+
+			BeforeEach(func() {
+				var err error
+				manifest, err = etcd.NewManifest(etcd.Config{
 					IPRange: "10.244.4.0/24",
 				}, iaas.NewWardenConfig())
 				Expect(err).NotTo(HaveOccurred())
-
-				job := manifest.Jobs[1]
-				network := manifest.Networks[0]
-
-				Expect(job.Instances).To(Equal(1))
-				Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
-				Expect(job.Networks[0].Name).To(Equal(network.Name))
-
-				job, err = etcd.SetJobInstanceCount(job, network, 3, 0)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(job.Instances).To(Equal(3))
-				Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
 			})
 
-			It("returns a job with an offsetted static ip list", func() {
-				manifest, err := etcd.NewManifest(etcd.Config{
-					IPRange: "10.244.4.0/24",
-				}, iaas.NewWardenConfig())
-				Expect(err).NotTo(HaveOccurred())
-
-				job := manifest.Jobs[1]
+			It("sets the correct values for instances and static_ips given a count", func() {
+				var err error
+				job := findJob(manifest, "etcd_z1")
 				network := manifest.Networks[0]
 
 				Expect(job.Instances).To(Equal(1))
 				Expect(job.Networks[0].StaticIPs).To(HaveLen(1))
 				Expect(job.Networks[0].Name).To(Equal(network.Name))
+				Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.4"}))
 
-				job, err = etcd.SetJobInstanceCount(job, network, 3, 3)
-
+				manifest, err = manifest.SetJobInstanceCount("etcd_z1", 3)
 				Expect(err).NotTo(HaveOccurred())
+
+				job = findJob(manifest, "etcd_z1")
+
 				Expect(job.Instances).To(Equal(3))
 				Expect(job.Networks[0].StaticIPs).To(HaveLen(3))
-				Expect(job.Networks[0].StaticIPs).To(ConsistOf([]string{
-					"10.244.4.7",
-					"10.244.4.8",
-					"10.244.4.9",
-				}))
+				Expect(job.Networks[0].Name).To(Equal(network.Name))
+				Expect(job.Networks[0].StaticIPs).To(Equal([]string{"10.244.4.4", "10.244.4.5", "10.244.4.6"}))
+			})
+
+			It("sets the correct values given a count of zero", func() {
+				var err error
+				manifest, err = manifest.SetJobInstanceCount("etcd_z1", 0)
+				Expect(err).NotTo(HaveOccurred())
+
+				job := findJob(manifest, "etcd_z1")
+				Expect(job.Instances).To(Equal(0))
+				Expect(job.Networks[0].StaticIPs).To(HaveLen(0))
 			})
 
 			Context("failure cases", func() {
-				It("returns an error when there aren't enough static ips", func() {
-					manifest, err := etcd.NewManifest(etcd.Config{
-						IPRange: "10.244.4.0/24",
-					}, iaas.NewWardenConfig())
-					Expect(err).NotTo(HaveOccurred())
+				It("returns an error when the job does not exist", func() {
+					_, err := manifest.SetJobInstanceCount("fake-job", 3)
+					Expect(err).To(MatchError(`"fake-job" job does not exist`))
+				})
 
-					job := manifest.Jobs[1]
-					network := manifest.Networks[0]
+				It("returns an error when the networks is empty", func() {
+					manifest.Jobs[0].Networks = []core.JobNetwork{}
+					_, err := manifest.SetJobInstanceCount("etcd_z1", 3)
+					Expect(err).To(MatchError(`"etcd_z1" job must have an existing network to modify`))
+				})
 
-					job, err = etcd.SetJobInstanceCount(job, network, 1000, 0)
-					Expect(err).To(MatchError("can't allocate 1000 ips from 248 available ips"))
+				It("returns an error when the static ips is empty", func() {
+					manifest.Jobs[0].Networks[0].StaticIPs = []string{}
+					_, err := manifest.SetJobInstanceCount("etcd_z1", 3)
+					Expect(err).To(MatchError(`"etcd_z1" job must have at least one static ip in its network`))
+				})
+
+				It("returns an error when the job does not exist", func() {
+					manifest.Jobs[0].Networks[0].StaticIPs[0] = "%%%%"
+					_, err := manifest.SetJobInstanceCount("etcd_z1", 3)
+					Expect(err).To(MatchError(`'%%%%' is not a valid ip address`))
 				})
 			})
 		})

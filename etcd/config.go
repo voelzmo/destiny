@@ -10,6 +10,7 @@ type Config struct {
 	IPRange        string
 	Secrets        ConfigSecrets
 	TurbulenceHost string
+	IPTablesAgent  bool
 }
 
 type ConfigSecrets struct {

@@ -37,36 +37,40 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		return Manifest{}, err
 	}
 
-	for i, job := range manifest.Jobs {
-		switch job.Name {
-		case "consul_z1":
-			job.Instances = 1
-			job.Properties = &core.JobProperties{
+	manifest.Jobs = append([]core.Job{
+		{
+			Name:      "consul_z1",
+			Instances: 1,
+			Networks: []core.JobNetwork{{
+				Name:      manifest.Networks[0].Name,
+				StaticIPs: []string{consulStaticIP[5]},
+			}},
+			PersistentDisk: 1024,
+			ResourcePool:   manifest.ResourcePools[0].Name,
+			Properties: &core.JobProperties{
 				Consul: &core.JobPropertiesConsul{
 					Agent: core.JobPropertiesConsulAgent{
 						Mode: "server",
 					},
 				},
-			}
-			job.Networks[0].StaticIPs = []string{consulStaticIP[5]}
-			job.Templates = []core.JobTemplate{
+			},
+			Templates: []core.JobTemplate{
 				{
 					Name:    "consul_agent",
 					Release: "consul",
 				},
-			}
+			},
+		},
+	}, manifest.Jobs...)
 
+	for i, job := range manifest.Jobs {
+		switch job.Name {
 		case "etcd_z1":
-			job.Templates = []core.JobTemplate{
+			job.Templates = append([]core.JobTemplate{
 				{
 					Name:    "consul_agent",
 					Release: "consul",
-				},
-				{
-					Name:    "etcd",
-					Release: "etcd",
-				},
-			}
+				}}, job.Templates...)
 			job.Properties = &core.JobProperties{
 				Consul: &core.JobPropertiesConsul{
 					Agent: core.JobPropertiesConsulAgent{
@@ -76,71 +80,50 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 					},
 				},
 			}
-			if config.TurbulenceHost != "" {
-				job.Templates = append(job.Templates, core.JobTemplate{
-					Name:    "turbulence_agent",
-					Release: "turbulence",
-				})
-			}
+
 		case "testconsumer_z1":
-			job.Templates = []core.JobTemplate{
+			job.Templates = append([]core.JobTemplate{
 				{
 					Name:    "consul_agent",
 					Release: "consul",
-				},
-				{
-					Name:    "etcd_testconsumer",
-					Release: "etcd",
-				},
-			}
+				}}, job.Templates...)
 		}
 
 		manifest.Jobs[i] = job
 	}
 
-	manifest.Properties = Properties{
-		EtcdTestConsumer: &PropertiesEtcdTestConsumer{
-			Etcd: PropertiesEtcdTestConsumerEtcd{
-				RequireSSL: true,
-				Machines:   []string{"etcd.service.cf.internal"},
-				CACert:     config.Secrets.Etcd.CACert,
-				ClientCert: config.Secrets.Etcd.ClientCert,
-				ClientKey:  config.Secrets.Etcd.ClientKey,
+	manifest.Properties.EtcdTestConsumer.Etcd.RequireSSL = true
+	manifest.Properties.EtcdTestConsumer.Etcd.Machines = []string{"etcd.service.cf.internal"}
+	manifest.Properties.EtcdTestConsumer.Etcd.CACert = config.Secrets.Etcd.CACert
+	manifest.Properties.EtcdTestConsumer.Etcd.ClientCert = config.Secrets.Etcd.ClientCert
+	manifest.Properties.EtcdTestConsumer.Etcd.ClientKey = config.Secrets.Etcd.ClientKey
+
+	manifest.Properties.Etcd.Machines = []string{"etcd.service.cf.internal"}
+	manifest.Properties.Etcd.PeerRequireSSL = true
+	manifest.Properties.Etcd.RequireSSL = true
+	manifest.Properties.Etcd.AdvertiseURLsDNSSuffix = "etcd.service.cf.internal"
+	manifest.Properties.Etcd.CACert = config.Secrets.Etcd.CACert
+	manifest.Properties.Etcd.ClientCert = config.Secrets.Etcd.ClientCert
+	manifest.Properties.Etcd.ClientKey = config.Secrets.Etcd.ClientKey
+	manifest.Properties.Etcd.PeerCACert = config.Secrets.Etcd.PeerCACert
+	manifest.Properties.Etcd.PeerCert = config.Secrets.Etcd.PeerCert
+	manifest.Properties.Etcd.PeerKey = config.Secrets.Etcd.PeerKey
+	manifest.Properties.Etcd.ServerCert = config.Secrets.Etcd.ServerCert
+	manifest.Properties.Etcd.ServerKey = config.Secrets.Etcd.ServerKey
+
+	manifest.Properties.Consul = &consul.PropertiesConsul{
+		Agent: consul.PropertiesConsulAgent{
+			Domain: "cf.internal",
+			Servers: consul.PropertiesConsulAgentServers{
+				Lan: []string{consulStaticIP[5]},
 			},
 		},
-		Etcd: &PropertiesEtcd{
-			Cluster: []PropertiesEtcdCluster{{
-				Instances: 1,
-				Name:      "etcd_z1",
-			}},
-			Machines:                        []string{"etcd.service.cf.internal"},
-			PeerRequireSSL:                  true,
-			RequireSSL:                      true,
-			HeartbeatIntervalInMilliseconds: 50,
-			AdvertiseURLsDNSSuffix:          "etcd.service.cf.internal",
-			CACert:                          config.Secrets.Etcd.CACert,
-			ClientCert:                      config.Secrets.Etcd.ClientCert,
-			ClientKey:                       config.Secrets.Etcd.ClientKey,
-			PeerCACert:                      config.Secrets.Etcd.PeerCACert,
-			PeerCert:                        config.Secrets.Etcd.PeerCert,
-			PeerKey:                         config.Secrets.Etcd.PeerKey,
-			ServerCert:                      config.Secrets.Etcd.ServerCert,
-			ServerKey:                       config.Secrets.Etcd.ServerKey,
-		},
-		Consul: &consul.PropertiesConsul{
-			Agent: consul.PropertiesConsulAgent{
-				Domain: "cf.internal",
-				Servers: consul.PropertiesConsulAgentServers{
-					Lan: []string{consulStaticIP[5]},
-				},
-			},
-			CACert:      config.Secrets.Consul.CACert,
-			AgentCert:   config.Secrets.Consul.AgentCert,
-			AgentKey:    config.Secrets.Consul.AgentKey,
-			ServerCert:  config.Secrets.Consul.ServerCert,
-			ServerKey:   config.Secrets.Consul.ServerKey,
-			EncryptKeys: []string{config.Secrets.Consul.EncryptKey},
-		},
+		CACert:      config.Secrets.Consul.CACert,
+		AgentCert:   config.Secrets.Consul.AgentCert,
+		AgentKey:    config.Secrets.Consul.AgentKey,
+		ServerCert:  config.Secrets.Consul.ServerCert,
+		ServerKey:   config.Secrets.Consul.ServerKey,
+		EncryptKeys: []string{config.Secrets.Consul.EncryptKey},
 	}
 
 	manifest.Releases = append(manifest.Releases, core.Release{
@@ -148,31 +131,17 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Version: "latest",
 	})
 
-	if config.TurbulenceHost != "" {
-		manifest.Releases = append(manifest.Releases, core.Release{
-			Name:    "turbulence",
-			Version: "latest",
-		})
-
-		manifest.Properties.TurbulenceAgent = &core.PropertiesTurbulenceAgent{
-			API: core.PropertiesTurbulenceAgentAPI{
-				Host:     config.TurbulenceHost,
-				Password: turbulence.DefaultPassword,
-				CACert:   turbulence.APICACert,
-			},
-		}
-
-	}
-
 	return manifest, nil
 }
 
 func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 	config = NewConfigWithDefaults(config)
 
-	etcdRelease := core.Release{
-		Name:    "etcd",
-		Version: "latest",
+	releases := []core.Release{
+		{
+			Name:    "etcd",
+			Version: "latest",
+		},
 	}
 
 	cidr, err := core.ParseCIDRBlock(config.IPRange)
@@ -224,15 +193,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		return Manifest{}, err
 	}
 
-	consulZ1Job := core.Job{
-		Name:      "consul_z1",
-		Instances: 0,
-		Networks: []core.JobNetwork{{
-			Name:      etcdNetwork1.Name,
-			StaticIPs: []string{},
-		}},
-		PersistentDisk: 1024,
-		ResourcePool:   z1ResourcePool.Name,
+	etcdZ1JobTemplates := []core.JobTemplate{
+		{
+			Name:    "etcd",
+			Release: "etcd",
+		},
 	}
 
 	etcdZ1Job := core.Job{
@@ -244,12 +209,14 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		}},
 		PersistentDisk: 1024,
 		ResourcePool:   z1ResourcePool.Name,
-		Templates: []core.JobTemplate{
-			{
-				Name:    "etcd",
-				Release: "etcd",
-			},
-		},
+		Templates:      etcdZ1JobTemplates,
+	}
+
+	if config.IPTablesAgent {
+		etcdZ1Job.Templates = append(etcdZ1Job.Templates, core.JobTemplate{
+			Name:    "iptables_agent",
+			Release: "etcd",
+		})
 	}
 
 	testconsumerZ1Job := core.Job{
@@ -269,38 +236,57 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		},
 	}
 
+	globalProperties := Properties{
+		Etcd: &PropertiesEtcd{
+			Cluster: []PropertiesEtcdCluster{{
+				Instances: 1,
+				Name:      "etcd_z1",
+			}},
+			Machines:                        etcdZ1Job.Networks[0].StaticIPs,
+			PeerRequireSSL:                  false,
+			RequireSSL:                      false,
+			HeartbeatIntervalInMilliseconds: 50,
+		},
+		EtcdTestConsumer: &PropertiesEtcdTestConsumer{
+			Etcd: PropertiesEtcdTestConsumerEtcd{
+				Machines: etcdZ1Job.Networks[0].StaticIPs,
+			},
+		},
+	}
+
+	if config.TurbulenceHost != "" {
+		globalProperties.TurbulenceAgent = &core.PropertiesTurbulenceAgent{
+			API: core.PropertiesTurbulenceAgentAPI{
+				Host:     config.TurbulenceHost,
+				Password: turbulence.DefaultPassword,
+				CACert:   turbulence.APICACert,
+			},
+		}
+
+		etcdZ1Job.Templates = append(etcdZ1Job.Templates, core.JobTemplate{
+			Name:    "turbulence_agent",
+			Release: "turbulence",
+		})
+
+		releases = append(releases, core.Release{
+			Name:    "turbulence",
+			Version: "latest",
+		})
+	}
+
 	return Manifest{
 		DirectorUUID: config.DirectorUUID,
 		Name:         config.Name,
 		Compilation:  compilation,
 		Jobs: []core.Job{
-			consulZ1Job,
 			etcdZ1Job,
 			testconsumerZ1Job,
 		},
 		Networks: []core.Network{
 			etcdNetwork1,
 		},
-		Properties: Properties{
-			Etcd: &PropertiesEtcd{
-				Cluster: []PropertiesEtcdCluster{{
-					Instances: 1,
-					Name:      "etcd_z1",
-				}},
-				Machines:                        etcdZ1Job.Networks[0].StaticIPs,
-				PeerRequireSSL:                  false,
-				RequireSSL:                      false,
-				HeartbeatIntervalInMilliseconds: 50,
-			},
-			EtcdTestConsumer: &PropertiesEtcdTestConsumer{
-				Etcd: PropertiesEtcdTestConsumerEtcd{
-					Machines: etcdZ1Job.Networks[0].StaticIPs,
-				},
-			},
-		},
-		Releases: []core.Release{
-			etcdRelease,
-		},
+		Properties: globalProperties,
+		Releases:   releases,
 		ResourcePools: []core.ResourcePool{
 			z1ResourcePool,
 		},

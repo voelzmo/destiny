@@ -1,22 +1,40 @@
 package etcd
 
-import "github.com/pivotal-cf-experimental/destiny/core"
+import (
+	"fmt"
 
-func SetJobInstanceCount(job core.Job, network core.Network, count int, staticIPOffset int) (core.Job, error) {
-	job.Instances = count
-	for i, net := range job.Networks {
-		if net.Name == network.Name {
-			staticIps, err := network.StaticIPsFromRange(count + staticIPOffset)
-			if err != nil {
-				return core.Job{}, err
-			}
+	"github.com/pivotal-cf-experimental/destiny/core"
+)
 
-			net.StaticIPs = staticIps[staticIPOffset:]
-		}
-		job.Networks[i] = net
+func (manifest Manifest) SetJobInstanceCount(jobName string, count int) (Manifest, error) {
+	job, err := findJob(manifest, jobName)
+	if err != nil {
+		return Manifest{}, err
 	}
 
-	return job, nil
+	job.Instances = count
+
+	if len(job.Networks) == 0 {
+		return Manifest{}, fmt.Errorf("%q job must have an existing network to modify", jobName)
+	}
+	network := job.Networks[0]
+
+	if count == 0 {
+		job.Networks[0].StaticIPs = []string{}
+		return manifest, nil
+	}
+
+	if len(network.StaticIPs) == 0 {
+		return Manifest{}, fmt.Errorf("%q job must have at least one static ip in its network", jobName)
+	}
+	firstIP, err := core.ParseIP(network.StaticIPs[0])
+	if err != nil {
+		return Manifest{}, err
+	}
+	lastIP := firstIP.Add(count - 1)
+	job.Networks[0].StaticIPs = firstIP.To(lastIP)
+
+	return manifest, nil
 }
 
 func SetEtcdProperties(job core.Job, properties Properties) Properties {
@@ -37,4 +55,13 @@ func (m Manifest) RemoveJob(jobName string) Manifest {
 		}
 	}
 	return m
+}
+
+func findJob(manifest Manifest, name string) (*core.Job, error) {
+	for index := range manifest.Jobs {
+		if manifest.Jobs[index].Name == name {
+			return &manifest.Jobs[index], nil
+		}
+	}
+	return &core.Job{}, fmt.Errorf("%q job does not exist", name)
 }

@@ -91,12 +91,3 @@ var _ = Describe("Manifest", func() {
 		})
 	})
 })
-
-func findJob(manifest consul.Manifest, name string) *core.Job {
-	for _, job := range manifest.Jobs {
-		if job.Name == name {
-			return &job
-		}
-	}
-	return &core.Job{}
-}
