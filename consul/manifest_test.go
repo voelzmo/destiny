@@ -270,7 +270,7 @@ var _ = Describe("Manifest", func() {
 					Workers:             3,
 					CloudProperties: core.CompilationCloudProperties{
 						InstanceType:     "c3.large",
-						AvailabilityZone: "us-west-2b",
+						AvailabilityZone: "us-west-2a",
 						EphemeralDisk: &core.CompilationCloudPropertiesEphemeralDisk{
 							Size: 2048,
 							Type: "gp2",

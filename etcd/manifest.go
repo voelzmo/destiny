@@ -165,7 +165,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Network:             etcdNetwork1.Name,
 		ReuseCompilationVMs: true,
 		Workers:             3,
-		CloudProperties:     iaasConfig.Compilation(),
+		CloudProperties:     iaasConfig.Compilation("us-east-1a"),
 	}
 
 	update := core.Update{

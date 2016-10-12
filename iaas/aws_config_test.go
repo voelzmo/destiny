@@ -54,7 +54,7 @@ var _ = Describe("AWS Config", func() {
 
 	Describe("Compilation", func() {
 		It("returns a compilation specific to AWS", func() {
-			compilationCloudProperties := awsConfig.Compilation()
+			compilationCloudProperties := awsConfig.Compilation("us-west-2a")
 			Expect(compilationCloudProperties).To(Equal(core.CompilationCloudProperties{
 				InstanceType:     "c3.large",
 				AvailabilityZone: "us-west-2a",

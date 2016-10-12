@@ -24,7 +24,7 @@ func NewTLSUpgradeManifest(config Config, iaasConfig iaas.Config) Manifest {
 		Network:             "etcd1",
 		ReuseCompilationVMs: true,
 		Workers:             3,
-		CloudProperties:     iaasConfig.Compilation(),
+		CloudProperties:     iaasConfig.Compilation("us-east-1a"),
 	}
 
 	update := core.Update{

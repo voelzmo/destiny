@@ -13,7 +13,7 @@ func (WardenConfig) NetworkSubnet(string) core.NetworkSubnetCloudProperties {
 	return core.NetworkSubnetCloudProperties{Name: "random"}
 }
 
-func (WardenConfig) Compilation() core.CompilationCloudProperties {
+func (WardenConfig) Compilation(ignored string) core.CompilationCloudProperties {
 	return core.CompilationCloudProperties{}
 }
 
