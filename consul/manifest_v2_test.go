@@ -182,12 +182,12 @@ var _ = Describe("ManifestV2", func() {
 				VMType:             "m3.medium",
 				AZs: []consul.ConfigAZ{
 					{
-						Name:    "us-east-1",
+						Name:    "us-west-2",
 						IPRange: "10.0.4.192/27",
 						Nodes:   3,
 					},
 					{
-						Name:    "us-east-1",
+						Name:    "us-west-2",
 						IPRange: "10.0.5.192/27",
 						Nodes:   3,
 					},

@@ -57,7 +57,7 @@ var _ = Describe("AWS Config", func() {
 			compilationCloudProperties := awsConfig.Compilation()
 			Expect(compilationCloudProperties).To(Equal(core.CompilationCloudProperties{
 				InstanceType:     "c3.large",
-				AvailabilityZone: "us-east-1a",
+				AvailabilityZone: "us-west-2a",
 				EphemeralDisk: &core.CompilationCloudPropertiesEphemeralDisk{
 					Size: 2048,
 					Type: "gp2",

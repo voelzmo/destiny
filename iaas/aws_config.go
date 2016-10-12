@@ -51,7 +51,7 @@ func (a AWSConfig) NetworkSubnet(ipRange string) core.NetworkSubnetCloudProperti
 func (a AWSConfig) Compilation() core.CompilationCloudProperties {
 	return core.CompilationCloudProperties{
 		InstanceType:     "c3.large",
-		AvailabilityZone: "us-east-1a",
+		AvailabilityZone: "us-west-2a",
 		EphemeralDisk: &core.CompilationCloudPropertiesEphemeralDisk{
 			Size: 2048,
 			Type: "gp2",
