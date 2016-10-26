@@ -15,17 +15,19 @@ import (
 var _ = Describe("Manifest", func() {
 	Describe("NewManifestWithJobLevelProperties", func() {
 		It("generates a valid Consul BOSH-Lite manifest with proper job level consul properties", func() {
-			manifest, err := consul.NewManifestWithJobLevelProperties(consul.Config{
+			manifest, err := consul.NewManifestWithJobLevelProperties(consul.ConfigV2{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
-				Networks: []consul.ConfigNetwork{
+				AZs: []consul.ConfigAZ{
 					{
 						IPRange: "10.244.4.0/24",
 						Nodes:   2,
+						Name:    "z1",
 					},
 					{
 						IPRange: "10.244.5.0/24",
 						Nodes:   1,
+						Name:    "z2",
 					},
 				},
 			}, iaas.NewWardenConfig())
@@ -34,7 +36,7 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
 
-			Expect(manifest.Jobs[0].Properties.Consul).To(Equal(&core.JobPropertiesConsul{
+			Expect(manifest.InstanceGroups[0].Properties.Consul).To(Equal(&core.JobPropertiesConsul{
 				Agent: core.JobPropertiesConsulAgent{
 					Domain:     "cf.internal",
 					Datacenter: "dc1",
@@ -64,45 +66,13 @@ var _ = Describe("Manifest", func() {
 				EncryptKeys: []string{consul.EncryptKey},
 			}))
 
-			Expect(manifest.Jobs[1].Properties.Consul).To(Equal(&core.JobPropertiesConsul{
+			Expect(manifest.InstanceGroups[1].Properties.Consul).To(Equal(&core.JobPropertiesConsul{
 				Agent: core.JobPropertiesConsulAgent{
 					Domain:     "cf.internal",
 					Datacenter: "dc1",
 					Servers: core.JobPropertiesConsulAgentServers{
 						Lan: []string{"10.244.4.4", "10.244.4.5", "10.244.5.4"},
 					},
-					Mode:     "server",
-					LogLevel: "info",
-					Services: core.JobPropertiesConsulAgentServices{
-						"router": core.JobPropertiesConsulAgentService{
-							Name: "gorouter",
-							Check: &core.JobPropertiesConsulAgentServiceCheck{
-								Name:     "router-check",
-								Script:   "/var/vcap/jobs/router/bin/script",
-								Interval: "1m",
-							},
-							Tags: []string{"routing"},
-						},
-						"cloud_controller": core.JobPropertiesConsulAgentService{},
-					},
-				},
-				CACert:      consul.CACert,
-				ServerCert:  consul.DC1ServerCert,
-				ServerKey:   consul.DC1ServerKey,
-				AgentCert:   consul.DC1AgentCert,
-				AgentKey:    consul.DC1AgentKey,
-				EncryptKeys: []string{consul.EncryptKey},
-			}))
-
-			Expect(manifest.Jobs[2].Properties.Consul).To(Equal(&core.JobPropertiesConsul{
-				Agent: core.JobPropertiesConsulAgent{
-					Domain:     "cf.internal",
-					Datacenter: "dc1",
-					Servers: core.JobPropertiesConsulAgentServers{
-						Lan: []string{"10.244.4.4", "10.244.4.5", "10.244.5.4"},
-					},
-					Mode:     "client",
-					LogLevel: "info",
 				},
 				CACert:      consul.CACert,
 				AgentCert:   consul.DC1AgentCert,
@@ -115,13 +85,14 @@ var _ = Describe("Manifest", func() {
 
 		Context("failure cases", func() {
 			It("returns an error when it fails to build base manifest", func() {
-				_, err := consul.NewManifestWithJobLevelProperties(consul.Config{
+				_, err := consul.NewManifestWithJobLevelProperties(consul.ConfigV2{
 					DirectorUUID: "some-director-uuid",
 					Name:         "consul-some-random-guid",
-					Networks: []consul.ConfigNetwork{
+					AZs: []consul.ConfigAZ{
 						{
 							IPRange: "fake-cidr-block",
 							Nodes:   1,
+							Name:    "z1",
 						},
 					},
 				}, iaas.NewWardenConfig())
@@ -135,13 +106,14 @@ var _ = Describe("Manifest", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest_with_job_level_properties.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest, err := consul.NewManifestWithJobLevelProperties(consul.Config{
+			manifest, err := consul.NewManifestWithJobLevelProperties(consul.ConfigV2{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul",
-				Networks: []consul.ConfigNetwork{
+				AZs: []consul.ConfigAZ{
 					{
 						IPRange: "10.244.4.0/24",
 						Nodes:   1,
+						Name:    "z1",
 					},
 				},
 			}, iaas.NewWardenConfig())

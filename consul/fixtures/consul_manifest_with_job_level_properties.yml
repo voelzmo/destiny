@@ -6,12 +6,6 @@ releases:
 - name: consul
   version: latest
 
-compilation:
-  cloud_properties: {}
-  network: consul1
-  reuse_compilation_vms: true
-  workers: 3
-
 update:
   canaries: 1
   canary_watch_time: 1000-180000
@@ -19,22 +13,22 @@ update:
   serial: true
   update_watch_time: 1000-180000
 
-resource_pools:
-- cloud_properties: {}
-  name: consul_z1
-  network: consul1
-  stemcell:
-    name: bosh-warden-boshlite-ubuntu-trusty-go_agent
-    version: latest
+stemcells:
+- alias: default
+  name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+  version: latest
 
-jobs:
+instance_groups:
 - instances: 1
-  name: consul_z1
+  name: consul
+  azs: [z1]
   networks:
-  - name: consul1
+  - name: private
     static_ips:
     - 10.244.4.4
-  persistent_disk: 1024
+  persistent_disk_type: default
+  vm_type: default
+  stemcell: default
   properties:
     consul:
       agent:
@@ -194,23 +188,21 @@ jobs:
           2IsBL3Pnl4NBxEbWjd3wliHil2SPH7NRSm8wiCn+zPfpauKp5iLaD1pNNEdZpXGt
           puYKU5AIas6dozRCZobWn9uGYSxXkO2hdLZzI1veEKmimzkrDQ4Nqgk=
           -----END RSA PRIVATE KEY-----
-  resource_pool: consul_z1
-  templates:
+  jobs:
   - name: consul_agent
     release: consul
-  update:
-    max_in_flight: 1
 - instances: 1
-  name: consul_test_consumer
+  name: test_consumer
+  azs: [z1]
+  stemcell: default
+  vm_type: default
   networks:
-  - name: consul1
+  - name: private
     static_ips:
     - 10.244.4.10
   properties:
     consul:
       agent:
-        mode: client
-        log_level: info
         domain: "cf.internal"
         datacenter: "dc1"
         servers:
@@ -302,25 +294,10 @@ jobs:
           -----END CERTIFICATE-----
       encrypt_keys:
       - Twas brillig, and the slithy toves Did gyre and gimble in the wabe; All mimsy were the borogoves, And the mome raths outgrabe.
-  resource_pool: consul_z1
-  templates:
+  jobs:
   - name: consul_agent
     release: consul
   - name: consul-test-consumer
     release: consul
-
-networks:
-- name: consul1
-  subnets:
-  - cloud_properties:
-      name: random
-    gateway: 10.244.4.1
-    range: 10.244.4.0/24
-    reserved:
-    - 10.244.4.2-10.244.4.3
-    - 10.244.4.255
-    static:
-    - 10.244.4.4-10.244.4.251
-  type: manual
 
 properties: {}

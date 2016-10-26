@@ -1,5 +1,7 @@
 package consul
 
+import "github.com/pivotal-cf-experimental/destiny/core"
+
 type Config struct {
 	DirectorUUID   string
 	Name           string
@@ -21,4 +23,24 @@ type ConfigSecretsConsul struct {
 	ServerKey  string
 	ServerCert string
 	CACert     string
+}
+
+func (c *Config) PopulateDefaultConfigNodes() {
+	for i, _ := range c.Networks {
+		if c.Networks[i].Nodes == 0 {
+			c.Networks[i].Nodes = 1
+		}
+	}
+}
+
+func (config Config) GetCIDRBlocks() ([]core.CIDRBlock, error) {
+	cidrBlocks := []core.CIDRBlock{}
+	for _, cfgNetwork := range config.Networks {
+		cidr, err := core.ParseCIDRBlock(cfgNetwork.IPRange)
+		if err != nil {
+			return nil, err
+		}
+		cidrBlocks = append(cidrBlocks, cidr)
+	}
+	return cidrBlocks, nil
 }

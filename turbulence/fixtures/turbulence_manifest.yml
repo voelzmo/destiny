@@ -8,12 +8,6 @@ releases:
 - name: bosh-warden-cpi
   version: latest
 
-compilation:
-  cloud_properties: {}
-  network: turbulence
-  reuse_compilation_vms: true
-  workers: 3
-
 update:
   canaries: 1
   canary_watch_time: 1000-180000
@@ -21,42 +15,27 @@ update:
   serial: true
   update_watch_time: 1000-180000
 
-resource_pools:
-- cloud_properties: {}
-  name: turbulence
-  network: turbulence
-  stemcell:
-    name: bosh-warden-boshlite-ubuntu-trusty-go_agent
-    version: latest
+stemcells:
+- alias: default
+  name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+  version: latest
 
-jobs:
+instance_groups:
 - instances: 1
   name: api
+  azs: [z1]
   networks:
-  - name: turbulence
+  - name: private
     static_ips:
     - 10.244.4.20
-  persistent_disk: 1024
-  resource_pool: turbulence
-  templates:
+  vm_type: default
+  stemcell: default
+  persistent_disk_type: default
+  jobs:
   - name: turbulence_api
     release: turbulence
   - name: warden_cpi
     release: bosh-warden-cpi
-
-networks:
-- name: turbulence
-  subnets:
-  - cloud_properties:
-      name: random
-    gateway: 10.244.4.1
-    range: 10.244.4.0/24
-    reserved:
-    - 10.244.4.2-10.244.4.3
-    - 10.244.4.255
-    static:
-    - 10.244.4.4-10.244.4.251
-  type: manual
 
 properties:
   turbulence_api:

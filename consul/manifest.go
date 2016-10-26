@@ -25,15 +25,11 @@ type ConsulMember struct {
 }
 
 func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
-	config = populateDefaultConfigNodes(config)
+	config.PopulateDefaultConfigNodes()
 
-	cidrBlocks := []core.CIDRBlock{}
-	for _, cfgNetwork := range config.Networks {
-		cidr, err := core.ParseCIDRBlock(cfgNetwork.IPRange)
-		if err != nil {
-			return Manifest{}, err
-		}
-		cidrBlocks = append(cidrBlocks, cidr)
+	cidrBlocks, err := config.GetCIDRBlocks()
+	if err != nil {
+		return Manifest{}, err
 	}
 
 	consulNetworks := []core.Network{}
@@ -253,14 +249,4 @@ func overrideTLS(properties *PropertiesConsul, dc string) {
 	}
 
 	properties.CACert = CACert
-}
-
-func populateDefaultConfigNodes(config Config) Config {
-	for i, cfgNetworks := range config.Networks {
-		if cfgNetworks.Nodes == 0 {
-			config.Networks[i].Nodes = 1
-		}
-	}
-
-	return config
 }

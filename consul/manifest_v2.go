@@ -10,55 +10,50 @@ type ManifestV2 struct {
 	DirectorUUID   string               `yaml:"director_uuid"`
 	Name           string               `yaml:"name"`
 	Releases       []core.Release       `yaml:"releases"`
-	Stemcells      []Stemcell           `yaml:"stemcells"`
+	Stemcells      []core.Stemcell      `yaml:"stemcells"`
 	Update         core.Update          `yaml:"update"`
 	InstanceGroups []core.InstanceGroup `yaml:"instance_groups"`
 	Properties     Properties           `yaml:"properties"`
 }
 
-type Stemcell struct {
-	Alias   string
-	Name    string
-	Version string
-}
-
 func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) {
-	consulInstanceGroup, err := consulInstanceGroup(config.AZs, config.PersistentDiskType, config.VMType)
-	if err != nil {
-		return ManifestV2{}, err
-	}
-
-	consulTestConsumerInstanceGroup, err := consulTestConsumerInstanceGroup(config.AZs, config.VMType)
-	if err != nil {
-		return ManifestV2{}, err
-	}
-
-	properties, err := properties(config.AZs)
-	if err != nil {
-		return ManifestV2{}, err
-	}
-
-	return ManifestV2{
+	manifest := ManifestV2{
 		DirectorUUID: config.DirectorUUID,
 		Name:         config.Name,
 		Releases:     releases(),
-		Stemcells: []Stemcell{
+		Stemcells: []core.Stemcell{
 			{
 				Alias:   "default",
 				Version: "latest",
 				Name:    iaasConfig.Stemcell(),
 			},
 		},
-		Update: update(),
-		InstanceGroups: []core.InstanceGroup{
-			consulInstanceGroup,
-			consulTestConsumerInstanceGroup,
-		},
-		Properties: properties,
-	}, nil
+		Update:         update(),
+		InstanceGroups: []core.InstanceGroup{},
+		Properties:     Properties{},
+	}
+
+	consulInstanceGroup, err := consulInstanceGroup(config)
+	if err != nil {
+		return ManifestV2{}, err
+	}
+	manifest.InstanceGroups = append(manifest.InstanceGroups, consulInstanceGroup)
+
+	consulTestConsumerInstanceGroup, err := consulTestConsumerInstanceGroup(config.AZs, config.VMType)
+	if err != nil {
+		return ManifestV2{}, err
+	}
+	manifest.InstanceGroups = append(manifest.InstanceGroups, consulTestConsumerInstanceGroup)
+
+	manifest.Properties.Consul = newConsulProperties(consulInstanceGroup.Networks[0].StaticIPs)
+
+	return manifest, nil
 }
 
-func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType string) (core.InstanceGroup, error) {
+func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
+	persistentDiskType := config.PersistentDiskType
+	azs := config.AZs
+	vmType := config.VMType
 	totalNodes := 0
 	for _, az := range azs {
 		totalNodes += az.Nodes
@@ -96,32 +91,22 @@ func consulInstanceGroup(azs []ConfigAZ, persistentDiskType string, vmType strin
 				Release: "consul",
 			},
 		},
-		MigratedFrom: []core.InstanceGroupMigratedFrom{
-			{
-				Name: "consul_z1",
-				AZ:   "z1",
-			},
-			{
-				Name: "consul_z2",
-				AZ:   "z2",
-			},
-		},
-		Properties: core.InstanceGroupProperties{
-			Consul: core.InstanceGroupPropertiesConsul{
-				Agent: core.InstanceGroupPropertiesConsulAgent{
+		Properties: &core.JobProperties{
+			Consul: &core.JobPropertiesConsul{
+				Agent: core.JobPropertiesConsulAgent{
 					Mode:     "server",
 					LogLevel: "info",
-					Services: map[string]core.InstanceGroupPropertiesConsulAgentService{
-						"router": core.InstanceGroupPropertiesConsulAgentService{
+					Services: core.JobPropertiesConsulAgentServices{
+						"router": core.JobPropertiesConsulAgentService{
 							Name: "gorouter",
-							Check: core.InstanceGroupPropertiesConsulAgentServiceCheck{
+							Check: &core.JobPropertiesConsulAgentServiceCheck{
 								Name:     "router-check",
 								Script:   "/var/vcap/jobs/router/bin/script",
 								Interval: "1m",
 							},
 							Tags: []string{"routing"},
 						},
-						"cloud_controller": core.InstanceGroupPropertiesConsulAgentService{},
+						"cloud_controller": core.JobPropertiesConsulAgentService{},
 					},
 				},
 			},
@@ -140,7 +125,7 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) (core.Instan
 	}
 
 	return core.InstanceGroup{
-		Instances: 3,
+		Instances: 1,
 		Name:      "test_consumer",
 		AZs:       []string{azs[0].Name},
 		Networks: []core.InstanceGroupNetwork{
@@ -148,8 +133,6 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) (core.Instan
 				Name: "private",
 				StaticIPs: []string{
 					cidr.GetFirstIP().Add(10).String(),
-					cidr.GetFirstIP().Add(11).String(),
-					cidr.GetFirstIP().Add(12).String(),
 				},
 			},
 		},
@@ -165,54 +148,18 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) (core.Instan
 				Release: "consul",
 			},
 		},
-		MigratedFrom: []core.InstanceGroupMigratedFrom{
-			{
-				Name: "consul_test_consumer",
-				AZ:   "z1",
-			},
-		},
-	}, nil
-}
-
-func properties(azs []ConfigAZ) (Properties, error) {
-	consulInstanceGroupStaticIPs, err := consulInstanceGroupStaticIPs(azs)
-	if err != nil {
-		return Properties{}, err
-	}
-
-	return Properties{
-		Consul: &PropertiesConsul{
-			Agent: PropertiesConsulAgent{
-				Domain:     "cf.internal",
-				Datacenter: "dc1",
-				Servers: PropertiesConsulAgentServers{
-					Lan: consulInstanceGroupStaticIPs,
-				},
-			},
-			AgentCert: DC1AgentCert,
-			AgentKey:  DC1AgentKey,
-			CACert:    CACert,
-			EncryptKeys: []string{
-				EncryptKey,
-			},
-			ServerCert: DC1ServerCert,
-			ServerKey:  DC1ServerKey,
-		},
 	}, nil
 }
 
 func consulInstanceGroupStaticIPs(azs []ConfigAZ) ([]string, error) {
 	staticIPs := []string{}
 	for _, cfgAZs := range azs {
-		cidr, err := core.ParseCIDRBlock(cfgAZs.IPRange)
+		ips, err := cfgAZs.StaticIPs()
 		if err != nil {
 			return []string{}, err
 		}
-		for n := 0; n < cfgAZs.Nodes; n++ {
-			staticIPs = append(staticIPs, cidr.GetFirstIP().Add(4+n).String())
-		}
+		staticIPs = append(staticIPs, ips...)
 	}
-
 	return staticIPs, nil
 }
 

@@ -43,7 +43,7 @@ var _ = Describe("ManifestV2", func() {
 				},
 			}))
 
-			Expect(manifest.Stemcells).To(Equal([]consul.Stemcell{
+			Expect(manifest.Stemcells).To(Equal([]core.Stemcell{
 				{
 					Alias:   "default",
 					Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
@@ -83,32 +83,22 @@ var _ = Describe("ManifestV2", func() {
 						Release: "consul",
 					},
 				},
-				MigratedFrom: []core.InstanceGroupMigratedFrom{
-					{
-						Name: "consul_z1",
-						AZ:   "z1",
-					},
-					{
-						Name: "consul_z2",
-						AZ:   "z2",
-					},
-				},
-				Properties: core.InstanceGroupProperties{
-					Consul: core.InstanceGroupPropertiesConsul{
-						Agent: core.InstanceGroupPropertiesConsulAgent{
+				Properties: &core.JobProperties{
+					Consul: &core.JobPropertiesConsul{
+						Agent: core.JobPropertiesConsulAgent{
 							Mode:     "server",
 							LogLevel: "info",
-							Services: map[string]core.InstanceGroupPropertiesConsulAgentService{
-								"router": core.InstanceGroupPropertiesConsulAgentService{
+							Services: core.JobPropertiesConsulAgentServices{
+								"router": core.JobPropertiesConsulAgentService{
 									Name: "gorouter",
-									Check: core.InstanceGroupPropertiesConsulAgentServiceCheck{
+									Check: &core.JobPropertiesConsulAgentServiceCheck{
 										Name:     "router-check",
 										Script:   "/var/vcap/jobs/router/bin/script",
 										Interval: "1m",
 									},
 									Tags: []string{"routing"},
 								},
-								"cloud_controller": core.InstanceGroupPropertiesConsulAgentService{},
+								"cloud_controller": core.JobPropertiesConsulAgentService{},
 							},
 						},
 					},
@@ -116,7 +106,7 @@ var _ = Describe("ManifestV2", func() {
 			}))
 
 			Expect(manifest.InstanceGroups[1]).To(Equal(core.InstanceGroup{
-				Instances: 3,
+				Instances: 1,
 				Name:      "test_consumer",
 				AZs:       []string{"z1"},
 				Networks: []core.InstanceGroupNetwork{
@@ -124,8 +114,6 @@ var _ = Describe("ManifestV2", func() {
 						Name: "private",
 						StaticIPs: []string{
 							"10.244.4.10",
-							"10.244.4.11",
-							"10.244.4.12",
 						},
 					},
 				},
@@ -139,12 +127,6 @@ var _ = Describe("ManifestV2", func() {
 					{
 						Name:    "consul-test-consumer",
 						Release: "consul",
-					},
-				},
-				MigratedFrom: []core.InstanceGroupMigratedFrom{
-					{
-						Name: "consul_test_consumer",
-						AZ:   "z1",
 					},
 				},
 			}))
@@ -195,7 +177,7 @@ var _ = Describe("ManifestV2", func() {
 			}, iaas.AWSConfig{})
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(manifest.Stemcells).To(Equal([]consul.Stemcell{
+			Expect(manifest.Stemcells).To(Equal([]core.Stemcell{
 				{
 					Alias:   "default",
 					Name:    "bosh-aws-xen-hvm-ubuntu-trusty-go_agent",
@@ -222,8 +204,6 @@ var _ = Describe("ManifestV2", func() {
 					Name: "private",
 					StaticIPs: []string{
 						"10.0.4.202",
-						"10.0.4.203",
-						"10.0.4.204",
 					},
 				},
 			}))

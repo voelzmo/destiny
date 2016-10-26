@@ -6,18 +6,18 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/turbulence"
 )
 
-func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Manifest, error) {
-	manifest, err := NewManifest(config, iaasConfig)
+func NewManifestWithTurbulenceAgent(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) {
+	manifest, err := NewManifestV2(config, iaasConfig)
 	if err != nil {
-		return Manifest{}, err
+		return ManifestV2{}, err
 	}
-	consulTestConsumerJob, err := findJob(manifest, "consul_test_consumer")
+	consulTestConsumerJob, err := manifest.GetInstanceGroup("test_consumer")
 	if err != nil {
 		// not tested
-		return Manifest{}, err
+		return ManifestV2{}, err
 	}
 
-	consulTestConsumerJob.Templates = append(consulTestConsumerJob.Templates, core.JobTemplate{
+	consulTestConsumerJob.Jobs = append(consulTestConsumerJob.Jobs, core.InstanceGroupJob{
 		Name:    "turbulence_agent",
 		Release: "turbulence",
 	})
@@ -27,25 +27,28 @@ func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Mani
 		Version: "latest",
 	})
 
-	staticIpForAddTestHost, err := manifest.Networks[0].StaticIPsFromRange(10)
+	cidr, err := core.ParseCIDRBlock(config.AZs[0].IPRange)
 	if err != nil {
 		// not tested
-		return Manifest{}, err
+		return ManifestV2{}, err
 	}
 
-	manifest.Jobs = append(manifest.Jobs, core.Job{
-		Name:         "fake-dns-server",
-		Instances:    1,
-		ResourcePool: manifest.Jobs[0].ResourcePool,
-		Networks: []core.JobNetwork{
+	ip := cidr.GetFirstIP().Add(13).String()
+
+	manifest.InstanceGroups = append(manifest.InstanceGroups, core.InstanceGroup{
+		Name:               "fake-dns-server",
+		Instances:          1,
+		AZs:                []string{"z1"},
+		VMType:             "default",
+		Stemcell:           "default",
+		PersistentDiskType: "default",
+		Networks: []core.InstanceGroupNetwork{
 			{
-				Name: manifest.Networks[0].Name,
-				StaticIPs: []string{
-					staticIpForAddTestHost[9],
-				},
+				Name:      "private",
+				StaticIPs: []string{ip},
 			},
 		},
-		Templates: []core.JobTemplate{
+		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "turbulence_agent",
 				Release: "turbulence",
@@ -58,7 +61,7 @@ func NewManifestWithTurbulenceAgent(config Config, iaasConfig iaas.Config) (Mani
 	})
 
 	manifest.Properties.ConsulTestConsumer = &core.ConsulTestConsumer{
-		NameServer: staticIpForAddTestHost[9],
+		NameServer: ip,
 	}
 
 	manifest.Properties.TurbulenceAgent = &core.PropertiesTurbulenceAgent{

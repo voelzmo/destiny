@@ -42,3 +42,23 @@ type PropertiesConsulAgentServers struct {
 type PropertiesConsulAgentDNSConfig struct {
 	RecursorTimeout string `yaml:"recursor_timeout"`
 }
+
+func newConsulProperties(staticIPs []string) *PropertiesConsul {
+	return &PropertiesConsul{
+		Agent: PropertiesConsulAgent{
+			Domain:     "cf.internal",
+			Datacenter: "dc1",
+			Servers: PropertiesConsulAgentServers{
+				Lan: staticIPs,
+			},
+		},
+		AgentCert: DC1AgentCert,
+		AgentKey:  DC1AgentKey,
+		CACert:    CACert,
+		EncryptKeys: []string{
+			EncryptKey,
+		},
+		ServerCert: DC1ServerCert,
+		ServerKey:  DC1ServerKey,
+	}
+}

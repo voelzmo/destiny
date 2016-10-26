@@ -23,11 +23,6 @@ instance_groups:
   persistent_disk_type: default
   vm_type: default
   stemcell: default
-  migrated_from:
-    - name: consul_z1
-      az: z1
-    - name: consul_z2
-      az: z2
   properties:
     consul:
       agent:
@@ -44,17 +39,12 @@ instance_groups:
           cloud_controller: {}
 
 - name: test_consumer
-  instances: 3
+  instances: 1
   azs: [z1]
   networks:
   - name: private
     static_ips:
     - 10.244.4.10
-    - 10.244.4.11
-    - 10.244.4.12
-  migrated_from:
-    - name: consul_test_consumer
-      az: z1
   jobs:
   - name: consul_agent
     release: consul

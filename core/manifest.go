@@ -25,8 +25,9 @@ type Release struct {
 
 type Stemcell struct {
 	Alias   string
-	OS      string
+	OS      string `yaml:"os,omitempty"`
 	Version string
+	Name    string
 }
 
 type ResourcePool struct {

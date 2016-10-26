@@ -14,18 +14,20 @@ import (
 var _ = Describe("Manifest", func() {
 	Describe("NewManifestWithTurbulenceAgent", func() {
 		It("generates a valid Consul BOSH-lite manifest with additional turbulence agent on test consumer", func() {
-			manifest, err := consul.NewManifestWithTurbulenceAgent(consul.Config{
+			manifest, err := consul.NewManifestWithTurbulenceAgent(consul.ConfigV2{
 				DirectorUUID:   "some-director-uuid",
 				Name:           "consul-some-random-guid",
 				TurbulenceHost: "10.244.4.32",
-				Networks: []consul.ConfigNetwork{
+				AZs: []consul.ConfigAZ{
 					{
 						IPRange: "10.244.4.0/24",
 						Nodes:   2,
+						Name:    "z1",
 					},
 					{
 						IPRange: "10.244.5.0/24",
 						Nodes:   1,
+						Name:    "z2",
 					},
 				},
 			}, iaas.NewWardenConfig())
@@ -39,14 +41,17 @@ var _ = Describe("Manifest", func() {
 				Password: turbulence.DefaultPassword,
 				CACert:   turbulence.APICACert,
 			}))
-			Expect(manifest.Jobs[3].ResourcePool).To(Equal("consul_z1"))
-			Expect(manifest.Jobs[3].Networks[0]).To(Equal(core.JobNetwork{
-				Name:      "consul1",
+			Expect(manifest.InstanceGroups[2].VMType).To(Equal("default"))
+			Expect(manifest.InstanceGroups[2].Networks[0]).To(Equal(core.InstanceGroupNetwork{
+				Name:      "private",
 				StaticIPs: []string{"10.244.4.13"},
 			}))
-			Expect(manifest.Jobs[3].Name).To(Equal("fake-dns-server"))
-			Expect(manifest.Jobs[3].Instances).To(Equal(1))
-			Expect(manifest.Jobs[3].Templates).To(gomegamatchers.ContainSequence([]core.JobTemplate{
+			Expect(manifest.InstanceGroups[2].Name).To(Equal("fake-dns-server"))
+			Expect(manifest.InstanceGroups[2].Instances).To(Equal(1))
+			Expect(manifest.InstanceGroups[2].VMType).To(Equal("default"))
+			Expect(manifest.InstanceGroups[2].Stemcell).To(Equal("default"))
+			Expect(manifest.InstanceGroups[2].PersistentDiskType).To(Equal("default"))
+			Expect(manifest.InstanceGroups[2].Jobs).To(gomegamatchers.ContainSequence([]core.InstanceGroupJob{
 				{
 					Name:    "turbulence_agent",
 					Release: "turbulence",
@@ -77,13 +82,14 @@ var _ = Describe("Manifest", func() {
 
 	Context("failure cases", func() {
 		It("returns an error when the manifest creation fails", func() {
-			_, err := consul.NewManifestWithTurbulenceAgent(consul.Config{
+			_, err := consul.NewManifestWithTurbulenceAgent(consul.ConfigV2{
 				DirectorUUID: "some-director-uuid",
 				Name:         "consul-some-random-guid",
-				Networks: []consul.ConfigNetwork{
+				AZs: []consul.ConfigAZ{
 					{
 						IPRange: "fake-cidr-block",
 						Nodes:   1,
+						Name:    "z1",
 					},
 				},
 			}, iaas.NewWardenConfig())

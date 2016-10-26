@@ -7,15 +7,13 @@ import (
 )
 
 type Manifest struct {
-	DirectorUUID  string              `yaml:"director_uuid"`
-	Name          string              `yaml:"name"`
-	Jobs          []core.Job          `yaml:"jobs"`
-	Properties    Properties          `yaml:"properties"`
-	Update        core.Update         `yaml:"update"`
-	Compilation   core.Compilation    `yaml:"compilation"`
-	Networks      []core.Network      `yaml:"networks"`
-	Releases      []core.Release      `yaml:"releases"`
-	ResourcePools []core.ResourcePool `yaml:"resource_pools"`
+	DirectorUUID   string               `yaml:"director_uuid"`
+	Name           string               `yaml:"name"`
+	Stemcells      []core.Stemcell      `yaml:"stemcells"`
+	InstanceGroups []core.InstanceGroup `yaml:"instance_groups"`
+	Properties     Properties           `yaml:"properties"`
+	Update         core.Update          `yaml:"update"`
+	Releases       []core.Release       `yaml:"releases"`
 }
 
 func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
@@ -49,23 +47,6 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Type: "manual",
 	}
 
-	compilation := core.Compilation{
-		Network:             turbulenceNetwork.Name,
-		ReuseCompilationVMs: true,
-		Workers:             3,
-		CloudProperties:     iaasConfig.Compilation("us-east-1a"),
-	}
-
-	turbulenceResourcePool := core.ResourcePool{
-		Name:    "turbulence",
-		Network: turbulenceNetwork.Name,
-		Stemcell: core.ResourcePoolStemcell{
-			Name:    iaasConfig.Stemcell(),
-			Version: "latest",
-		},
-		CloudProperties: iaasConfig.ResourcePool(config.IPRange),
-	}
-
 	update := core.Update{
 		Canaries:        1,
 		CanaryWatchTime: "1000-180000",
@@ -79,16 +60,22 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		return Manifest{}, err
 	}
 
-	apiJob := core.Job{
+	apiJob := core.InstanceGroup{
 		Instances: 1,
 		Name:      "api",
-		Networks: []core.JobNetwork{{
-			Name:      turbulenceNetwork.Name,
-			StaticIPs: []string{staticIps[16]},
-		}},
-		PersistentDisk: 1024,
-		ResourcePool:   turbulenceResourcePool.Name,
-		Templates: []core.JobTemplate{
+		AZs:       []string{"z1"},
+		Networks: []core.InstanceGroupNetwork{
+			{
+				Name: "private",
+				StaticIPs: []string{
+					staticIps[16],
+				},
+			},
+		},
+		VMType:             "default",
+		Stemcell:           "default",
+		PersistentDiskType: "default",
+		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "turbulence_api",
 				Release: turbulenceRelease.Name,
@@ -127,15 +114,19 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 	}
 
 	return Manifest{
-		DirectorUUID:  config.DirectorUUID,
-		Name:          config.Name,
-		Releases:      []core.Release{turbulenceRelease, cpiRelease},
-		ResourcePools: []core.ResourcePool{turbulenceResourcePool},
-		Compilation:   compilation,
-		Update:        update,
-		Jobs:          []core.Job{apiJob},
-		Networks:      []core.Network{turbulenceNetwork},
-		Properties:    turbulenceProperties,
+		DirectorUUID: config.DirectorUUID,
+		Name:         config.Name,
+		Stemcells: []core.Stemcell{
+			{
+				Alias:   "default",
+				Version: "latest",
+				Name:    iaasConfig.Stemcell(),
+			},
+		},
+		Releases:       []core.Release{turbulenceRelease, cpiRelease},
+		Update:         update,
+		InstanceGroups: []core.InstanceGroup{apiJob},
+		Properties:     turbulenceProperties,
 	}, nil
 }
 
