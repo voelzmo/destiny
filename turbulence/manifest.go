@@ -60,6 +60,16 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		return Manifest{}, err
 	}
 
+	vmType := "default"
+	if config.BOSH.VMType != "" {
+		vmType = config.BOSH.VMType
+	}
+
+	persistentDiskType := "default"
+	if config.BOSH.PersistentDiskType != "" {
+		persistentDiskType = config.BOSH.PersistentDiskType
+	}
+
 	apiJob := core.InstanceGroup{
 		Instances: 1,
 		Name:      "api",
@@ -72,9 +82,9 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				},
 			},
 		},
-		VMType:             "default",
+		VMType:             vmType,
 		Stemcell:           "default",
-		PersistentDiskType: "default",
+		PersistentDiskType: persistentDiskType,
 		Jobs: []core.InstanceGroupJob{
 			{
 				Name:    "turbulence_api",

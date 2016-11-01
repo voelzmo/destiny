@@ -20,10 +20,12 @@ var _ = Describe("Manifest", func() {
 				DirectorUUID: "some-director-uuid",
 				IPRange:      "10.0.16.0/24",
 				BOSH: turbulence.ConfigBOSH{
-					Target:         "some-bosh-target",
-					Username:       "some-bosh-username",
-					Password:       "some-bosh-password",
-					DirectorCACert: "some-ca-cert",
+					Target:             "some-bosh-target",
+					Username:           "some-bosh-username",
+					Password:           "some-bosh-password",
+					DirectorCACert:     "some-ca-cert",
+					PersistentDiskType: "some-persistent-disk-type",
+					VMType:             "some-vm-type",
 				},
 			}, iaas.AWSConfig{
 				AccessKeyID:           "some-access-key-id",
@@ -70,9 +72,9 @@ var _ = Describe("Manifest", func() {
 						},
 					},
 				},
-				VMType:             "default",
+				VMType:             "some-vm-type",
 				Stemcell:           "default",
-				PersistentDiskType: "default",
+				PersistentDiskType: "some-persistent-disk-type",
 				Jobs: []core.InstanceGroupJob{
 					{
 						Name:    "turbulence_api",

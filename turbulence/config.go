@@ -8,8 +8,10 @@ type Config struct {
 }
 
 type ConfigBOSH struct {
-	Target         string
-	Username       string
-	Password       string
-	DirectorCACert string
+	Target             string
+	Username           string
+	Password           string
+	DirectorCACert     string
+	PersistentDiskType string
+	VMType             string
 }
