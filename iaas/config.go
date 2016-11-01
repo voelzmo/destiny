@@ -9,4 +9,5 @@ type Config interface {
 	CPI() CPI
 	Properties(staticIP string) Properties
 	Stemcell() string
+	WindowsStemcell() string
 }

@@ -115,5 +115,9 @@ func (a AWSConfig) Properties(staticIP string) Properties {
 }
 
 func (AWSConfig) Stemcell() string {
-	return AWSStemcell
+	return AWSLinuxStemcell
+}
+
+func (AWSConfig) WindowsStemcell() string {
+	return AWSWindowsStemcell
 }

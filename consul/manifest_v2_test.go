@@ -214,6 +214,46 @@ var _ = Describe("ManifestV2", func() {
 			Expect(manifest.InstanceGroups[1].VMType).To(Equal("m3.medium"))
 		})
 
+		It("returns a bosh 2.0 consul manifest with windows clients", func() {
+			manifest, err := consul.NewManifestV2(consul.ConfigV2{
+				AZs: []consul.ConfigAZ{
+					{
+						Name:    "us-west-2",
+						IPRange: "10.0.4.192/27",
+						Nodes:   3,
+					},
+				},
+				WindowsClients: true,
+			}, iaas.AWSConfig{})
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(manifest.Stemcells).To(HaveLen(2))
+			Expect(manifest.Stemcells[0]).To(Equal(core.Stemcell{
+				Alias:   "linux",
+				Name:    "bosh-aws-xen-hvm-ubuntu-trusty-go_agent",
+				Version: "latest",
+			}))
+			Expect(manifest.Stemcells[1]).To(Equal(core.Stemcell{
+				Alias:   "windows",
+				Name:    "bosh-aws-xen-hvm-windows-stemcell-go_agent",
+				Version: "latest",
+			}))
+
+			Expect(manifest.InstanceGroups).To(HaveLen(2))
+			Expect(manifest.InstanceGroups[0].Stemcell).To(Equal("linux"))
+			Expect(manifest.InstanceGroups[1].Stemcell).To(Equal("windows"))
+
+			Expect(manifest.InstanceGroups[1].Jobs).To(HaveLen(2))
+			Expect(manifest.InstanceGroups[1].Jobs[0]).To(Equal(core.InstanceGroupJob{
+				Name:    "consul_agent_windows",
+				Release: "consul",
+			}))
+			Expect(manifest.InstanceGroups[1].Jobs[1]).To(Equal(core.InstanceGroupJob{
+				Name:    "consul-test-consumer-windows",
+				Release: "consul",
+			}))
+		})
+
 		Context("failure cases", func() {
 			It("returns an error when the az ip range is not a valid cidrblock", func() {
 				_, err := consul.NewManifestV2(consul.ConfigV2{

@@ -18,19 +18,35 @@ type ManifestV2 struct {
 
 func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) {
 	manifest := ManifestV2{
-		DirectorUUID: config.DirectorUUID,
-		Name:         config.Name,
-		Releases:     releases(),
-		Stemcells: []core.Stemcell{
+		DirectorUUID:   config.DirectorUUID,
+		Name:           config.Name,
+		Releases:       releases(),
+		Update:         update(),
+		InstanceGroups: []core.InstanceGroup{},
+		Properties:     Properties{},
+	}
+
+	if config.WindowsClients {
+		manifest.Stemcells = []core.Stemcell{
+			{
+				Alias:   "linux",
+				Version: "latest",
+				Name:    iaasConfig.Stemcell(),
+			},
+			{
+				Alias:   "windows",
+				Version: "latest",
+				Name:    iaasConfig.WindowsStemcell(),
+			},
+		}
+	} else {
+		manifest.Stemcells = []core.Stemcell{
 			{
 				Alias:   "default",
 				Version: "latest",
 				Name:    iaasConfig.Stemcell(),
 			},
-		},
-		Update:         update(),
-		InstanceGroups: []core.InstanceGroup{},
-		Properties:     Properties{},
+		}
 	}
 
 	consulInstanceGroup, err := consulInstanceGroup(config)
@@ -39,7 +55,7 @@ func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) 
 	}
 	manifest.InstanceGroups = append(manifest.InstanceGroups, consulInstanceGroup)
 
-	consulTestConsumerInstanceGroup, err := consulTestConsumerInstanceGroup(config.AZs, config.VMType)
+	consulTestConsumerInstanceGroup, err := consulTestConsumerInstanceGroup(config)
 	if err != nil {
 		return ManifestV2{}, err
 	}
@@ -72,6 +88,11 @@ func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
 		return core.InstanceGroup{}, err
 	}
 
+	stemcell := "default"
+	if config.WindowsClients {
+		stemcell = "linux"
+	}
+
 	return core.InstanceGroup{
 		Instances: totalNodes,
 		Name:      "consul",
@@ -83,7 +104,7 @@ func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
 			},
 		},
 		VMType:             vmType,
-		Stemcell:           "default",
+		Stemcell:           stemcell,
 		PersistentDiskType: persistentDiskType,
 		Jobs: []core.InstanceGroupJob{
 			{
@@ -114,20 +135,29 @@ func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
 	}, nil
 }
 
-func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) (core.InstanceGroup, error) {
-	cidr, err := core.ParseCIDRBlock(azs[0].IPRange)
+func consulTestConsumerInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
+	cidr, err := core.ParseCIDRBlock(config.AZs[0].IPRange)
 	if err != nil {
 		return core.InstanceGroup{}, err
 	}
 
-	if vmType == "" {
-		vmType = "default"
+	if config.VMType == "" {
+		config.VMType = "default"
+	}
+
+	stemcell := "default"
+	agentName := "consul_agent"
+	testConsumerName := "consul-test-consumer"
+	if config.WindowsClients {
+		stemcell = "windows"
+		agentName = "consul_agent_windows"
+		testConsumerName = "consul-test-consumer-windows"
 	}
 
 	return core.InstanceGroup{
 		Instances: 1,
 		Name:      "test_consumer",
-		AZs:       []string{azs[0].Name},
+		AZs:       []string{config.AZs[0].Name},
 		Networks: []core.InstanceGroupNetwork{
 			{
 				Name: "private",
@@ -136,15 +166,15 @@ func consulTestConsumerInstanceGroup(azs []ConfigAZ, vmType string) (core.Instan
 				},
 			},
 		},
-		VMType:   vmType,
-		Stemcell: "default",
+		VMType:   config.VMType,
+		Stemcell: stemcell,
 		Jobs: []core.InstanceGroupJob{
 			{
-				Name:    "consul_agent",
+				Name:    agentName,
 				Release: "consul",
 			},
 			{
-				Name:    "consul-test-consumer",
+				Name:    testConsumerName,
 				Release: "consul",
 			},
 		},

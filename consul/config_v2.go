@@ -9,6 +9,7 @@ type ConfigV2 struct {
 	PersistentDiskType string
 	VMType             string
 	TurbulenceHost     string
+	WindowsClients     bool
 }
 
 type ConfigAZ struct {

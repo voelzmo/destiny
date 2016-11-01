@@ -53,3 +53,7 @@ func (WardenConfig) Properties(string) Properties {
 func (WardenConfig) Stemcell() string {
 	return WardenStemcell
 }
+
+func (WardenConfig) WindowsStemcell() string {
+	panic("windows stemcell not available on warden")
+}
