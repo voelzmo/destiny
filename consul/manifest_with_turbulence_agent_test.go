@@ -78,6 +78,32 @@ var _ = Describe("Manifest", func() {
 			}))
 			Expect(manifest.Properties.ConsulTestConsumer.NameServer).To(Equal("10.244.4.13"))
 		})
+
+		It("generates a valid Consul BOSH-lite manifest with additional turbulence agent on test consumer", func() {
+			manifest, err := consul.NewManifestWithTurbulenceAgent(consul.ConfigV2{
+				DirectorUUID:   "some-director-uuid",
+				Name:           "consul-some-random-guid",
+				TurbulenceHost: "10.244.4.32",
+				AZs: []consul.ConfigAZ{
+					{
+						IPRange: "10.244.4.0/24",
+						Nodes:   2,
+						Name:    "z1",
+					},
+					{
+						IPRange: "10.244.5.0/24",
+						Nodes:   1,
+						Name:    "z2",
+					},
+				},
+				PersistentDiskType: "1GB",
+				VMType:             "m3.medium",
+			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(manifest.InstanceGroups[2].PersistentDiskType).To(Equal("1GB"))
+			Expect(manifest.InstanceGroups[2].VMType).To(Equal("m3.medium"))
+		})
 	})
 
 	Context("failure cases", func() {

@@ -35,13 +35,23 @@ func NewManifestWithTurbulenceAgent(config ConfigV2, iaasConfig iaas.Config) (Ma
 
 	ip := cidr.GetFirstIP().Add(13).String()
 
+	persistentDiskType := "default"
+	if config.PersistentDiskType != "" {
+		persistentDiskType = config.PersistentDiskType
+	}
+
+	vmType := "default"
+	if config.VMType != "" {
+		vmType = config.VMType
+	}
+
 	manifest.InstanceGroups = append(manifest.InstanceGroups, core.InstanceGroup{
 		Name:               "fake-dns-server",
 		Instances:          1,
 		AZs:                []string{"z1"},
-		VMType:             "default",
+		VMType:             vmType,
 		Stemcell:           "default",
-		PersistentDiskType: "default",
+		PersistentDiskType: persistentDiskType,
 		Networks: []core.InstanceGroupNetwork{
 			{
 				Name:      "private",
