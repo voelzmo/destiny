@@ -1158,6 +1158,38 @@ var _ = Describe("Manifest", func() {
 			}))
 		})
 
+		Context("configurable properties", func() {
+			var manifest etcd.Manifest
+			BeforeEach(func() {
+				var err error
+				manifest, err = etcd.NewTLSManifest(etcd.Config{
+					DirectorUUID: "some-director-uuid",
+					Name:         "etcd-some-random-guid",
+					IPRange:      "10.244.4.0/27",
+				}, iaas.NewWardenConfig())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("can modify etcd listen ips", func() {
+				manifest.Properties.Etcd.ClientIP = "some-client-ip"
+				manifest.Properties.Etcd.PeerIP = "some-peer-ip"
+
+				Expect(manifest.Properties.Etcd.ClientIP).To(Equal("some-client-ip"))
+				Expect(manifest.Properties.Etcd.PeerIP).To(Equal("some-peer-ip"))
+			})
+
+			It("serializes etcd listen ips", func() {
+				manifest.Properties.Etcd.ClientIP = "some-client-ip"
+				manifest.Properties.Etcd.PeerIP = "some-peer-ip"
+
+				manifestYAML, err := manifest.ToYAML()
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(manifestYAML).To(ContainSubstring(`client_ip: some-client-ip`))
+				Expect(manifestYAML).To(ContainSubstring(`peer_ip: some-peer-ip`))
+			})
+		})
+
 		Context("failure cases", func() {
 			It("should error on malformed YAML", func() {
 				_, err := etcd.FromYAML([]byte("%%%%%%%%%%"))

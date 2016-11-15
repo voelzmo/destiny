@@ -34,6 +34,8 @@ type PropertiesEtcd struct {
 	PeerKey                         string                  `yaml:"peer_key"`
 	ServerCert                      string                  `yaml:"server_cert"`
 	ServerKey                       string                  `yaml:"server_key"`
+	ClientIP                        string                  `yaml:"client_ip,omitempty"`
+	PeerIP                          string                  `yaml:"peer_ip,omitempty"`
 }
 
 type PropertiesEtcdCluster struct {
