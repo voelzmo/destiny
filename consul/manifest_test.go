@@ -859,7 +859,7 @@ var _ = Describe("Manifest", func() {
 					},
 				}},
 				VMType:             "default",
-				Stemcell:           "default",
+				Stemcell:           "linux",
 				PersistentDiskType: "default",
 				Jobs: []core.InstanceGroupJob{
 					{
@@ -899,7 +899,7 @@ var _ = Describe("Manifest", func() {
 					},
 				}},
 				VMType:   "default",
-				Stemcell: "default",
+				Stemcell: "linux",
 				Jobs: []core.InstanceGroupJob{
 					{
 						Name:    "consul_agent",

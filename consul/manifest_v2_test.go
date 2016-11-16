@@ -45,7 +45,7 @@ var _ = Describe("ManifestV2", func() {
 
 			Expect(manifest.Stemcells).To(Equal([]core.Stemcell{
 				{
-					Alias:   "default",
+					Alias:   "linux",
 					Name:    "bosh-warden-boshlite-ubuntu-trusty-go_agent",
 					Version: "latest",
 				},
@@ -75,7 +75,7 @@ var _ = Describe("ManifestV2", func() {
 					},
 				},
 				VMType:             "default",
-				Stemcell:           "default",
+				Stemcell:           "linux",
 				PersistentDiskType: "default",
 				Jobs: []core.InstanceGroupJob{
 					{
@@ -118,7 +118,7 @@ var _ = Describe("ManifestV2", func() {
 					},
 				},
 				VMType:   "default",
-				Stemcell: "default",
+				Stemcell: "linux",
 				Jobs: []core.InstanceGroupJob{
 					{
 						Name:    "consul_agent",
@@ -179,7 +179,7 @@ var _ = Describe("ManifestV2", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(manifest.Stemcells).To(Equal([]core.Stemcell{
 				{
-					Alias:   "default",
+					Alias:   "linux",
 					Name:    "bosh-aws-xen-hvm-ubuntu-trusty-go_agent",
 					Version: "latest",
 				},

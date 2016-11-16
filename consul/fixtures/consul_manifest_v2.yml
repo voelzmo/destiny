@@ -3,7 +3,7 @@ director_uuid: some-director-uuid
 name: consul-some-random-guid
 
 stemcells:
-- alias: default
+- alias: linux
   name: bosh-warden-boshlite-ubuntu-trusty-go_agent
   version: latest
 
@@ -22,7 +22,7 @@ instance_groups:
     release: consul
   persistent_disk_type: default
   vm_type: default
-  stemcell: default
+  stemcell: linux
   properties:
     consul:
       agent:
@@ -51,7 +51,7 @@ instance_groups:
   - name: consul-test-consumer
     release: consul
   vm_type: default
-  stemcell: default
+  stemcell: linux
 
 releases:
 - name: consul

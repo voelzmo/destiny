@@ -14,7 +14,7 @@ update:
   update_watch_time: 1000-180000
 
 stemcells:
-- alias: default
+- alias: linux
   name: bosh-warden-boshlite-ubuntu-trusty-go_agent
   version: latest
 
@@ -28,7 +28,7 @@ instance_groups:
     - 10.244.4.4
   persistent_disk_type: default
   vm_type: default
-  stemcell: default
+  stemcell: linux
   properties:
     consul:
       agent:
@@ -194,7 +194,7 @@ instance_groups:
 - instances: 1
   name: test_consumer
   azs: [z1]
-  stemcell: default
+  stemcell: linux
   vm_type: default
   networks:
   - name: private

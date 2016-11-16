@@ -25,28 +25,20 @@ func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) 
 		InstanceGroups: []core.InstanceGroup{},
 		Properties:     Properties{},
 	}
+	manifest.Stemcells = []core.Stemcell{
+		{
+			Alias:   "linux",
+			Version: "latest",
+			Name:    iaasConfig.Stemcell(),
+		},
+	}
 
 	if config.WindowsClients {
-		manifest.Stemcells = []core.Stemcell{
-			{
-				Alias:   "linux",
-				Version: "latest",
-				Name:    iaasConfig.Stemcell(),
-			},
-			{
-				Alias:   "windows",
-				Version: "latest",
-				Name:    iaasConfig.WindowsStemcell(),
-			},
-		}
-	} else {
-		manifest.Stemcells = []core.Stemcell{
-			{
-				Alias:   "default",
-				Version: "latest",
-				Name:    iaasConfig.Stemcell(),
-			},
-		}
+		manifest.Stemcells = append(manifest.Stemcells, core.Stemcell{
+			Alias:   "windows",
+			Version: "latest",
+			Name:    iaasConfig.WindowsStemcell(),
+		})
 	}
 
 	consulInstanceGroup, err := consulInstanceGroup(config)
@@ -88,11 +80,6 @@ func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
 		return core.InstanceGroup{}, err
 	}
 
-	stemcell := "default"
-	if config.WindowsClients {
-		stemcell = "linux"
-	}
-
 	return core.InstanceGroup{
 		Instances: totalNodes,
 		Name:      "consul",
@@ -104,7 +91,7 @@ func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
 			},
 		},
 		VMType:             vmType,
-		Stemcell:           stemcell,
+		Stemcell:           "linux",
 		PersistentDiskType: persistentDiskType,
 		Jobs: []core.InstanceGroupJob{
 			{
@@ -145,7 +132,7 @@ func consulTestConsumerInstanceGroup(config ConfigV2) (core.InstanceGroup, error
 		config.VMType = "default"
 	}
 
-	stemcell := "default"
+	stemcell := "linux"
 	agentName := "consul_agent"
 	testConsumerName := "consul-test-consumer"
 	if config.WindowsClients {
