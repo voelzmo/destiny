@@ -50,7 +50,7 @@ func NewManifestWithTurbulenceAgent(config ConfigV2, iaasConfig iaas.Config) (Ma
 		Instances:          1,
 		AZs:                []string{"z1"},
 		VMType:             vmType,
-		Stemcell:           "default",
+		Stemcell:           "linux",
 		PersistentDiskType: persistentDiskType,
 		Networks: []core.InstanceGroupNetwork{
 			{

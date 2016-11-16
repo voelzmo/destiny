@@ -49,7 +49,7 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.InstanceGroups[2].Name).To(Equal("fake-dns-server"))
 			Expect(manifest.InstanceGroups[2].Instances).To(Equal(1))
 			Expect(manifest.InstanceGroups[2].VMType).To(Equal("default"))
-			Expect(manifest.InstanceGroups[2].Stemcell).To(Equal("default"))
+			Expect(manifest.InstanceGroups[2].Stemcell).To(Equal("linux"))
 			Expect(manifest.InstanceGroups[2].PersistentDiskType).To(Equal("default"))
 			Expect(manifest.InstanceGroups[2].Jobs).To(gomegamatchers.ContainSequence([]core.InstanceGroupJob{
 				{

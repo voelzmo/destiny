@@ -11,16 +11,6 @@ func releases() []core.Release {
 	}
 }
 
-func stemcells() []core.Stemcell {
-	return []core.Stemcell{
-		{
-			Alias:   "default",
-			OS:      "ubuntu-trusty",
-			Version: "latest",
-		},
-	}
-}
-
 func update() core.Update {
 	return core.Update{
 		Canaries:        1,
