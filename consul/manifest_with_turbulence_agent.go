@@ -11,16 +11,6 @@ func NewManifestWithTurbulenceAgent(config ConfigV2, iaasConfig iaas.Config) (Ma
 	if err != nil {
 		return ManifestV2{}, err
 	}
-	consulTestConsumerJob, err := manifest.GetInstanceGroup("test_consumer")
-	if err != nil {
-		// not tested
-		return ManifestV2{}, err
-	}
-
-	consulTestConsumerJob.Jobs = append(consulTestConsumerJob.Jobs, core.InstanceGroupJob{
-		Name:    "turbulence_agent",
-		Release: "turbulence",
-	})
 
 	manifest.Releases = append(manifest.Releases, core.Release{
 		Name:    "turbulence",
