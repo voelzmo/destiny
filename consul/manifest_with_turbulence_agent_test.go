@@ -53,12 +53,12 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.InstanceGroups[2].PersistentDiskType).To(Equal("default"))
 			Expect(manifest.InstanceGroups[2].Jobs).To(gomegamatchers.ContainSequence([]core.InstanceGroupJob{
 				{
-					Name:    "turbulence_agent",
-					Release: "turbulence",
-				},
-				{
 					Name:    "fake-dns-server",
 					Release: "consul",
+				},
+				{
+					Name:    "turbulence_agent",
+					Release: "turbulence",
 				},
 			}))
 
