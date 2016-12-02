@@ -237,8 +237,9 @@ var _ = Describe("Manifest", func() {
 
 		It("generates a valid Consul AWS manifest", func() {
 			manifest, err := consul.NewManifest(consul.Config{
-				DirectorUUID: "some-director-uuid",
-				Name:         "consul-some-random-guid",
+				DirectorUUID:    "some-director-uuid",
+				Name:            "consul-some-random-guid",
+				CompilationZone: "us-west-2a",
 				Networks: []consul.ConfigNetwork{
 					{
 						IPRange: "10.0.4.0/24",
@@ -483,6 +484,59 @@ var _ = Describe("Manifest", func() {
 						ServerKey:   consul.DC1ServerKey,
 						EncryptKeys: []string{consul.EncryptKey},
 					},
+				},
+			}))
+		})
+
+		It("generates a valid Consul GCP manifest", func() {
+			manifest, err := consul.NewManifest(consul.Config{
+				DirectorUUID:    "some-director-uuid",
+				Name:            "consul-some-random-guid",
+				CompilationZone: "us-west1-a",
+				Networks: []consul.ConfigNetwork{
+					{
+						IPRange: "10.0.4.0/24",
+						Nodes:   1,
+					},
+					{
+						IPRange: "10.0.5.0/24",
+						Nodes:   1,
+					},
+				},
+			}, iaas.GCPConfig{
+				SubnetCloudProperties: iaas.GCPSubnetCloudProperties{
+					NetworkName:    "network-1",
+					SubnetworkName: "subnet-1",
+					Tags: []string{
+						"internal",
+					},
+				},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(manifest.Compilation.CloudProperties).To(Equal(core.CompilationCloudProperties{
+				Zone:           "us-west1-a",
+				MachineType:    "n1-standard-2",
+				RootDiskSizeGB: "100",
+				RootDiskType:   "pd-ssd",
+			}))
+
+			Expect(manifest.Networks[0].Subnets[0].Range).To(Equal("10.0.4.0/24"))
+			Expect(manifest.Networks[0].Subnets[0].CloudProperties).To(Equal(core.NetworkSubnetCloudProperties{
+				NetworkName:         "network-1",
+				SubnetworkName:      "subnet-1",
+				EphemeralExternalIP: true,
+				Tags: []string{
+					"internal",
+				},
+			}))
+
+			Expect(manifest.Networks[1].Subnets[0].Range).To(Equal("10.0.5.0/24"))
+			Expect(manifest.Networks[1].Subnets[0].CloudProperties).To(Equal(core.NetworkSubnetCloudProperties{
+				NetworkName:         "network-1",
+				SubnetworkName:      "subnet-1",
+				EphemeralExternalIP: true,
+				Tags: []string{
+					"internal",
 				},
 			}))
 		})
@@ -936,7 +990,7 @@ var _ = Describe("Manifest", func() {
 	})
 
 	Describe("ToYAML", func() {
-		It("returns a YAML representation of the consul manifest", func() {
+		PIt("returns a YAML representation of the consul manifest", func() {
 			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest.yml")
 			Expect(err).NotTo(HaveOccurred())
 

@@ -21,9 +21,13 @@ type NetworkSubnet struct {
 }
 
 type NetworkSubnetCloudProperties struct {
-	Name           string   `yaml:"name"`
-	Subnet         string   `yaml:"subnet,omitempty"`
-	SecurityGroups []string `yaml:"security_groups,omitempty"`
+	Name                string   `yaml:"name"`
+	Subnet              string   `yaml:"subnet,omitempty"`
+	SecurityGroups      []string `yaml:"security_groups,omitempty"`
+	NetworkName         string
+	SubnetworkName      string
+	EphemeralExternalIP bool
+	Tags                []string
 }
 
 func (n Network) StaticIPs(count int) []string {

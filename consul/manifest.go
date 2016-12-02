@@ -52,7 +52,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Network:             consulNetworks[0].Name,
 		ReuseCompilationVMs: true,
 		Workers:             3,
-		CloudProperties:     iaasConfig.Compilation("us-west-2a"),
+		CloudProperties:     iaasConfig.Compilation(config.CompilationZone),
 	}
 
 	stemcell := core.ResourcePoolStemcell{

@@ -3,12 +3,13 @@ package consul
 import "github.com/pivotal-cf-experimental/destiny/core"
 
 type Config struct {
-	DirectorUUID   string
-	Name           string
-	ConsulSecrets  ConfigSecretsConsul
-	DC             string
-	Networks       []ConfigNetwork
-	TurbulenceHost string
+	DirectorUUID    string
+	Name            string
+	CompilationZone string
+	ConsulSecrets   ConfigSecretsConsul
+	DC              string
+	Networks        []ConfigNetwork
+	TurbulenceHost  string
 }
 
 type ConfigNetwork struct {

@@ -11,6 +11,10 @@ type CompilationCloudProperties struct {
 	InstanceType     string                                   `yaml:"instance_type,omitempty"`
 	AvailabilityZone string                                   `yaml:"availability_zone,omitempty"`
 	EphemeralDisk    *CompilationCloudPropertiesEphemeralDisk `yaml:"ephemeral_disk,omitempty"`
+	MachineType      string
+	Zone             string
+	RootDiskSizeGB   string
+	RootDiskType     string
 }
 
 type CompilationCloudPropertiesEphemeralDisk struct {
