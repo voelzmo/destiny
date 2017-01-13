@@ -252,6 +252,8 @@ var _ = Describe("ManifestV2", func() {
 				Name:    "consul-test-consumer-windows",
 				Release: "consul",
 			}))
+			Expect(manifest.Properties.ConsulTestConsumer.RequireSSL).To(BeTrue())
+			Expect(manifest.Properties.Consul.Agent.RequireSSL).To(BeTrue())
 		})
 
 		Context("failure cases", func() {
@@ -299,6 +301,36 @@ var _ = Describe("ManifestV2", func() {
 					},
 				},
 			}, iaas.NewWardenConfig())
+			Expect(err).NotTo(HaveOccurred())
+
+			yaml, err := manifest.ToYAML()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(yaml).To(gomegamatchers.MatchYAML(consulManifest))
+		})
+
+		It("returns a YAML representation of the consul manifest for windows", func() {
+			consulManifest, err := ioutil.ReadFile("fixtures/consul_manifest_v2_windows.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			manifest, err := consul.NewManifestV2(consul.ConfigV2{
+				DirectorUUID: "some-director-uuid",
+				Name:         "consul-some-random-guid",
+				AZs: []consul.ConfigAZ{
+					{
+						Name:    "z1",
+						IPRange: "10.0.16.0/24",
+						Nodes:   2,
+					},
+					{
+						Name:    "z2",
+						IPRange: "10.0.32.0/24",
+						Nodes:   1,
+					},
+				},
+				WindowsClients:     true,
+				PersistentDiskType: "1GB",
+				VMType:             "m3.medium",
+			}, iaas.AWSConfig{})
 			Expect(err).NotTo(HaveOccurred())
 
 			yaml, err := manifest.ToYAML()

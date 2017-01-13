@@ -33,6 +33,7 @@ type PropertiesConsulAgent struct {
 	Mode       string                         `yaml:"mode,omitempty"`
 	Datacenter string                         `yaml:"datacenter,omitempty"`
 	DNSConfig  PropertiesConsulAgentDNSConfig `yaml:"dns_config,omitempty"`
+	RequireSSL bool                           `yaml:"require_ssl,omitempty"`
 }
 
 type PropertiesConsulAgentServers struct {

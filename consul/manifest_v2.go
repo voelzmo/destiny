@@ -33,14 +33,6 @@ func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) 
 		},
 	}
 
-	if config.WindowsClients {
-		manifest.Stemcells = append(manifest.Stemcells, core.Stemcell{
-			Alias:   "windows",
-			Version: "latest",
-			Name:    iaasConfig.WindowsStemcell(),
-		})
-	}
-
 	consulInstanceGroup, err := consulInstanceGroup(config)
 	if err != nil {
 		return ManifestV2{}, err
@@ -54,6 +46,19 @@ func NewManifestV2(config ConfigV2, iaasConfig iaas.Config) (ManifestV2, error) 
 	manifest.InstanceGroups = append(manifest.InstanceGroups, consulTestConsumerInstanceGroup)
 
 	manifest.Properties.Consul = newConsulProperties(consulInstanceGroup.Networks[0].StaticIPs)
+
+	if config.WindowsClients {
+		manifest.Stemcells = append(manifest.Stemcells, core.Stemcell{
+			Alias:   "windows",
+			Version: "latest",
+			Name:    iaasConfig.WindowsStemcell(),
+		})
+
+		manifest.Properties.ConsulTestConsumer = &core.ConsulTestConsumer{
+			RequireSSL: true,
+		}
+		manifest.Properties.Consul.Agent.RequireSSL = true
+	}
 
 	return manifest, nil
 }

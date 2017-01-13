@@ -88,7 +88,8 @@ type PropertiesTurbulenceAgent struct {
 }
 
 type ConsulTestConsumer struct {
-	NameServer string `yaml:"nameserver"`
+	NameServer string `yaml:"nameserver,omitempty"`
+	RequireSSL bool   `yaml:"require_ssl"`
 }
 
 type PropertiesTurbulenceAgentAPI struct {
