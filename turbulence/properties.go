@@ -28,3 +28,15 @@ type PropertiesTurbulenceAPIDirector struct {
 	Password string `yaml:"password"`
 	Username string `yaml:"username"`
 }
+
+type APIProperties struct {
+	Cert     APIPropertiesCert               `yaml:"cert"`
+	Password string                          `yaml:"password"`
+	Director PropertiesTurbulenceAPIDirector `yaml:"director"`
+}
+
+type APIPropertiesCert struct {
+	Certificate string `yaml:"certificate"`
+	PrivateKey  string `yaml:"private_key"`
+	CA          string `yaml:"ca"`
+}

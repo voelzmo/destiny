@@ -18,7 +18,7 @@ var _ = Describe("Manifest", func() {
 			manifest, err := turbulence.NewManifest(turbulence.Config{
 				Name:         "turbulence",
 				DirectorUUID: "some-director-uuid",
-				IPRange:      "10.0.16.0/24",
+				IPRange:      "10.0.16.224/27",
 				BOSH: turbulence.ConfigBOSH{
 					Target:             "some-bosh-target",
 					Username:           "some-bosh-username",
@@ -68,7 +68,7 @@ var _ = Describe("Manifest", func() {
 					{
 						Name: "private",
 						StaticIPs: []string{
-							"10.0.16.20",
+							"10.0.16.244",
 						},
 					},
 				},
@@ -79,6 +79,20 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "turbulence_api",
 						Release: "turbulence",
+						Properties: turbulence.APIProperties{
+							Cert: turbulence.APIPropertiesCert{
+								Certificate: turbulence.APICertificate,
+								PrivateKey:  turbulence.APIPrivateKey,
+								CA:          turbulence.APICACert,
+							},
+							Password: "turbulence-password",
+							Director: turbulence.PropertiesTurbulenceAPIDirector{
+								CACert:   "some-ca-cert",
+								Host:     "some-bosh-target",
+								Password: "some-bosh-password",
+								Username: "some-bosh-username",
+							},
+						},
 					},
 					{
 						Name:    "aws_cpi",
@@ -99,16 +113,7 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Properties).To(Equal(turbulence.Properties{
 				TurbulenceAPI: &turbulence.PropertiesTurbulenceAPI{
-					Certificate: turbulence.APICertificate,
-					CPIJobName:  "aws_cpi",
-					Director: turbulence.PropertiesTurbulenceAPIDirector{
-						CACert:   "some-ca-cert",
-						Host:     "some-bosh-target",
-						Password: "some-bosh-password",
-						Username: "some-bosh-username",
-					},
-					Password:   "turbulence-password",
-					PrivateKey: turbulence.APIPrivateKey,
+					CPIJobName: "aws_cpi",
 				},
 				AWS: &iaas.PropertiesAWS{
 					AccessKeyID:           "some-access-key-id",
@@ -124,7 +129,7 @@ var _ = Describe("Manifest", func() {
 					Username: "some-registry-username",
 				},
 				Blobstore: &core.PropertiesBlobstore{
-					Address: "10.0.16.20",
+					Address: "10.0.16.244",
 					Port:    2520,
 					Agent: core.PropertiesBlobstoreAgent{
 						User:     "agent",
@@ -132,7 +137,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 				Agent: &core.PropertiesAgent{
-					Mbus: "nats://nats:password@10.0.16.20:4222",
+					Mbus: "nats://nats:password@10.0.16.244:4222",
 				},
 			}))
 		})
@@ -140,7 +145,7 @@ var _ = Describe("Manifest", func() {
 		It("generates a valid Turbulence BOSH-Lite manifest", func() {
 			manifest, err := turbulence.NewManifest(turbulence.Config{
 				DirectorUUID: "some-director-uuid",
-				IPRange:      "10.244.4.0/24",
+				IPRange:      "10.244.4.224/27",
 				BOSH: turbulence.ConfigBOSH{
 					Target:   "some-bosh-target",
 					Username: "some-bosh-username",
@@ -175,7 +180,7 @@ var _ = Describe("Manifest", func() {
 					{
 						Name: "private",
 						StaticIPs: []string{
-							"10.244.4.20",
+							"10.244.4.244",
 						},
 					},
 				},
@@ -186,6 +191,20 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "turbulence_api",
 						Release: "turbulence",
+						Properties: turbulence.APIProperties{
+							Cert: turbulence.APIPropertiesCert{
+								Certificate: turbulence.APICertificate,
+								PrivateKey:  turbulence.APIPrivateKey,
+								CA:          turbulence.APICACert,
+							},
+							Password: turbulence.DefaultPassword,
+							Director: turbulence.PropertiesTurbulenceAPIDirector{
+								CACert:   turbulence.BOSHDirectorCACert,
+								Host:     "some-bosh-target",
+								Password: "some-bosh-password",
+								Username: "some-bosh-username",
+							},
+						},
 					},
 					{
 						Name:    "warden_cpi",
@@ -193,6 +212,7 @@ var _ = Describe("Manifest", func() {
 					},
 				},
 			}))
+
 			Expect(manifest.Releases).To(Equal([]core.Release{
 				{
 					Name:    "turbulence",
@@ -206,16 +226,7 @@ var _ = Describe("Manifest", func() {
 
 			Expect(manifest.Properties).To(Equal(turbulence.Properties{
 				TurbulenceAPI: &turbulence.PropertiesTurbulenceAPI{
-					Certificate: turbulence.APICertificate,
-					CPIJobName:  "warden_cpi",
-					Director: turbulence.PropertiesTurbulenceAPIDirector{
-						CACert:   turbulence.BOSHDirectorCACert,
-						Host:     "some-bosh-target",
-						Password: "some-bosh-password",
-						Username: "some-bosh-username",
-					},
-					Password:   turbulence.DefaultPassword,
-					PrivateKey: turbulence.APIPrivateKey,
+					CPIJobName: "warden_cpi",
 				},
 				WardenCPI: &iaas.PropertiesWardenCPI{
 					Agent: iaas.PropertiesWardenCPIAgent{

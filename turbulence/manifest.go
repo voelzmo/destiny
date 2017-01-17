@@ -70,6 +70,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		persistentDiskType = config.BOSH.PersistentDiskType
 	}
 
+	directorCACert := BOSHDirectorCACert
+	if config.BOSH.DirectorCACert != "" {
+		directorCACert = config.BOSH.DirectorCACert
+	}
+
 	apiJob := core.InstanceGroup{
 		Instances: 1,
 		Name:      "api",
@@ -89,17 +94,26 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 			{
 				Name:    "turbulence_api",
 				Release: turbulenceRelease.Name,
+				Properties: APIProperties{
+					Cert: APIPropertiesCert{
+						Certificate: APICertificate,
+						PrivateKey:  APIPrivateKey,
+						CA:          APICACert,
+					},
+					Password: DefaultPassword,
+					Director: PropertiesTurbulenceAPIDirector{
+						CACert:   directorCACert,
+						Host:     config.BOSH.Target,
+						Password: config.BOSH.Password,
+						Username: config.BOSH.Username,
+					},
+				},
 			},
 			{
 				Name:    cpi.JobName,
 				Release: cpiRelease.Name,
 			},
 		},
-	}
-
-	directorCACert := BOSHDirectorCACert
-	if config.BOSH.DirectorCACert != "" {
-		directorCACert = config.BOSH.DirectorCACert
 	}
 
 	iaasProperties := iaasConfig.Properties(staticIps[16])
@@ -110,16 +124,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Blobstore: iaasProperties.Blobstore,
 		Agent:     iaasProperties.Agent,
 		TurbulenceAPI: &PropertiesTurbulenceAPI{
-			Certificate: APICertificate,
-			CPIJobName:  cpi.JobName,
-			Director: PropertiesTurbulenceAPIDirector{
-				CACert:   directorCACert,
-				Host:     config.BOSH.Target,
-				Password: config.BOSH.Password,
-				Username: config.BOSH.Username,
-			},
-			Password:   DefaultPassword,
-			PrivateKey: APIPrivateKey,
+			CPIJobName: cpi.JobName,
 		},
 	}
 
