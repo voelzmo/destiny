@@ -22,7 +22,34 @@ type InstanceGroupMigratedFrom struct {
 type InstanceGroupNetwork JobNetwork
 
 type InstanceGroupJob struct {
-	Name       string      `yaml:"name"`
-	Release    string      `yaml:"release"`
-	Properties interface{} `yaml:"properties"`
+	Name       string        `yaml:"name"`
+	Release    string        `yaml:"release"`
+	Properties APIProperties `yaml:"properties,omitempty"`
+}
+
+type PropertiesTurbulenceAPI struct {
+	Certificate string                          `yaml:"certificate,omitempty"`
+	CPIJobName  string                          `yaml:"cpi_job_name"`
+	Director    PropertiesTurbulenceAPIDirector `yaml:"director,omitempty"`
+	Password    string                          `yaml:"password,omitempty"`
+	PrivateKey  string                          `yaml:"private_key,omitempty"`
+}
+
+type PropertiesTurbulenceAPIDirector struct {
+	CACert       string `yaml:"ca_cert"`
+	Host         string `yaml:"host"`
+	ClientSecret string `yaml:"client_secret"`
+	Client       string `yaml:"client"`
+}
+
+type APIProperties struct {
+	Cert     APIPropertiesCert               `yaml:"cert"`
+	Password string                          `yaml:"password"`
+	Director PropertiesTurbulenceAPIDirector `yaml:"director"`
+}
+
+type APIPropertiesCert struct {
+	Certificate string `yaml:"certificate"`
+	PrivateKey  string `yaml:"private_key"`
+	CA          string `yaml:"ca"`
 }

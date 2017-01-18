@@ -94,18 +94,18 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 			{
 				Name:    "turbulence_api",
 				Release: turbulenceRelease.Name,
-				Properties: APIProperties{
-					Cert: APIPropertiesCert{
+				Properties: core.APIProperties{
+					Cert: core.APIPropertiesCert{
 						Certificate: APICertificate,
 						PrivateKey:  APIPrivateKey,
 						CA:          APICACert,
 					},
 					Password: DefaultPassword,
-					Director: PropertiesTurbulenceAPIDirector{
-						CACert:   directorCACert,
-						Host:     config.BOSH.Target,
-						Password: config.BOSH.Password,
-						Username: config.BOSH.Username,
+					Director: core.PropertiesTurbulenceAPIDirector{
+						CACert:       directorCACert,
+						Host:         config.BOSH.Target,
+						ClientSecret: config.BOSH.Password,
+						Client:       config.BOSH.Username,
 					},
 				},
 			},
@@ -123,7 +123,7 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 		Registry:  iaasProperties.Registry,
 		Blobstore: iaasProperties.Blobstore,
 		Agent:     iaasProperties.Agent,
-		TurbulenceAPI: &PropertiesTurbulenceAPI{
+		TurbulenceAPI: &core.PropertiesTurbulenceAPI{
 			CPIJobName: cpi.JobName,
 		},
 	}
