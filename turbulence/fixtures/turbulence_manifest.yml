@@ -34,6 +34,8 @@ instance_groups:
   jobs:
   - name: turbulence_api
     release: turbulence
+    provides:
+      api: {shared: true}
     properties:
       cert:
         certificate: |+

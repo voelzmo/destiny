@@ -4,7 +4,6 @@ import (
 	"github.com/pivotal-cf-experimental/destiny/consul"
 	"github.com/pivotal-cf-experimental/destiny/core"
 	"github.com/pivotal-cf-experimental/destiny/iaas"
-	"github.com/pivotal-cf-experimental/destiny/turbulence"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,9 +14,9 @@ var _ = Describe("Manifest", func() {
 	Describe("NewManifestWithTurbulenceAgent", func() {
 		It("generates a valid Consul BOSH-lite manifest with additional turbulence agent on test consumer", func() {
 			manifest, err := consul.NewManifestWithTurbulenceAgent(consul.ConfigV2{
-				DirectorUUID:   "some-director-uuid",
-				Name:           "consul-some-random-guid",
-				TurbulenceHost: "10.244.4.32",
+				DirectorUUID: "some-director-uuid",
+				Name:         "consul-some-random-guid",
+				TurbulenceDeploymentName: "turbulence",
 				AZs: []consul.ConfigAZ{
 					{
 						IPRange: "10.244.4.0/24",
@@ -36,11 +35,6 @@ var _ = Describe("Manifest", func() {
 			Expect(manifest.DirectorUUID).To(Equal("some-director-uuid"))
 			Expect(manifest.Name).To(Equal("consul-some-random-guid"))
 
-			Expect(manifest.Properties.TurbulenceAgent.API).To(Equal(core.PropertiesTurbulenceAgentAPI{
-				Host:     "10.244.4.32",
-				Password: turbulence.DefaultPassword,
-				CACert:   turbulence.APICACert,
-			}))
 			Expect(manifest.InstanceGroups[2].VMType).To(Equal("default"))
 			Expect(manifest.InstanceGroups[2].Networks[0]).To(Equal(core.InstanceGroupNetwork{
 				Name:      "private",
@@ -59,6 +53,12 @@ var _ = Describe("Manifest", func() {
 				{
 					Name:    "turbulence_agent",
 					Release: "turbulence",
+					Consumes: core.JobConsumes{
+						API: core.Consumer{
+							From:       "api",
+							Deployment: "turbulence",
+						},
+					},
 				},
 			}))
 
@@ -71,11 +71,6 @@ var _ = Describe("Manifest", func() {
 				Version: "latest",
 			}))
 
-			Expect(manifest.Properties.TurbulenceAgent.API).To(Equal(core.PropertiesTurbulenceAgentAPI{
-				Host:     "10.244.4.32",
-				Password: turbulence.DefaultPassword,
-				CACert:   turbulence.APICACert,
-			}))
 			Expect(manifest.Properties.ConsulTestConsumer.NameServer).To(Equal("10.244.4.13"))
 		})
 

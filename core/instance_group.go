@@ -25,6 +25,25 @@ type InstanceGroupJob struct {
 	Name       string        `yaml:"name"`
 	Release    string        `yaml:"release"`
 	Properties APIProperties `yaml:"properties,omitempty"`
+	Provides   JobProvides   `yaml:"provides,omitempty"`
+	Consumes   JobConsumes   `yaml:"consumes,omitempty"`
+}
+
+type JobProvides struct {
+	API Provider `yaml:"api"`
+}
+
+type Provider struct {
+	Shared bool `yaml:"shared"`
+}
+
+type JobConsumes struct {
+	API Consumer `yaml:"api"`
+}
+
+type Consumer struct {
+	From       string `yaml:"from"`
+	Deployment string `yaml:"deployment"`
 }
 
 type PropertiesTurbulenceAPI struct {

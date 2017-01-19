@@ -3,13 +3,14 @@ package consul
 import "github.com/pivotal-cf-experimental/destiny/core"
 
 type ConfigV2 struct {
-	DirectorUUID       string
-	Name               string
-	AZs                []ConfigAZ
-	PersistentDiskType string
-	VMType             string
-	TurbulenceHost     string
-	WindowsClients     bool
+	DirectorUUID             string
+	Name                     string
+	AZs                      []ConfigAZ
+	PersistentDiskType       string
+	VMType                   string
+	TurbulenceHost           string
+	TurbulenceDeploymentName string
+	WindowsClients           bool
 }
 
 type ConfigAZ struct {

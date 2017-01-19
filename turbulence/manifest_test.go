@@ -79,6 +79,11 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "turbulence_api",
 						Release: "turbulence",
+						Provides: core.JobProvides{
+							API: core.Provider{
+								Shared: true,
+							},
+						},
 						Properties: core.APIProperties{
 							Cert: core.APIPropertiesCert{
 								Certificate: turbulence.APICertificate,
@@ -191,6 +196,11 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "turbulence_api",
 						Release: "turbulence",
+						Provides: core.JobProvides{
+							API: core.Provider{
+								Shared: true,
+							},
+						},
 						Properties: core.APIProperties{
 							Cert: core.APIPropertiesCert{
 								Certificate: turbulence.APICertificate,
@@ -318,6 +328,11 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "turbulence_api",
 						Release: "turbulence",
+						Provides: core.JobProvides{
+							API: core.Provider{
+								Shared: true,
+							},
+						},
 						Properties: core.APIProperties{
 							Cert: core.APIPropertiesCert{
 								Certificate: turbulence.APICertificate,

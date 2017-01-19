@@ -94,6 +94,11 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 			{
 				Name:    "turbulence_api",
 				Release: turbulenceRelease.Name,
+				Provides: core.JobProvides{
+					API: core.Provider{
+						Shared: true,
+					},
+				},
 				Properties: core.APIProperties{
 					Cert: core.APIPropertiesCert{
 						Certificate: APICertificate,
