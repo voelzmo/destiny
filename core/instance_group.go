@@ -22,6 +22,11 @@ type InstanceGroupMigratedFrom struct {
 type InstanceGroupNetwork JobNetwork
 
 type InstanceGroupJob struct {
-	Name    string `yaml:"name"`
-	Release string `yaml:"release"`
+	Name     string      `yaml:"name"`
+	Release  string      `yaml:"release"`
+	Consumes JobConsumes `yaml:"consumes,omitempty"`
+}
+
+type JobConsumes struct {
+	Consul string `yaml:"consul"`
 }

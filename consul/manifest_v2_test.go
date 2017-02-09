@@ -81,6 +81,9 @@ var _ = Describe("ManifestV2", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 				Properties: &core.JobProperties{
@@ -123,10 +126,16 @@ var _ = Describe("ManifestV2", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 					{
 						Name:    "consul-test-consumer",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 			}))
@@ -247,10 +256,16 @@ var _ = Describe("ManifestV2", func() {
 			Expect(manifest.InstanceGroups[1].Jobs[0]).To(Equal(core.InstanceGroupJob{
 				Name:    "consul_agent_windows",
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			}))
 			Expect(manifest.InstanceGroups[1].Jobs[1]).To(Equal(core.InstanceGroupJob{
 				Name:    "consul-test-consumer-windows",
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			}))
 			Expect(manifest.Properties.ConsulTestConsumer.RequireSSL).To(BeTrue())
 			Expect(manifest.Properties.Consul.Agent.RequireSSL).To(BeTrue())

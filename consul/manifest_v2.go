@@ -102,6 +102,9 @@ func consulInstanceGroup(config ConfigV2) (core.InstanceGroup, error) {
 			{
 				Name:    "consul_agent",
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			},
 		},
 		Properties: &core.JobProperties{
@@ -164,10 +167,16 @@ func consulTestConsumerInstanceGroup(config ConfigV2) (core.InstanceGroup, error
 			{
 				Name:    agentName,
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			},
 			{
 				Name:    testConsumerName,
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			},
 		},
 	}, nil

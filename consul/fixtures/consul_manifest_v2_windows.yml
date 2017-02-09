@@ -23,6 +23,7 @@ instance_groups:
   jobs:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
   persistent_disk_type: 1GB
   vm_type: m3.medium
   stemcell: linux
@@ -51,8 +52,10 @@ instance_groups:
   jobs:
   - name: consul_agent_windows
     release: consul
+    consumes: {consul: nil}
   - name: consul-test-consumer-windows
     release: consul
+    consumes: {consul: nil}
   vm_type: m3.medium
   stemcell: windows
 

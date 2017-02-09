@@ -20,6 +20,7 @@ instance_groups:
   jobs:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
   persistent_disk_type: default
   vm_type: default
   stemcell: linux
@@ -48,8 +49,10 @@ instance_groups:
   jobs:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
   - name: consul-test-consumer
     release: consul
+    consumes: {consul: nil}
   vm_type: default
   stemcell: linux
 

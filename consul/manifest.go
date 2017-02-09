@@ -114,6 +114,9 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 			Templates: []core.JobTemplate{{
 				Name:    "consul_agent",
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			}},
 			Update: &core.JobUpdate{
 				MaxInFlight: 1,
@@ -151,10 +154,16 @@ func NewManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 			{
 				Name:    "consul_agent",
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			},
 			{
 				Name:    "consul-test-consumer",
 				Release: "consul",
+				Consumes: core.JobConsumes{
+					Consul: "nil",
+				},
 			},
 		},
 	})

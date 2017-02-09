@@ -53,6 +53,7 @@ jobs:
   templates:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
   update:
     max_in_flight: 1
 - instances: 1
@@ -70,8 +71,10 @@ jobs:
   templates:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
   - name: consul-test-consumer
     release: consul
+    consumes: {consul: nil}
 
 networks:
 - name: consul1

@@ -105,6 +105,9 @@ var _ = Describe("Manifest", func() {
 				Templates: []core.JobTemplate{{
 					Name:    "consul_agent",
 					Release: "consul",
+					Consumes: core.JobConsumes{
+						Consul: "nil",
+					},
 				}},
 				Update: &core.JobUpdate{
 					MaxInFlight: 1,
@@ -143,6 +146,9 @@ var _ = Describe("Manifest", func() {
 				Templates: []core.JobTemplate{{
 					Name:    "consul_agent",
 					Release: "consul",
+					Consumes: core.JobConsumes{
+						Consul: "nil",
+					},
 				}},
 				Update: &core.JobUpdate{
 					MaxInFlight: 1,
@@ -171,10 +177,16 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 					{
 						Name:    "consul-test-consumer",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 			}))
@@ -351,6 +363,9 @@ var _ = Describe("Manifest", func() {
 						Templates: []core.JobTemplate{{
 							Name:    "consul_agent",
 							Release: "consul",
+							Consumes: core.JobConsumes{
+								Consul: "nil",
+							},
 						}},
 						Update: &core.JobUpdate{
 							MaxInFlight: 1,
@@ -388,6 +403,9 @@ var _ = Describe("Manifest", func() {
 						Templates: []core.JobTemplate{{
 							Name:    "consul_agent",
 							Release: "consul",
+							Consumes: core.JobConsumes{
+								Consul: "nil",
+							},
 						}},
 						Update: &core.JobUpdate{
 							MaxInFlight: 1,
@@ -415,10 +433,16 @@ var _ = Describe("Manifest", func() {
 							{
 								Name:    "consul_agent",
 								Release: "consul",
+								Consumes: core.JobConsumes{
+									Consul: "nil",
+								},
 							},
 							{
 								Name:    "consul-test-consumer",
 								Release: "consul",
+								Consumes: core.JobConsumes{
+									Consul: "nil",
+								},
 							},
 						},
 					},
@@ -728,6 +752,9 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 				Properties: &core.JobProperties{
@@ -776,10 +803,16 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 					{
 						Name:    "consul-test-consumer",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 			}))
@@ -865,6 +898,9 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 				Properties: &core.JobProperties{
@@ -904,10 +940,16 @@ var _ = Describe("Manifest", func() {
 					{
 						Name:    "consul_agent",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 					{
 						Name:    "consul-test-consumer",
 						Release: "consul",
+						Consumes: core.JobConsumes{
+							Consul: "nil",
+						},
 					},
 				},
 			}))

@@ -191,6 +191,7 @@ instance_groups:
   jobs:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
 - instances: 1
   name: test_consumer
   azs: [z1]
@@ -297,7 +298,9 @@ instance_groups:
   jobs:
   - name: consul_agent
     release: consul
+    consumes: {consul: nil}
   - name: consul-test-consumer
     release: consul
+    consumes: {consul: nil}
 
 properties: {}
