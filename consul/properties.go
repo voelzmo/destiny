@@ -24,6 +24,7 @@ type PropertiesConsul struct {
 	ServerCert  string                `yaml:"server_cert"`
 	ServerKey   string                `yaml:"server_key"`
 	EncryptKeys []string              `yaml:"encrypt_keys"`
+	RequireSSL  bool                  `yaml:"require_ssl,omitempty"`
 }
 
 type PropertiesConsulAgent struct {
