@@ -58,6 +58,9 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				{
 					Name:    "consul_agent",
 					Release: "consul",
+					Consumes: core.JobConsumes{
+						Consul: "nil",
+					},
 				},
 			},
 		},
@@ -70,6 +73,9 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				{
 					Name:    "consul_agent",
 					Release: "consul",
+					Consumes: core.JobConsumes{
+						Consul: "nil",
+					},
 				}}, job.Templates...)
 			job.Properties = &core.JobProperties{
 				Consul: &core.JobPropertiesConsul{
@@ -86,6 +92,9 @@ func NewTLSManifest(config Config, iaasConfig iaas.Config) (Manifest, error) {
 				{
 					Name:    "consul_agent",
 					Release: "consul",
+					Consumes: core.JobConsumes{
+						Consul: "nil",
+					},
 				}}, job.Templates...)
 		}
 
