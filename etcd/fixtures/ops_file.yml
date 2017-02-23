@@ -1,0 +1,23 @@
+- type: replace
+  path: /director_uuid
+  value: some-director-uuid
+- type: replace
+  path: /name
+  value: etcd-some-random-guid
+- type: replace
+  path: /instance_groups/name=consul/networks/name=private/static_ips
+  value:
+    - 10.244.4.244
+- type: replace
+  path: /instance_groups/name=etcd/networks/name=private/static_ips
+  value:
+    - 10.244.4.10
+    - 10.244.4.11
+    - 10.244.5.12
+- type: replace
+  path: /properties/consul/agent/servers/lan
+  value:
+    - 10.244.4.244
+- type: replace
+  path: /stemcells/alias=default/name
+  value: bosh-warden-boshlite-ubuntu-trusty-go_agent
