@@ -3,10 +3,11 @@ package etcd_test
 import (
 	"io/ioutil"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf-experimental/destiny/etcd"
 	"github.com/pivotal-cf-experimental/gomegamatchers"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("ManifestV2", func() {
