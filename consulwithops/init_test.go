@@ -9,5 +9,5 @@ import (
 
 func TestConsul(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "consul")
+	RunSpecs(t, "consulwithops")
 }

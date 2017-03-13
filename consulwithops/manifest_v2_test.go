@@ -26,4 +26,4 @@ var _ = Describe("ManifestV2", func() {
 			Expect(manifest).To(gomegamatchers.MatchYAML(consulManifest))
 		})
 	})
-}
+})
