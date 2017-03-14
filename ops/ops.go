@@ -1,7 +1,11 @@
 package ops
 
 import (
-	"github.com/pivotal-cf-experimental/destiny/bosh"
+	"fmt"
+	"strings"
+
+	"github.com/cppforlife/go-patch/patch"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -18,18 +22,49 @@ func ApplyOp(manifest string, op Op) (string, error) {
 }
 
 func ApplyOps(manifest string, ops []Op) (string, error) {
-	opsYaml, err := marshal(ops)
+	var doc interface{}
+	err := yaml.Unmarshal([]byte(manifest), &doc)
 	if err != nil {
 		return "", err
 	}
 
-	boshCLI := bosh.CLI{}
+	goPatchOps := patch.Ops{}
+	for _, op := range ops {
+		goPatchOp, err := makeGoPatchOp(op)
+		if err != nil {
+			return "", err
+		}
 
-	manifestContents, err := boshCLI.Interpolate(manifest, string(opsYaml))
+		goPatchOps = append(goPatchOps, goPatchOp)
+	}
+
+	doc, err = goPatchOps.Apply(doc)
 	if err != nil {
 		// not tested
 		return "", err
 	}
 
-	return manifestContents, nil
+	manifestYAML, err := marshal(doc)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.Trim(string(manifestYAML), "\n"), nil
+}
+
+func makeGoPatchOp(op Op) (patch.Op, error) {
+	switch op.Type {
+	case "replace":
+		path, err := patch.NewPointerFromString(op.Path)
+		if err != nil {
+			return nil, err
+		}
+
+		return patch.ReplaceOp{
+			Path:  path,
+			Value: op.Value,
+		}, nil
+	default:
+		return nil, fmt.Errorf("op type %s not supported by destiny", op.Type)
+	}
 }

@@ -68,6 +68,36 @@ favorite_color: red`))
 					Expect(err).To(MatchError("failed to marshal"))
 				})
 			})
+
+			Context("when apply ops fails to unmarshal", func() {
+				It("returns an error", func() {
+					_, err := ops.ApplyOps("%%%", []ops.Op{})
+					Expect(err).To(MatchError("yaml: could not find expected directive name"))
+				})
+			})
+
+			Context("when the op type is not supported", func() {
+				It("returns an error", func() {
+					_, err := ops.ApplyOps("some-manifest", []ops.Op{
+						{
+							Type: "other",
+						},
+					})
+					Expect(err).To(MatchError("op type other not supported by destiny"))
+				})
+			})
+
+			Context("when the op path is bad", func() {
+				It("returns an error", func() {
+					_, err := ops.ApplyOps("some-manifest", []ops.Op{
+						{
+							Type: "replace",
+							Path: "%%%",
+						},
+					})
+					Expect(err).To(MatchError("Expected to start with '/'"))
+				})
+			})
 		})
 	})
 })
