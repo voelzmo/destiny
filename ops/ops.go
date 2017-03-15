@@ -91,6 +91,15 @@ func makeGoPatchOp(op Op) (patch.Op, error) {
 			Path:  path,
 			Value: op.Value,
 		}, nil
+	case "remove":
+		path, err := patch.NewPointerFromString(op.Path)
+		if err != nil {
+			return nil, err
+		}
+
+		return patch.RemoveOp{
+			Path: path,
+		}, nil
 	default:
 		return nil, fmt.Errorf("op type %s not supported by destiny", op.Type)
 	}

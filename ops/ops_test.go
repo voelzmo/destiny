@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Ops", func() {
 	Describe("ApplyOp", func() {
-		It("returns a manifest with a ops change", func() {
+		It("returns a manifest with a replace op applied", func() {
 			manifest := "name: some-name"
 			modifiedManifest, err := ops.ApplyOp(manifest, ops.Op{
 				Type:  "replace",
@@ -22,6 +22,22 @@ var _ = Describe("Ops", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(modifiedManifest).To(Equal("name: some-changed-name"))
+		})
+
+		It("returns a manifest with a remove op applied", func() {
+			manifest := `
+---
+name: some-name
+favorite_color: blue`
+			modifiedManifest, err := ops.ApplyOp(manifest, ops.Op{
+				Type: "remove",
+				Path: "/name",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(modifiedManifest).To(gomegamatchers.MatchYAML(`
+---
+favorite_color: blue`))
 		})
 	})
 
@@ -87,11 +103,23 @@ favorite_color: red`))
 				})
 			})
 
-			Context("when the op path is bad", func() {
+			Context("when the replace op path is bad", func() {
 				It("returns an error", func() {
 					_, err := ops.ApplyOps("some-manifest", []ops.Op{
 						{
 							Type: "replace",
+							Path: "%%%",
+						},
+					})
+					Expect(err).To(MatchError("Expected to start with '/'"))
+				})
+			})
+
+			Context("when the remove op path is bad", func() {
+				It("returns an error", func() {
+					_, err := ops.ApplyOps("some-manifest", []ops.Op{
+						{
+							Type: "remove",
 							Path: "%%%",
 						},
 					})
