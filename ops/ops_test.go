@@ -103,11 +103,13 @@ favorite_color: red`))
 
 	Describe("FindOp", func() {
 		It("returns a value provided an op path", func() {
-			manifest := "name: some-name"
+			manifest := `name: |-
+  some-name
+  some-name2`
 			name, err := ops.FindOp(manifest, "/name")
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(name).To(Equal("some-name"))
+			Expect(name.(string)).To(Equal("some-name\nsome-name2"))
 		})
 
 		Context("failure cases", func() {
@@ -122,23 +124,6 @@ favorite_color: red`))
 				It("returns an error", func() {
 					_, err := ops.FindOp("some-manifest", "%%%")
 					Expect(err).To(MatchError("Expected to start with '/'"))
-				})
-			})
-
-			Context("when find op fails to marshal", func() {
-				BeforeEach(func() {
-					ops.SetMarshal(func(interface{}) ([]byte, error) {
-						return []byte{}, errors.New("failed to marshal")
-					})
-				})
-
-				AfterEach(func() {
-					ops.ResetMarshal()
-				})
-
-				It("returns an error", func() {
-					_, err := ops.FindOp("some-manifest", "")
-					Expect(err).To(MatchError("failed to marshal"))
 				})
 			})
 		})

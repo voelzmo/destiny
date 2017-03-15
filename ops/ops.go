@@ -52,7 +52,7 @@ func ApplyOps(manifest string, ops []Op) (string, error) {
 	return strings.Trim(string(manifestYAML), "\n"), nil
 }
 
-func FindOp(manifest, path string) (string, error) {
+func FindOp(manifest, path string) (interface{}, error) {
 	var doc interface{}
 	err := yaml.Unmarshal([]byte(manifest), &doc)
 	if err != nil {
@@ -76,12 +76,7 @@ func FindOp(manifest, path string) (string, error) {
 		return "", err
 	}
 
-	manifestYAML, err := marshal(doc)
-	if err != nil {
-		return "", err
-	}
-
-	return strings.Trim(string(manifestYAML), "\n"), nil
+	return doc, nil
 }
 
 func makeGoPatchOp(op Op) (patch.Op, error) {
