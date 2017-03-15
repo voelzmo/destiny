@@ -52,6 +52,38 @@ func ApplyOps(manifest string, ops []Op) (string, error) {
 	return strings.Trim(string(manifestYAML), "\n"), nil
 }
 
+func FindOp(manifest, path string) (string, error) {
+	var doc interface{}
+	err := yaml.Unmarshal([]byte(manifest), &doc)
+	if err != nil {
+		return "", err
+	}
+
+	pointerPath, err := patch.NewPointerFromString(path)
+	if err != nil {
+		return "", err
+	}
+
+	goPatchOps := patch.Ops{
+		patch.FindOp{
+			Path: pointerPath,
+		},
+	}
+
+	doc, err = goPatchOps.Apply(doc)
+	if err != nil {
+		// not tested
+		return "", err
+	}
+
+	manifestYAML, err := marshal(doc)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.Trim(string(manifestYAML), "\n"), nil
+}
+
 func makeGoPatchOp(op Op) (patch.Op, error) {
 	switch op.Type {
 	case "replace":

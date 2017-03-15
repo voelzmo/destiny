@@ -100,4 +100,47 @@ favorite_color: red`))
 			})
 		})
 	})
+
+	Describe("FindOp", func() {
+		It("returns a value provided an op path", func() {
+			manifest := "name: some-name"
+			name, err := ops.FindOp(manifest, "/name")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(name).To(Equal("some-name"))
+		})
+
+		Context("failure cases", func() {
+			Context("when find op fails to unmarshal", func() {
+				It("returns an error", func() {
+					_, err := ops.FindOp("%%%", "")
+					Expect(err).To(MatchError("yaml: could not find expected directive name"))
+				})
+			})
+
+			Context("when the op path is bad", func() {
+				It("returns an error", func() {
+					_, err := ops.FindOp("some-manifest", "%%%")
+					Expect(err).To(MatchError("Expected to start with '/'"))
+				})
+			})
+
+			Context("when find op fails to marshal", func() {
+				BeforeEach(func() {
+					ops.SetMarshal(func(interface{}) ([]byte, error) {
+						return []byte{}, errors.New("failed to marshal")
+					})
+				})
+
+				AfterEach(func() {
+					ops.ResetMarshal()
+				})
+
+				It("returns an error", func() {
+					_, err := ops.FindOp("some-manifest", "")
+					Expect(err).To(MatchError("failed to marshal"))
+				})
+			})
+		})
+	})
 })
