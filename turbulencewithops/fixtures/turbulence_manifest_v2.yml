@@ -80,9 +80,9 @@ instance_groups:
           b0lpHA8bE9gQTQjmIa8MIpaP3UNTxvmKfEQnk5UAZ5xY2at5mmyj3t8woGdzoL98
           yDd2GtrGsguQXM2op+4LqEdHef57g7vwolZejJqN776Xu/lZtCTp01+HTA==
           -----END CERTIFICATE-----
-        host: some-bosh-target
-        password: some-bosh-password
-        username: some-bosh-username
+        host: some-director-host
+        password: some-director-password
+        username: some-director-user
       password: turbulence-password
       private_key: |+
         -----BEGIN RSA PRIVATE KEY-----

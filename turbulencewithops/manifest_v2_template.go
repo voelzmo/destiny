@@ -83,9 +83,9 @@ instance_groups:
           b0lpHA8bE9gQTQjmIa8MIpaP3UNTxvmKfEQnk5UAZ5xY2at5mmyj3t8woGdzoL98
           yDd2GtrGsguQXM2op+4LqEdHef57g7vwolZejJqN776Xu/lZtCTp01+HTA==
           -----END CERTIFICATE-----
-        host: some-bosh-target
-        password: some-bosh-password
-        username: some-bosh-username
+        host: REPLACE_ME
+        password: REPLACE_ME
+        username: REPLACE_ME
       password: turbulence-password
       private_key: |+
         -----BEGIN RSA PRIVATE KEY-----
