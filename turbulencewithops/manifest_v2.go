@@ -13,8 +13,8 @@ func NewManifestV2(config ConfigV2) (string, error) {
 		{"replace", "/director_uuid", config.DirectorUUID},
 		{"replace", "/name", config.Name},
 		{"replace", "/instance_groups/name=api/azs", config.AZs},
-		{"replace", "/instance_groups/name=api/properties/turbulence_api/director/host", config.DirectorHost},
-		{"replace", "/instance_groups/name=api/properties/turbulence_api/director/username", config.DirectorUsername},
-		{"replace", "/instance_groups/name=api/properties/turbulence_api/director/password", config.DirectorPassword},
+		{"replace", "/instance_groups/name=api/properties/director/host", config.DirectorHost},
+		{"replace", "/instance_groups/name=api/properties/director/client", config.DirectorUsername},
+		{"replace", "/instance_groups/name=api/properties/director/client_secret", config.DirectorPassword},
 	})
 }

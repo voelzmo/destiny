@@ -12,8 +12,6 @@ stemcells:
 releases:
 - name: turbulence
   version: latest
-- name: bosh-warden-cpi
-  version: latest
 
 instance_groups:
 - name: api
@@ -22,15 +20,16 @@ instance_groups:
   jobs:
   - name: turbulence_api
     release: turbulence
-  - name: warden_cpi
-    release: bosh-warden-cpi
+    provides:
+      api: {shared: true}
   vm_type: default
   stemcell: default
   persistent_disk_type: 1GB
   networks:
   - name: private
   properties:
-    turbulence_api:
+    advertised_host: turbulence.local
+    cert:
       certificate: |+
         -----BEGIN CERTIFICATE-----
         MIIEMTCCAhmgAwIBAgIRAJU/R4sb343Cs8/OZg5skPAwDQYJKoZIhvcNAQELBQAw
@@ -57,35 +56,6 @@ instance_groups:
         +I+b3oKvzhPiM3WO+v+Lu7M3s7k5VZ8joIg6QnlIR+38f75tKQduoifQoyCjjnDS
         iQefcookOmhMBxZj+1YoSSZc5nSd
         -----END CERTIFICATE-----
-      cpi_job_name: warden_cpi
-      director:
-        ca_cert: |+
-          -----BEGIN CERTIFICATE-----
-          MIIDtzCCAp+gAwIBAgIJAMZ/qRdRamluMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
-          BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
-          aWRnaXRzIFB0eSBMdGQwIBcNMTYwODI2MjIzMzE5WhgPMjI5MDA2MTAyMjMzMTla
-          MEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJ
-          bnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
-          ggEKAoIBAQDN/bv70wDn6APMqiJZV7ESZhUyGu8OzuaeEfb+64SNvQIIME0s9+i7
-          D9gKAZjtoC2Tr9bJBqsKdVhREd/X6ePTaopxL8shC9GxXmTqJ1+vKT6UxN4kHr3U
-          +Y+LK2SGYUAvE44nv7sBbiLxDl580P00ouYTf6RJgW6gOuKpIGcvsTGA4+u0UTc+
-          y4pj6sT0+e3xj//Y4wbLdeJ6cfcNTU63jiHpKc9Rgo4Tcy97WeEryXWz93rtRh8d
-          pvQKHVDU/26EkNsPSsn9AHNgaa+iOA2glZ2EzZ8xoaMPrHgQhcxoi8maFzfM2dX2
-          XB1BOswa/46yqfzc4xAwaW0MLZLg3NffAgMBAAGjgacwgaQwHQYDVR0OBBYEFNRJ
-          PYFebixALIR2Ee+yFoSqurxqMHUGA1UdIwRuMGyAFNRJPYFebixALIR2Ee+yFoSq
-          urxqoUmkRzBFMQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8G
-          A1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkggkAxn+pF1FqaW4wDAYDVR0T
-          BAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAoPTwU2rm0ca5b8xMni3vpjYmB9NW
-          oSpGcWENbvu/p7NpiPAe143c5EPCuEHue/AbHWWxBzNAZvhVZBeFirYNB3HYnCla
-          jP4WI3o2Q0MpGy3kMYigEYG76WeZAM5ovl0qDP6fKuikZofeiygb8lPs7Hv4/88x
-          pSsZYBm7UPTS3Pl044oZfRJdqTpyHVPDqwiYD5KQcI0yHUE9v5KC0CnqOrU/83PE
-          b0lpHA8bE9gQTQjmIa8MIpaP3UNTxvmKfEQnk5UAZ5xY2at5mmyj3t8woGdzoL98
-          yDd2GtrGsguQXM2op+4LqEdHef57g7vwolZejJqN776Xu/lZtCTp01+HTA==
-          -----END CERTIFICATE-----
-        host: REPLACE_ME
-        password: REPLACE_ME
-        username: REPLACE_ME
-      password: turbulence-password
       private_key: |+
         -----BEGIN RSA PRIVATE KEY-----
         MIIEogIBAAKCAQEAvwFXXhFGwyAJEywO4lz8nQPukyUvUyJ2mi9TCcCEoX5FjmZV
@@ -114,18 +84,64 @@ instance_groups:
         WiOuGPj6duy7Tn75XhAiXtcpLsSCqy6dgTkaG9+47jfVf4Kz32yh8e3A8LsUnekA
         35JD5rJPjgZfec6c03uP62aUqUfa90HANh8EI98OBuWc6C4MeZ4=
         -----END RSA PRIVATE KEY-----
-    warden_cpi:
-      agent:
-        blobstore:
-          options:
-            endpoint: http://10.254.50.4:25251
-            password: agent-password
-            user: agent
-          provider: dav
-        mbus: nats://nats:nats-password@10.254.50.4:4222
-      warden:
-        connect_address: 10.254.50.4:7777
-        connect_network: tcp
+      ca: |+
+        -----BEGIN CERTIFICATE-----
+        MIIE9DCCAtygAwIBAgIBATANBgkqhkiG9w0BAQsFADAaMRgwFgYDVQQDEw90dXJi
+        dWxlbmNlQVBJQ0EwHhcNMTcwMzE2MTkwMDAwWhcNMjcwMzE2MTkwMDA2WjAaMRgw
+        FgYDVQQDEw90dXJidWxlbmNlQVBJQ0EwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAw
+        ggIKAoICAQDApIczHgYlFTocl48h8Xhf2Jsd33oIeZo8PGamEDdmYOO6uEXixKUL
+        v3eQ+eUEGMZB9/mxNE6eudQz7cYyjgiLSAOOOmGOw7YQqJBkLtM+JwUSJWawxu9o
+        v2yQwU5sAqOsl+K5k9Knwe1CGeYRa1IrfpIGeB5d2xF8NpRU0iP/FEdFFTOKEbSe
+        ezL7pydZ7GOFjRci9PXE6qIUZuaGgg/Xq2AGRuB8StX+uSlbZP23uVclKy4p+i4y
+        QHfodN5/UBlfWrVwTBFk8LsgC3ylHkp39sDXNsbjw2HtE7Cke2Eeq+2hahq8b5ub
+        a1hk2UphXxO5RmB6XFFRvYLERjosr9xLDr3vSiVf2JfZZJddmMznLM1cm+OHWJKZ
+        /5wO+ce1bN7Z1jy6u75XlKhZTPHS69LxDONHVBBgeZtD5XRjKqCFXkKyUI6SA+b3
+        oVXtzjlGT4limxTJ8N6GllOdsezN2OUCWT68T3LlAULZf9IlWJfrBFiUBOE5Gw6F
+        2nTwQr3ydNvbk3vPd8uegDWMv3o8bT/lEZJh+IH8ej9N1OpTRMoMUdtTO0cakizf
+        kX297USlUHKl9bPRx0tx38z6fwdsJgu0EhZ6HiSRxLvKcVP/JHofelByvTsBi3Pn
+        t6TrQiJQt/JmGjL37gycQfCq4YKfdh/+RtfvG++rOL1qyxSM+Z/96QIDAQABo0Uw
+        QzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQU
+        c10UM7akDSV7LqWGSEAxUvGK3/IwDQYJKoZIhvcNAQELBQADggIBAAdKqT/HZydf
+        Fyk67iN4QO+39lgIivhGdUq0Ny1RAjOJ8khzJqJB+nJhmiFQ1+AX5i4Idd12b28H
+        KcKtTbypcrnyKltqmBeoLH5k/YjUZO3RhDhli5457oeEecikxl5Gf5FpVYpmhIh+
+        jxxyykupgiUued/XO+qiu8kdNdjNz2Qiy8aV0ouL7BeQ/0I6Qqv87kzPxWYuIXO7
+        xvmNEvRItPTa7tOPngvyvptp+G+bkeZC7LMGMMba+GeOQeBBjCSQBsz9PcElEiNU
+        ovisJLMEPrFYrqxb4hh+P0ULA9U+hN6eXYIzFPscaaRLv+JD78YEzG/lChQWaTkN
+        LWN9KCbxLKAvN9CZZmrWe8Hs46bnFg5mQbgngLzTg5Hc5K1ol65ICyNDNQTyEhs4
+        yUxKzqbkgxR53wMidfS0NdiW2zh02EOJdKyB81BXkeFk0KM7jPoTExSaipINdeg0
+        Xnqj56GcgV38l9Ycv4qwJFVcOSh6GErzwVUxA0HvuKsuUU+NexfRGCZfK3kJPyEG
+        +Quy24VF2Js7DM2lH+0T6Ya0XAIsWhWs8uStX/mUH4MCejOYYATCV5veOlkMZVfr
+        k3Xz1dMGZXJS/gvJIMBepVnuxaNuOThJqcWXnx3sV9WBeEI3blxRq8KMPCEmpNZt
+        ZArE25wBgDjK7NQ60CZAD8zEKdIkmqv+
+        -----END CERTIFICATE-----
+    director:
+      ca_cert: |+
+        -----BEGIN CERTIFICATE-----
+        MIIDtzCCAp+gAwIBAgIJAMZ/qRdRamluMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+        BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+        aWRnaXRzIFB0eSBMdGQwIBcNMTYwODI2MjIzMzE5WhgPMjI5MDA2MTAyMjMzMTla
+        MEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJ
+        bnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+        ggEKAoIBAQDN/bv70wDn6APMqiJZV7ESZhUyGu8OzuaeEfb+64SNvQIIME0s9+i7
+        D9gKAZjtoC2Tr9bJBqsKdVhREd/X6ePTaopxL8shC9GxXmTqJ1+vKT6UxN4kHr3U
+        +Y+LK2SGYUAvE44nv7sBbiLxDl580P00ouYTf6RJgW6gOuKpIGcvsTGA4+u0UTc+
+        y4pj6sT0+e3xj//Y4wbLdeJ6cfcNTU63jiHpKc9Rgo4Tcy97WeEryXWz93rtRh8d
+        pvQKHVDU/26EkNsPSsn9AHNgaa+iOA2glZ2EzZ8xoaMPrHgQhcxoi8maFzfM2dX2
+        XB1BOswa/46yqfzc4xAwaW0MLZLg3NffAgMBAAGjgacwgaQwHQYDVR0OBBYEFNRJ
+        PYFebixALIR2Ee+yFoSqurxqMHUGA1UdIwRuMGyAFNRJPYFebixALIR2Ee+yFoSq
+        urxqoUmkRzBFMQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8G
+        A1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkggkAxn+pF1FqaW4wDAYDVR0T
+        BAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAoPTwU2rm0ca5b8xMni3vpjYmB9NW
+        oSpGcWENbvu/p7NpiPAe143c5EPCuEHue/AbHWWxBzNAZvhVZBeFirYNB3HYnCla
+        jP4WI3o2Q0MpGy3kMYigEYG76WeZAM5ovl0qDP6fKuikZofeiygb8lPs7Hv4/88x
+        pSsZYBm7UPTS3Pl044oZfRJdqTpyHVPDqwiYD5KQcI0yHUE9v5KC0CnqOrU/83PE
+        b0lpHA8bE9gQTQjmIa8MIpaP3UNTxvmKfEQnk5UAZ5xY2at5mmyj3t8woGdzoL98
+        yDd2GtrGsguQXM2op+4LqEdHef57g7vwolZejJqN776Xu/lZtCTp01+HTA==
+        -----END CERTIFICATE-----
+      host: REPLACE_ME
+      client: REPLACE_ME
+      client_secret: REPLACE_ME
+    password: turbulence-password
 
 update:
   canaries: 1
