@@ -1,5 +1,8 @@
-director_uuid: some-director-uuid
-name: some-manifest-name
+package consul
+
+const manifestV2 = `
+director_uuid: REPLACE_ME
+name: REPLACE_ME
 
 stemcells:
 - alias: default
@@ -13,9 +16,7 @@ releases:
 instance_groups:
 - name: consul
   instances: 1
-  azs:
-  - z1
-  - z2
+  azs: []
   jobs:
   - name: consul_agent
     release: consul
@@ -186,9 +187,7 @@ instance_groups:
         -----END RSA PRIVATE KEY-----
 - name: testconsumer
   instances: 1
-  azs:
-  - z1
-  - z2
+  azs: []
   jobs:
   - name: consul_agent
     release: consul
@@ -208,3 +207,4 @@ update:
   max_in_flight: 1
   serial: true
   update_watch_time: 1000-180000
+`
