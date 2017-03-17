@@ -1,4 +1,4 @@
-package turbulencewithops
+package turbulence
 
 import "github.com/pivotal-cf-experimental/destiny/ops"
 

@@ -1,4 +1,4 @@
-package turbulencewithops
+package turbulence
 
 const manifestV2 = `
 director_uuid: REPLACE_ME

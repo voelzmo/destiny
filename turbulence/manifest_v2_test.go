@@ -1,9 +1,9 @@
-package turbulencewithops_test
+package turbulence_test
 
 import (
 	"io/ioutil"
 
-	"github.com/pivotal-cf-experimental/destiny/turbulencewithops"
+	"github.com/pivotal-cf-experimental/destiny/turbulence"
 	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
@@ -16,7 +16,7 @@ var _ = Describe("ManifestV2", func() {
 			turbulenceManifest, err := ioutil.ReadFile("fixtures/turbulence_manifest_v2.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest, err := turbulencewithops.NewManifestV2(turbulencewithops.ConfigV2{
+			manifest, err := turbulence.NewManifestV2(turbulence.ConfigV2{
 				DirectorUUID:     "some-director-uuid",
 				Name:             "turbulence",
 				AZs:              []string{"z1"},
