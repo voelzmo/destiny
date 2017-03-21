@@ -3,9 +3,8 @@ package consul
 import "github.com/pivotal-cf-experimental/destiny/core"
 
 type ConfigV2 struct {
-	DirectorUUID string
-	Name         string
-	AZs          []string
+	Name string
+	AZs  []string
 }
 
 // TODO: Delete everything below once etcd has been refactored to use V2 manifests

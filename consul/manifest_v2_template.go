@@ -1,7 +1,6 @@
 package consul
 
 const manifestV2 = `
-director_uuid: REPLACE_ME
 name: REPLACE_ME
 
 stemcells:

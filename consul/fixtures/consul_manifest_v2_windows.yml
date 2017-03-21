@@ -4,6 +4,9 @@ stemcells:
 - alias: default
   os: ubuntu-trusty
   version: latest
+- alias: windows
+  os: windows2012R2
+  version: latest
 
 releases:
 - name: consul
@@ -189,14 +192,14 @@ instance_groups:
   - z1
   - z2
   jobs:
-  - name: consul_agent
+  - name: consul_agent_windows
     release: consul
     consumes:
       consul: { from: consul_server }
-  - name: consul-test-consumer
+  - name: consul-test-consumer-windows
     release: consul
   vm_type: default
-  stemcell: default
+  stemcell: windows
   persistent_disk_type: 1GB
   networks:
   - name: private

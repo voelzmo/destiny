@@ -10,9 +10,24 @@ type Op struct {
 
 func NewManifestV2(config ConfigV2) (string, error) {
 	return ops.ApplyOps(manifestV2, []ops.Op{
-		{"replace", "/director_uuid", config.DirectorUUID},
 		{"replace", "/name", config.Name},
 		{"replace", "/instance_groups/name=consul/azs", config.AZs},
 		{"replace", "/instance_groups/name=testconsumer/azs", config.AZs},
+	})
+}
+
+func NewManifestV2Windows(config ConfigV2) (string, error) {
+	return ops.ApplyOps(manifestV2, []ops.Op{
+		{"replace", "/name", config.Name},
+		{"replace", "/instance_groups/name=consul/azs", config.AZs},
+		{"replace", "/instance_groups/name=testconsumer/azs", config.AZs},
+		{"replace", "/stemcells/-", map[string]string{
+			"alias":   "windows",
+			"os":      "windows2012R2",
+			"version": "latest",
+		}},
+		{"replace", "/instance_groups/name=testconsumer/jobs/name=consul_agent/name", "consul_agent_windows"},
+		{"replace", "/instance_groups/name=testconsumer/jobs/name=consul-test-consumer/name", "consul-test-consumer-windows"},
+		{"replace", "/instance_groups/name=testconsumer/stemcell", "windows"},
 	})
 }
