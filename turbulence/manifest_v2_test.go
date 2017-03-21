@@ -17,7 +17,6 @@ var _ = Describe("ManifestV2", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			manifest, err := turbulence.NewManifestV2(turbulence.ConfigV2{
-				DirectorUUID:     "some-director-uuid",
 				Name:             "turbulence",
 				AZs:              []string{"z1"},
 				DirectorHost:     "some-director-host",

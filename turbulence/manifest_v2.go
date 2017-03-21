@@ -10,7 +10,6 @@ type Op struct {
 
 func NewManifestV2(config ConfigV2) (string, error) {
 	return ops.ApplyOps(manifestV2, []ops.Op{
-		{"replace", "/director_uuid", config.DirectorUUID},
 		{"replace", "/name", config.Name},
 		{"replace", "/instance_groups/name=api/azs", config.AZs},
 		{"replace", "/instance_groups/name=api/properties/director/host", config.DirectorHost},
