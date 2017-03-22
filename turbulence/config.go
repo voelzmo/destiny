@@ -6,4 +6,5 @@ type ConfigV2 struct {
 	DirectorHost     string
 	DirectorUsername string
 	DirectorPassword string
+	DirectorCACert   string
 }

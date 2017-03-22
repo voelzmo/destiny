@@ -22,6 +22,7 @@ var _ = Describe("ManifestV2", func() {
 				DirectorHost:     "some-director-host",
 				DirectorUsername: "some-director-user",
 				DirectorPassword: "some-director-password",
+				DirectorCACert:   "some-director-ca-cert",
 			})
 			Expect(err).NotTo(HaveOccurred())
 

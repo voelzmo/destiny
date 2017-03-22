@@ -15,5 +15,6 @@ func NewManifestV2(config ConfigV2) (string, error) {
 		{"replace", "/instance_groups/name=api/properties/director/host", config.DirectorHost},
 		{"replace", "/instance_groups/name=api/properties/director/client", config.DirectorUsername},
 		{"replace", "/instance_groups/name=api/properties/director/client_secret", config.DirectorPassword},
+		{"replace", "/instance_groups/name=api/properties/director/ca_cert", config.DirectorCACert},
 	})
 }
