@@ -28,6 +28,7 @@ func NewManifestV2Windows(config ConfigV2) (string, error) {
 		}},
 		{"replace", "/instance_groups/name=testconsumer/jobs/name=consul_agent/name", "consul_agent_windows"},
 		{"replace", "/instance_groups/name=testconsumer/jobs/name=consul-test-consumer/name", "consul-test-consumer-windows"},
+		{"replace", "/instance_groups/name=testconsumer/vm_extensions?", []string{"50GB_ephemeral_disk"}},
 		{"replace", "/instance_groups/name=testconsumer/stemcell", "windows"},
 	})
 }

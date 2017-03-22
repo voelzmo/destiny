@@ -199,6 +199,8 @@ instance_groups:
   - name: consul-test-consumer-windows
     release: consul
   vm_type: default
+  vm_extensions:
+  - 50GB_ephemeral_disk
   stemcell: windows
   persistent_disk_type: 1GB
   networks:
