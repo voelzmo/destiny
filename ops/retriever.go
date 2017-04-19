@@ -9,6 +9,7 @@ import (
 type InstanceGroup struct {
 	Name      string
 	Instances int
+	Lifecycle string
 }
 
 func ManifestName(manifest string) (string, error) {

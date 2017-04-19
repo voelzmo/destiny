@@ -42,20 +42,31 @@ instance_groups:
 - name: etcd
   instances: 3
 - name: testconsumer
-  instances: 1`)
+  instances: 1
+- name: some-errand
+  instances: 1
+  lifecycle: errand`)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(instanceGroups).To(Equal([]ops.InstanceGroup{
 				{
 					Name:      "consul",
 					Instances: 1,
+					Lifecycle: "",
 				},
 				{
 					Name:      "etcd",
 					Instances: 3,
+					Lifecycle: "",
 				},
 				{
 					Name:      "testconsumer",
 					Instances: 1,
+					Lifecycle: "",
+				},
+				{
+					Name:      "some-errand",
+					Instances: 1,
+					Lifecycle: "errand",
 				},
 			}))
 		})
