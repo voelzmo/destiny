@@ -2,10 +2,13 @@ package turbulence
 
 import "github.com/pivotal-cf-experimental/destiny/ops"
 
-type Op struct {
-	Type  string      `yaml:"type"`
-	Path  string      `yaml:"path"`
-	Value interface{} `yaml:"value"`
+type ConfigV2 struct {
+	Name             string
+	AZs              []string
+	DirectorHost     string
+	DirectorUsername string
+	DirectorPassword string
+	DirectorCACert   string
 }
 
 func NewManifestV2(config ConfigV2) (string, error) {

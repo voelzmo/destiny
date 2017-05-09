@@ -2,6 +2,11 @@ package consul
 
 import "github.com/pivotal-cf-experimental/destiny/ops"
 
+type ConfigV2 struct {
+	Name string
+	AZs  []string
+}
+
 func NewManifestV2(config ConfigV2) (string, error) {
 	return ops.ApplyOps(manifestV2, []ops.Op{
 		{"replace", "/name", config.Name},
