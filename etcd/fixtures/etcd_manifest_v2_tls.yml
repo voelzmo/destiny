@@ -26,9 +26,9 @@ instance_groups:
       consul_client: { from: client_link }
       consul: nil
     provides:
-      consul_common: { from: common_link }
-      consul_server: { from: server_link }
-      consul_client: { from: client_link }
+      consul_common: { as: common_link }
+      consul_server: { as: server_link }
+      consul_client: { as: client_link }
   vm_type: default
   stemcell: default
   persistent_disk_type: 1GB
