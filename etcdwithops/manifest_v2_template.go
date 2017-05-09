@@ -84,9 +84,14 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: { from: consul_server }
+      consul_common: { from: common_link }
+      consul_server: { from: server_link }
+      consul_client: { from: client_link }
+      consul: nil
     provides:
-      consul: { as: consul_server }
+      consul_common: { from: common_link }
+      consul_server: { from: server_link }
+      consul_client: { from: client_link }
   vm_type: default
   stemcell: default
   persistent_disk_type: 1GB
@@ -247,7 +252,10 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: { from: consul_server }
+      consul_common: { from: common_link }
+      consul_server: nil
+      consul_client: { from: client_link }
+      consul: nil
   - name: etcd
     release: etcd
     consumes:
@@ -505,7 +513,10 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: { from: consul_server }
+      consul_common: { from: common_link }
+      consul_server: nil
+      consul_client: { from: client_link }
+      consul: nil
   - name: etcd_testconsumer
     release: etcd
     consumes:
