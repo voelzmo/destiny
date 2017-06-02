@@ -87,7 +87,6 @@ instance_groups:
       consul_common: { from: common_link }
       consul_server: { from: server_link }
       consul_client: { from: client_link }
-      consul: nil
     provides:
       consul_common: { as: common_link }
       consul_server: { as: server_link }
@@ -255,7 +254,6 @@ instance_groups:
       consul_common: { from: common_link }
       consul_server: nil
       consul_client: { from: client_link }
-      consul: nil
   - name: etcd
     release: etcd
     consumes:
@@ -516,7 +514,6 @@ instance_groups:
       consul_common: { from: common_link }
       consul_server: nil
       consul_client: { from: client_link }
-      consul: nil
   - name: etcd_testconsumer
     release: etcd
     consumes:
