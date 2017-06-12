@@ -208,6 +208,7 @@ instance_groups:
         services:
           etcd: {}
     etcd:
+      enable_debug_logging: true
       advertise_urls_dns_suffix: etcd.service.cf.internal
       cluster:
       - instances: 3

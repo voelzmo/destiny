@@ -33,6 +33,7 @@ instance_groups:
   - name: private
   properties:
     etcd:
+      enable_debug_logging: true
       heartbeat_interval_in_milliseconds: 50
       peer_require_ssl: false
       require_ssl: false
@@ -271,6 +272,7 @@ instance_groups:
         services:
           etcd: {}
     etcd:
+      enable_debug_logging: true
       advertise_urls_dns_suffix: etcd.service.cf.internal
       cluster:
       - instances: 3
