@@ -26,7 +26,7 @@ instance_groups:
       etcd: { from: etcd_server }
     provides:
       etcd: { as: etcd_server }
-  vm_type: default
+  vm_type: large
   stemcell: default
   persistent_disk_type: 1GB
   networks:
@@ -261,7 +261,7 @@ instance_groups:
       etcd: { from: etcd_server }
     provides:
       etcd: { as: etcd_server }
-  vm_type: default
+  vm_type: large
   stemcell: default
   persistent_disk_type: 1GB
   networks:
