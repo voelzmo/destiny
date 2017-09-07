@@ -111,7 +111,8 @@ instance_groups:
         ZArE25wBgDjK7NQ60CZAD8zEKdIkmqv+
         -----END CERTIFICATE-----
     director:
-      ca_cert: some-director-ca-cert
+      cert:
+        ca: some-director-ca-cert
       host: some-director-host
       client: some-director-user
       client_secret: some-director-password
