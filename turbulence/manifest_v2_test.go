@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 
 	"github.com/pivotal-cf-experimental/destiny/turbulence"
-	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,7 +25,7 @@ var _ = Describe("ManifestV2", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(manifest).To(gomegamatchers.MatchYAML(turbulenceManifest))
+			Expect(manifest).To(MatchYAML(turbulenceManifest))
 		})
 	})
 })

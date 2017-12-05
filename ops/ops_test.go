@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/pivotal-cf-experimental/destiny/ops"
-	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -35,7 +34,7 @@ favorite_color: blue`
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(modifiedManifest).To(gomegamatchers.MatchYAML(`
+			Expect(modifiedManifest).To(MatchYAML(`
 ---
 favorite_color: blue`))
 		})
@@ -61,7 +60,7 @@ favorite_color: blue`
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(modifiedManifest).To(gomegamatchers.MatchYAML(`
+			Expect(modifiedManifest).To(MatchYAML(`
 ---
 name: some-changed-name
 favorite_color: red`))

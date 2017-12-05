@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 
 	"github.com/pivotal-cf-experimental/destiny/consul"
-	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +21,7 @@ var _ = Describe("ManifestV2", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(manifest).To(gomegamatchers.MatchYAML(consulManifest))
+			Expect(manifest).To(MatchYAML(consulManifest))
 		})
 	})
 
@@ -37,7 +36,7 @@ var _ = Describe("ManifestV2", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(manifest).To(gomegamatchers.MatchYAML(consulManifest))
+			Expect(manifest).To(MatchYAML(consulManifest))
 		})
 	})
 })

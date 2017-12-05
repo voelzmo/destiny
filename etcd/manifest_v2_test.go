@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 
 	"github.com/pivotal-cf-experimental/destiny/etcd"
-	"github.com/pivotal-cf-experimental/gomegamatchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +23,7 @@ var _ = Describe("ManifestV2", func() {
 				})
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(manifest).To(gomegamatchers.MatchYAML(etcdManifest))
+				Expect(manifest).To(MatchYAML(etcdManifest))
 			})
 		})
 
@@ -40,7 +39,7 @@ var _ = Describe("ManifestV2", func() {
 				})
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(manifest).To(gomegamatchers.MatchYAML(etcdManifest))
+				Expect(manifest).To(MatchYAML(etcdManifest))
 			})
 		})
 	})
