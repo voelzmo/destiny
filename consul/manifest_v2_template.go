@@ -5,7 +5,7 @@ name: REPLACE_ME
 
 stemcells:
 - alias: default
-  os: ubuntu-trusty
+  os: ubuntu-xenial
   version: latest
 
 releases:
