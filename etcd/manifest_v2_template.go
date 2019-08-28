@@ -30,7 +30,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
   properties:
     etcd:
       enable_debug_logging: true
@@ -52,7 +52,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
 
 update:
   canaries: 1
@@ -96,7 +96,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
   properties:
     consul:
       agent:
@@ -265,7 +265,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
   properties:
     consul:
       agent:
@@ -524,7 +524,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
 
 update:
   canaries: 1

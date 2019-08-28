@@ -27,7 +27,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
   properties:
     consul:
       server:
@@ -65,7 +65,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
   properties:
     consul:
       encrypt_keys:

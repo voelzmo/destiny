@@ -25,7 +25,7 @@ instance_groups:
   stemcell: default
   persistent_disk_type: 1GB
   networks:
-  - name: private
+  - name: default
   properties:
     advertised_host: turbulence.local
     cert:
