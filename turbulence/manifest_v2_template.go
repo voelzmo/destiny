@@ -23,7 +23,7 @@ instance_groups:
       api: {shared: true}
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
   properties:

@@ -25,7 +25,7 @@ instance_groups:
       consul_common: { as: common_link }
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
   properties:
@@ -63,7 +63,7 @@ instance_groups:
     release: consul
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
   properties:

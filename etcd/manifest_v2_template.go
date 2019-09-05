@@ -28,7 +28,7 @@ instance_groups:
       etcd: { as: etcd_server }
   vm_type: large
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
   properties:
@@ -50,7 +50,7 @@ instance_groups:
       etcd: { from: etcd_server }
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
 
@@ -94,7 +94,7 @@ instance_groups:
       consul_client: { as: client_link }
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
   properties:
@@ -263,7 +263,7 @@ instance_groups:
       etcd: { as: etcd_server }
   vm_type: large
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
   properties:
@@ -522,7 +522,7 @@ instance_groups:
       etcd: { from: etcd_server }
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: default
 

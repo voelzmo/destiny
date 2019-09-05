@@ -31,7 +31,7 @@ instance_groups:
       consul_client: { as: client_link }
   vm_type: default
   stemcell: default
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: private
   properties:
@@ -208,7 +208,7 @@ instance_groups:
   vm_extensions:
   - 50GB_ephemeral_disk
   stemcell: windows
-  persistent_disk_type: 1GB
+  persistent_disk_type: default
   networks:
   - name: private
 
